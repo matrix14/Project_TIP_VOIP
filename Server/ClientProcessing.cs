@@ -1,8 +1,8 @@
 ﻿using DbLibrary;
-using Newtonsoft.Json;
 using Shared;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Server
 {
@@ -27,6 +27,10 @@ namespace Server
         public Dictionary<int, Invitation> invitations;
         public DbMethods dbMethods;
 
+
+        private Dictionary<string,EventWaitHandle> eventHandlers;
+        private Dictionary<int, EventWaitHandle> userLoginHandler;
+
         /// <summary>
         /// Function that takes message from client procces it and return server response
         /// </summary>
@@ -47,6 +51,8 @@ namespace Server
         {
             List<string> res = new List<string>();
             string item;
+            if (!activeUsers[clientId].logged) userLoginHandler[clientId].WaitOne();
+            eventHandlers[activeUsers[clientId].userName].WaitOne();
             foreach(var function in asyncFunctions.Keys)
             {
                 item = asyncFunctions[function](clientId);
@@ -63,13 +69,16 @@ namespace Server
 
         public string CreateUser(string msg, int clientId)
         {
+            // Get message as object
             Login login = MessageProccesing.DeserializeObject(msg) as Login;
 
+            // Check if user doesnt already exists in DB
             DbMethods dbConnection = new DbMethods();
             lock (activeUsers[clientId]) { dbConnection = activeUsers[clientId].dbConnection; }
             if (dbConnection.CheckIfNameExist(login.username))
                 return MessageProccesing.CreateMessage(ErrorCodes.USER_ALREADY_EXISTS, Options.CREATE_USER);
 
+            // Hash password
             login.passwordHash = Security.HashPassword(login.passwordHash);
             if (dbConnection.AddNewUser(login.username, login.passwordHash)) return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR, Options.CREATE_USER);
             else return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR, Options.CREATE_USER);
@@ -77,17 +86,22 @@ namespace Server
 
         public string Login(string msg, int clientId)
         {
+            // Get message as object
             Login login = MessageProccesing.DeserializeObject(msg) as Login;
-            string passwordHash = "";
+
+            // Get password hash from DB
+            string passwordHash;
             DbMethods dbConnection = new DbMethods();
             lock (activeUsers[clientId]) { dbConnection = activeUsers[clientId].dbConnection; }
             try { passwordHash = dbConnection.GetFromUser("password_hash", login.username); }
             catch { return MessageProccesing.CreateMessage(ErrorCodes.USER_NOT_FOUND, Options.LOGIN); }
 
+            // Verify password
             if (Security.VerifyPassword(passwordHash, login.passwordHash))
             {
                 lock (activeUsers)
                 {
+                    // Check if user isnt already logged in
                     foreach (User u in activeUsers)
                     {
                         if (u != null)
@@ -98,10 +112,15 @@ namespace Server
                             }
                         }
                     }
-                    activeUsers[clientId].logged = true;
+                    // If user isnt already logged in, add data to activeUsers
                     activeUsers[clientId].userName = login.username;
+                    activeUsers[clientId].logged = true;
                     activeUsers[clientId].userId = dbConnection.GetUserId(login.username);
                 }
+                // Start async thread
+                eventHandlers[activeUsers[clientId].userName] = new EventWaitHandle(false, EventResetMode.ManualReset);
+                userLoginHandler[clientId].Set();
+
                 return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR, Options.LOGIN);
             }
             else return MessageProccesing.CreateMessage(ErrorCodes.INCORRECT_PASSWORD, Options.LOGIN);
@@ -109,6 +128,7 @@ namespace Server
 
         public string CheckUserName(string msg, int clientId)
         {
+            // Get message as object
             Username username = MessageProccesing.DeserializeObject(msg) as Username;
             DbMethods dbConnection = new DbMethods();
             lock (activeUsers[clientId]) { dbConnection = activeUsers[clientId].dbConnection; }
@@ -163,12 +183,6 @@ namespace Server
             throw new NotImplementedException();
         }
 
-        public string Disconnect(string msg, int clientId)
-        {
-            throw new NotImplementedException();
-        }
-
-
 
         public ClientProcessing()
         {
@@ -178,7 +192,6 @@ namespace Server
             syncFunctions.Add(Options.LOGIN, new Functions(Login));
             syncFunctions.Add(Options.CREATE_USER, new Functions(CreateUser));
             syncFunctions.Add(Options.CHECK_USER_NAME, new Functions(CheckUserName));
-            syncFunctions.Add(Options.DISCONNECT, new Functions(Disconnect));
             syncFunctions.Add(Options.GET_FRIENDS, new Functions(GetFriends));
             syncFunctions.Add(Options.DELETE_ACCOUNT, new Functions(DeleteAccount));
             syncFunctions.Add(Options.ADD_FRIEND, new Functions(AddFriend));
@@ -193,6 +206,8 @@ namespace Server
 
             dbMethods = new DbMethods();
             activeUsers = new List<User>();
+            eventHandlers = new Dictionary<string, EventWaitHandle>();
+            userLoginHandler = new Dictionary<int, EventWaitHandle>();
             //invitations = dbMethods.GetInvitations();
         }
 
@@ -207,7 +222,16 @@ namespace Server
                 }
             }
             activeUsers.Add(new User());
+            userLoginHandler.Add(activeUsers.Count - 1, new EventWaitHandle(false, EventResetMode.ManualReset));
             return activeUsers.Count - 1;
         }
+
+        public void Disconnect(int clientId)
+        {
+            userLoginHandler[clientId].Set();
+            eventHandlers[activeUsers[clientId].userName].Set();
+        }
+
+
     }
 }

@@ -61,22 +61,14 @@ namespace Server
                     //Prepare response
                     sendMessage = menager.ProccesClient(messageData.ToString(), clientId);
 
-                    //Disconnection
-                    if (sendMessage == "")
-                    {
-                        message = Encoding.ASCII.GetBytes("Error:0$$");
-                        stream.Write(message);
-                        tokenSource.Cancel();
-                        Thread.Sleep(1000);
-                        break;
-                    }
-
                     message = Encoding.ASCII.GetBytes(sendMessage);
                     //Send response
                     stream.Write(message);
                 }
                 catch (Exception e)
                 {
+                    tokenSource.Cancel();
+                    menager.Disconnect(clientId);
                     Console.WriteLine(e.Message);
                     break;
                 }
@@ -104,7 +96,6 @@ namespace Server
                         stream.Write(send);
                     }
                     messagesToSend.Clear();
-                    Thread.Sleep(80);
                 }
             }
             catch (Exception e)

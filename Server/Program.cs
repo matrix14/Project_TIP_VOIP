@@ -2,18 +2,29 @@
 using Shared;
 namespace Server
 {
+    public delegate void Notify();
     class Program
     {
+        public static event Notify ProcessCompleted;
         static void Main(string[] args)
         {
-            var x = Shared.MessageProccesing.CreateMessage(Shared.Options.DISCONNECT);
-            Console.WriteLine(x);
-            var y = Shared.MessageProccesing.CreateMessage(Shared.ErrorCodes.ADDING_FRIENDS_ERROR);
-            Console.WriteLine(y);
-            var z = Shared.MessageProccesing.CreateMessage<Shared.Login>(Shared.Options.LOGIN, new Shared.Login("ale", "jest"));
-            Console.WriteLine(z);
-            Login k = Shared.MessageProccesing.DeserializeObject(z) as Login;
-            Console.WriteLine(k.passwordHash);
+            Work();
+            OnProcessCompleted();
+        }
+
+        protected static void OnProcessCompleted() //protected virtual method
+        {
+            ProcessCompleted?.Invoke();
+        }
+
+        public static void Work()
+        {
+            ProcessCompleted += Program_ProcessCompleted;
+        }
+
+        private static void Program_ProcessCompleted()
+        {
+            Console.WriteLine("Process Completed!");
         }
     }
 }

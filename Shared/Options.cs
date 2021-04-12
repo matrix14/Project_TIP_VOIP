@@ -8,12 +8,11 @@ namespace Shared
         LOGIN = 1,                          //  Data:<JSONLogin>                                            Error:<>$$
         CREATE_USER = 2,                    //  Data:<JSONLogin>                                            Error:<>$$
         CHECK_USER_NAME = 3,                //  Data:<JSONUsername>                                         Error:<>$$
-        DISCONNECT = 4,                     //                                                              Error:<>$$
-        GET_FRIENDS = 5,                    //                                                              Error:<>$$Data:<JSONFriend>$$       
-        DELETE_ACCOUNT = 6,                 //                                                              Error:<>$$
-        ADD_FRIEND = 7,                     //  Data:<JSONUsername>                                         Error:<>$$
-        ACCEPT_FRIEND = 8,                  //  Data:<JSONInvitation>                                       Error:<>$$
-        DECLINE_FRIEND = 9,                 //  Data:<JSONInvitation>                                       Error:<>$$
+        GET_FRIENDS = 4,                    //                                                              Error:<>$$Data:<JSONFriend>$$       
+        DELETE_ACCOUNT = 5,                 //                                                              Error:<>$$
+        ADD_FRIEND = 6,                     //  Data:<JSONUsername>                                         Error:<>$$
+        ACCEPT_FRIEND = 7,                  //  Data:<JSONInvitation>                                       Error:<>$$
+        DECLINE_FRIEND = 8,                 //  Data:<JSONInvitation>                                       Error:<>$$
 
 
 
