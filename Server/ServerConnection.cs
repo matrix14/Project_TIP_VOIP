@@ -38,7 +38,9 @@ namespace Server
             TcpClient client = obj as TcpClient;
             NetworkStream stream = client.GetStream();
             int clientId = menager.AddActiveUser();
+            #pragma warning disable CS4014 
             Task.Run(() => ServerMessages(clientId, stream,token),token);
+            #pragma warning restore CS4014 
             byte[] message;
             Decoder decoder = Encoding.ASCII.GetDecoder();
             while (true)

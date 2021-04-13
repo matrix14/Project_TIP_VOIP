@@ -20,6 +20,7 @@ namespace Shared
         WRONG_INVATATION_ID = 11,
         SELF_INVITE_ERROR = 12,
         DELETING_ACCOUNT_ERROR = 13,
-        DISCONNECT_ERROR = 14,
+        INVITATION_ALREADY_EXIST = 14,
+        INVITATION_ALREADY_ACCEPTED = 15,
     }
 }

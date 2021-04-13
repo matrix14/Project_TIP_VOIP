@@ -16,5 +16,7 @@ namespace Shared
         {
             ;
         }
+
+        public static implicit operator string(Username i) => i.username;
     }
 }

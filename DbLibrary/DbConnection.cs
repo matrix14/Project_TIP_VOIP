@@ -12,7 +12,7 @@ namespace DbLibrary
         public DbConnection()
         {
             server = "10.8.0.1";
-            database = "projekt_pt";
+            database = "projekt_tip_kacper";
             uid = "user_io";
             password = "DN8OHj8mUkNmXBRm";
             string connectionString;
