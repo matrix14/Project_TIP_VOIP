@@ -15,22 +15,36 @@ namespace ClientWindows
             Login login = new Login(username, pass);
             ServerConnectorSync serverConn = new ServerConnectorSync();
             String reply = serverConn.sendMessageAndGetReply(MessageProccesing.CreateMessage(Options.LOGIN, login));
-            string title = "Login reply";
-            MessageBoxButtons buttons = MessageBoxButtons.OK;
-            MessageBox.Show(reply, title, buttons);
-            /*
-            if(username.Length>3&&pass.Length>3) //TODO: change it
-            {
-                string msg = "You did not enter a server name. Cancel this operation?"+username+" "+pass;
-                string title = "Wrong data!";
-                MessageBoxButtons buttons = MessageBoxButtons.OK;
-                MessageBox.Show(msg, title, buttons);
-            } else
-            {
-                return;
-            }
-            */
 
+            String[] replySplit = reply.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            string title = "Login";
+            String msg = "";
+            switch(error)
+            {
+                case ErrorCodes.NO_ERROR:
+                    msg = "Succesful login!";
+                    title = "Login";
+                    MessageBox.Show(msg, title, buttons);
+                    break;
+                case ErrorCodes.USER_NOT_FOUND:
+                    msg = "User not found!";
+                    title = "Login";
+                    MessageBox.Show(msg, title, buttons);
+                    break;
+                case ErrorCodes.INCORRECT_PASSWORD:
+                    msg = "Incorrect password!";
+                    title = "Login";
+                    MessageBox.Show(msg, title, buttons);
+                    break;
+                case ErrorCodes.USER_ALREADY_LOGGED_IN:
+                    msg = "User already logged in!";
+                    title = "Login";
+                    MessageBox.Show(msg, title, buttons);
+                    break;
+
+            }
         }
 
         public static void register(String username, String pass)
@@ -38,9 +52,26 @@ namespace ClientWindows
             Login login = new Login(username, pass);
             ServerConnectorSync serverConn = new ServerConnectorSync();
             String reply = serverConn.sendMessageAndGetReply(MessageProccesing.CreateMessage(Options.CREATE_USER, login));
-            string title = "Register reply";
+
+            String[] replySplit = reply.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+            
             MessageBoxButtons buttons = MessageBoxButtons.OK;
-            MessageBox.Show(reply, title, buttons);
+            string title = "Login";
+            String msg = "";
+            switch (error)
+            {
+                case ErrorCodes.NO_ERROR:
+                    msg = "Succesful register!";
+                    title = "Register";
+                    MessageBox.Show(msg, title, buttons);
+                    break;
+                case ErrorCodes.USER_ALREADY_EXISTS:
+                    msg = "User already exists!";
+                    title = "Register";
+                    MessageBox.Show(msg, title, buttons);
+                    break;
+            }
         }
     }
 }
