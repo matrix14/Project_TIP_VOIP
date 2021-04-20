@@ -12,6 +12,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{C8ED32C1-27B2-4A86-9F73-C715D97EDC22}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientWindows", "ClientWindows\ClientWindows.csproj", "{05573BF6-95AD-4AD1-BF5D-C595527D690D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C8ED32C1-27B2-4A86-9F73-C715D97EDC22} = {C8ED32C1-27B2-4A86-9F73-C715D97EDC22}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
