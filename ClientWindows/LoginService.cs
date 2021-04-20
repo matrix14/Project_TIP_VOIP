@@ -13,7 +13,7 @@ namespace ClientWindows
         public static void login(String username, String pass)
         {
             Login login = new Login(username, pass);
-            ServerConnectorSync serverConn = new ServerConnectorSync();
+            ServerConnectorAsync serverConn = new ServerConnectorAsync();
             String reply = serverConn.sendMessageAndGetReply(MessageProccesing.CreateMessage(Options.LOGIN, login));
 
             String[] replySplit = reply.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
@@ -50,7 +50,7 @@ namespace ClientWindows
         public static void register(String username, String pass)
         {
             Login login = new Login(username, pass);
-            ServerConnectorSync serverConn = new ServerConnectorSync();
+            ServerConnectorAsync serverConn = new ServerConnectorAsync();
             String reply = serverConn.sendMessageAndGetReply(MessageProccesing.CreateMessage(Options.CREATE_USER, login));
 
             String[] replySplit = reply.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);

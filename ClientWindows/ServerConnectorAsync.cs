@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ClientWindows
 {
-    class ServerConnectorSync
+    class ServerConnectorAsync
     {
         private const Int32 MAX_BUFFER_SIZE = 1024;
 
@@ -17,9 +17,9 @@ namespace ClientWindows
         private NetworkStream stream = null;
 
 
-        public ServerConnectorSync() { }
+        public ServerConnectorAsync() { }
 
-        public ServerConnectorSync(String address, Int32 port)
+        public ServerConnectorAsync(String address, Int32 port)
         {
             this.address = address;
             this.port = port;
@@ -31,6 +31,7 @@ namespace ClientWindows
             {
                 this.tcpclient = new TcpClient(this.address, this.port);
                 this.stream = tcpclient.GetStream();
+                
             } catch(System.Net.Sockets.SocketException) {
                 return;
             }
