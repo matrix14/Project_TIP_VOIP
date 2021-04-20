@@ -27,7 +27,7 @@ namespace Server
 
         /// <summary>
         /// <para> Key: <c>username</c> </para> 
-        /// <para> Value: <c>List(option,senderId)</c> </para>
+        /// <para> Value: <c>List(option,senderUsername)</c> </para>
         /// </summary>
         private Dictionary<string, List<Tuple<Options,string>>> whichFunction;
 
@@ -92,7 +92,18 @@ namespace Server
 
         public string Logout(string msg, int clientId)
         {
-            throw new NotImplementedException();
+            lock (userLoginHandler) userLoginHandler[clientId].Reset();
+            lock (activeUsers[clientId]) activeUsers[clientId].logged = false;
+            lock (eventHandlers) eventHandlers[activeUsers[clientId].username].Reset();
+
+
+            lock (activeUsers)
+            {
+                activeUsers[clientId].userId = -1;
+                activeUsers[clientId].username = null;
+            }
+
+            return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
 
         public string CreateUser(string msg, int clientId)
@@ -225,6 +236,7 @@ namespace Server
                 invitations[ei.invitationId] = ei;
             }
 
+            // Add invite to invitor list of invitations ids
             try
             {
                 userInvitationsIds[activeUsers[clientId].userId].Add(ei.invitationId);
@@ -233,6 +245,7 @@ namespace Server
             {
                 userInvitationsIds[activeUsers[clientId].userId] = new List<int> { ei.invitationId };
             }
+            // Add invite to invitee list of invitations ids
             try
             {
                 userInvitationsIds[activeUsers[clientId].dbConnection.GetUserId(inviteeUsername)].Add(ei.invitationId);
@@ -278,14 +291,15 @@ namespace Server
             lock (invitations[invitationId]) invitations[invitationId].status = 2;
             activeUsers[clientId].dbConnection.UpdateInvitations(invitationId, 2);
 
+            // Create recornd in DB
             activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invitationId].username);
 
-            // Delete index in ivitations
+            // Delete index in invitee ivitations ids
             lock(userInvitationsIds[activeUsers[clientId].userId])
             {
                 userInvitationsIds[activeUsers[clientId].userId].Remove(invitationId);
             }
-            // Tell async invitee Thread about accepted invitation
+            // Tell async invitor Thread about accepted invitation
             whichFunction[inv.username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
             eventHandlers[inv.username].Set();
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
@@ -321,8 +335,11 @@ namespace Server
 
             // Set status a declined
             invitations[invitationId].status = 3;
-            // Tell invitor about declined invitation
+            
+            // Update DB invitation
             activeUsers[clientId].dbConnection.UpdateInvitations(invitationId, 3);
+
+            // Tell invitor about declined invitation
             whichFunction[inv.username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
             eventHandlers[invitations[invitationId].username].Set();
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
@@ -330,8 +347,11 @@ namespace Server
 
         public string GetFriends(string msg, int clientId)
         {
+            // If user isint logged return error
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
             List<Friend> friends = new List<Friend>();
+
+            // Get friends from DB
             foreach (string friendName in activeUsers[clientId].dbConnection.GetFriendsNames(activeUsers[clientId].username))
             {
                 Friend friend = new Friend(friendName, 0);
@@ -344,7 +364,10 @@ namespace Server
 
         public string DeleteAccount(string msg, int clientId)
         {
+            // Delete user from DB
             activeUsers[clientId].dbConnection.DeleteUser(activeUsers[clientId].userId);
+
+            // Delete user informations from memory
             ClearUserData(clientId);
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
@@ -367,15 +390,19 @@ namespace Server
                     result.Add(invitations[InvitationsIds[i]]);
                     activeUsers[clientId].dbConnection.UpdateInvitations(InvitationsIds[i],1);
                 }
-                // If invitation was accepted
+                // If invitation was accepted or declined
                 else if(invitations[InvitationsIds[i]].status >= 2 && invitations[InvitationsIds[i]].username == activeUsers[clientId].username)
                 {
                     result.Add(invitations[InvitationsIds[i]]);
                     activeUsers[clientId].dbConnection.DeleteInvitation(InvitationsIds[i]);
+
+                    // Delete invitation
                     lock (invitations[InvitationsIds[i]])
                     {
                         invitations.Remove(InvitationsIds[i]);
                     }
+
+                    // Delete invitation id
                     lock(userInvitationsIds[activeUsers[clientId].userId])
                     {
                         userInvitationsIds[activeUsers[clientId].userId].Remove(InvitationsIds[i]);
