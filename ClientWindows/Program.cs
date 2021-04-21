@@ -8,6 +8,10 @@ namespace ClientWindows
 {
     static class Program
     {
+        public static String username = "";
+        public static Boolean isLoggedIn = false;
+        public static Form activeForm;
+        
         /// <summary>
         /// Główny punkt wejścia dla aplikacji.
         /// </summary>
@@ -19,8 +23,24 @@ namespace ClientWindows
             ServerConnectorAsync.StartConnection();
 
             Task.Run(() => ServerConnectorAsync.ReceiveWhile());
-            Application.Run(new LoginForm());
+            activeForm = new LoginForm();
+            Application.Run(activeForm);
             ServerConnectorAsync.StopConnection();
+        }
+
+        delegate Form GetActiveFormCallback();
+        public static Form GetActiveForm()
+        {
+            if (activeForm.InvokeRequired)
+            {
+                Form a = null;
+                Action showMethod = delegate () { a = activeForm; };
+                return a;
+            }
+            else
+            {
+                return activeForm;
+            }
         }
     }
 }

@@ -10,11 +10,18 @@ namespace ClientWindows
 {
     static class LoginService
     {
+        private static Boolean loginNotFinished = false;
 
         public static void login(String username, String pass)
         {
             Login login = new Login(username, pass);
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LOGIN, login));
+            loginNotFinished = true;
+            do
+            {
+
+            } while (loginNotFinished);
+
         }
 
         public static void loginReply(String message)
@@ -29,6 +36,9 @@ namespace ClientWindows
                 case ErrorCodes.NO_ERROR:
                     msg = "Succesful login!";
                     MessageBox.Show(msg, title, buttons);
+                    Program.isLoggedIn = true;
+                    
+                    //((LoginForm)Program.GetActiveForm()).onLoginFinished();
                     break;
                 case ErrorCodes.USER_NOT_FOUND:
                     msg = "User not found!";
@@ -44,6 +54,7 @@ namespace ClientWindows
                     break;
 
             }
+            loginNotFinished = false;
         }
 
         public static void register(String username, String pass)

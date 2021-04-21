@@ -29,7 +29,30 @@ namespace ClientWindows
 
         private void login_button_Click(object sender, EventArgs e)
         {
+            Program.username = this.login_textbox.Text;
             LoginService.login(this.login_textbox.Text, this.password_textbox.Text);
+            if (Program.isLoggedIn == true)
+            {
+                LoggedInForm lif = new LoggedInForm();
+                lif.Location = this.Location;
+                lif.StartPosition = FormStartPosition.Manual;
+                lif.FormClosing += delegate { this.Show(); };
+                lif.Show();
+                this.Hide();
+            }
+        }
+
+        public void onLoginFinished()
+        {
+            if (Program.isLoggedIn == true)
+            {
+                LoggedInForm lif = new LoggedInForm();
+                lif.Location = this.Location;
+                lif.StartPosition = FormStartPosition.Manual;
+                lif.FormClosing += delegate { this.Show(); };
+                lif.Show();
+                this.Hide();
+            }
         }
     }
 }
