@@ -15,6 +15,7 @@ namespace ClientWindows
         public LoggedInForm()
         {
             InitializeComponent();
+            this.signedInLogin_Text.Text = Program.username;
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -30,6 +31,28 @@ namespace ClientWindows
         private void openFriend_button_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void label1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void closeApp_button_Click(object sender, EventArgs e)
+        {
+            LoggedInService.logout();
+            this.Close();
+        }
+
+        private void LoggedInForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            LoggedInService.logout();
+            this.Close();
         }
     }
 }
