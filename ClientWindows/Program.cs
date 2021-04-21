@@ -16,7 +16,11 @@ namespace ClientWindows
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            ServerConnectorAsync.StartConnection();
+
+            Task.Run(() => ServerConnectorAsync.ReceiveWhile());
             Application.Run(new LoginForm());
+            ServerConnectorAsync.StopConnection();
         }
     }
 }

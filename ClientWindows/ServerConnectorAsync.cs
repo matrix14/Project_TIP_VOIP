@@ -1,86 +1,131 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ClientWindows
 {
+    class ReceiveObject
+    {
+        public const int MAX_BUFFER_SIZE = 2048;
+        public byte[] buffer = new byte[MAX_BUFFER_SIZE];
+        public StringBuilder sb = new StringBuilder();
+    }
     class ServerConnectorAsync
     {
-        private const Int32 MAX_BUFFER_SIZE = 1024;
+        private static int port = 13579;
+        private static String address = "127.0.0.1";
 
-        private String address = "localhost";
-        private Int32 port = 13579;
-        private TcpClient tcpclient = null;
-        private NetworkStream stream = null;
+        private static ManualResetEvent connectDone = new ManualResetEvent(false);
+        private static ManualResetEvent sendDone = new ManualResetEvent(false);
+        private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
+        private static String reply = String.Empty;
 
-        public ServerConnectorAsync() { }
+        private static Socket sock;
 
-        public ServerConnectorAsync(String address, Int32 port)
-        {
-            this.address = address;
-            this.port = port;
-        }
-
-        private void Connect() //TODO: add server connection data configuration
+        public static void StartConnection()
         {
             try
             {
-                this.tcpclient = new TcpClient(this.address, this.port);
-                this.stream = tcpclient.GetStream();
-                
-            } catch(System.Net.Sockets.SocketException) {
+                IPAddress ip = IPAddress.Parse(address);
+                IPEndPoint remoteAddr = new IPEndPoint(ip, port);
+                sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
+                connectDone.WaitOne();
+            } catch (Exception e)
+            {
+                return; //TODO Add message for client when problem
+            }
+        }
+
+        public static void StopConnection()
+        {
+            sock.Shutdown(SocketShutdown.Both);
+            sock.Close();
+        }
+
+        public static void SendMessage(String message)
+        {
+            byte[] byteData = Encoding.ASCII.GetBytes(message);
+            sock.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), sock);
+            sendDone.WaitOne();
+        }
+
+        private static void SendCallback(IAsyncResult res)
+        {
+            try
+            {
+                Socket sockInt = (Socket)res.AsyncState;
+                int len = sockInt.EndSend(res);
+                sendDone.Set();
+            } catch (Exception e)
+            {
                 return;
-            }
-            
-        }
-
-        private Boolean checkIfConnectionExists()
-        {
-            if(this.stream!=null)
-            {
-                return true;
-            } else
-            {
-                return false;
+                //TODO implement fault
             }
         }
 
-        private void Disconnect()
+        public static void ReceiveWhile()
         {
-            this.stream.Close();
-            this.tcpclient.Close();
+            do
+            {
+                Receive();
+                receiveDone.WaitOne();
+            } while (sock != null);
         }
 
-        private void connectIfNeeded()
+        public static void Receive()
         {
-            if(checkIfConnectionExists()==false)
+            receiveDone.Reset();
+            try
             {
-                this.Connect();
+                ReceiveObject ro = new ReceiveObject();
+                sock.BeginReceive(ro.buffer, 0, ReceiveObject.MAX_BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), ro);
+
+            } catch (Exception e)
+            {
+                return;
+                //TODO Implement faults
             }
         }
 
-        public String sendMessageAndGetReply(String message)
+        public static void ReceiveCallback(IAsyncResult res)
         {
-            connectIfNeeded();
-            if (!checkIfConnectionExists()) return "Error in creating connection!";
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
-            this.stream.Write(data, 0, data.Length);
-            data = new Byte[MAX_BUFFER_SIZE];
-            Int32 msgLength = this.stream.Read(data, 0, MAX_BUFFER_SIZE);
-            return System.Text.Encoding.ASCII.GetString(data, 0, msgLength);
+            try
+            {
+                ReceiveObject ro = (ReceiveObject)res.AsyncState;
+                int len = sock.EndReceive(res);
+                ro.sb.Append(Encoding.ASCII.GetString(ro.buffer, 0, len));
+                if (ro.sb.Length > 0)
+                {
+                    ServerProcessing.processReceivedMessage(ro.sb.ToString());
+                }
+                receiveDone.Set();
+            }
+            catch (Exception e)
+            {
+                return;
+                //TODO Implement faults
+            }
         }
 
-        public String sendMessage(String message)
+        private static void ConnectCallback(IAsyncResult res)
         {
-            connectIfNeeded();
-            if (!checkIfConnectionExists()) return "Error in creating connection!";
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
-            this.stream.Write(data, 0, data.Length);
-            return "Ok";
+            try
+            {
+                Socket sockInt = (Socket)res.AsyncState;
+                sockInt.EndConnect(res);
+                connectDone.Set();
+            } catch (Exception e)
+            {
+                return;
+                //TODO Implement faults
+            }
         }
     }
 }
