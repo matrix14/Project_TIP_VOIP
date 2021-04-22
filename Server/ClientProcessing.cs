@@ -26,6 +26,7 @@ namespace Server
         public List<User> activeUsers;
 
         /// <summary>
+        /// Contains list of functions to procces by client
         /// <para> Key: <c>username</c> </para> 
         /// <para> Value: <c>List(option,senderUsername)</c> </para>
         /// </summary>
@@ -75,7 +76,10 @@ namespace Server
         {
             List<string> res = new List<string>();
             string item;
+
+            // Async messages only to logged users
             if (!activeUsers[clientId].logged) userLoginHandler[clientId].WaitOne();
+            // Wait unit event
             eventHandlers[activeUsers[clientId].username].WaitOne();
             lock (whichFunction[activeUsers[clientId].username])
             {
@@ -364,6 +368,8 @@ namespace Server
 
         public string DeleteAccount(string msg, int clientId)
         {
+            // If user isint logged return error
+            if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
             // Delete user from DB
             activeUsers[clientId].dbConnection.DeleteUser(activeUsers[clientId].userId);
 
@@ -371,6 +377,78 @@ namespace Server
             ClearUserData(clientId);
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
+
+        public string InviteToConversation(string msg, int clientId)
+        {
+            // If user isint logged return error
+            if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
+            bool conversationExists = activeUsers[clientId].dbConnection.CheckIfConversationExist(activeUsers[clientId].username);
+            Username user = MessageProccesing.DeserializeObject(msg) as Username;
+            bool isActive = false;
+            foreach (User active in activeUsers)
+            {
+                if (active.username == user.username && active.logged)
+                {
+                    isActive = true;
+                    break;
+                }
+            }
+            if (!isActive) return MessageProccesing.CreateMessage(ErrorCodes.USER_OFFLINE);
+            int conversationId;
+
+            // Invite to existing converstaion
+            if (conversationExists)
+            {
+                conversationId = activeUsers[clientId].dbConnection.AddUserToConversation(activeUsers[clientId].username, user.username);
+            }
+            // Create new conversation
+            else
+            {
+                conversationId = activeUsers[clientId].dbConnection.CreateNewConversation(activeUsers[clientId].username, user.username);
+            }
+
+            // try catch czy jest zalogowany
+            whichFunction[user.username].Add(new Tuple<Options, string>(Options.INCOMMING_CALL, conversationId.ToString()));
+            eventHandlers[user.username].Set();
+            return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+        }
+
+        // Tell serverconnection
+        public string JoinConversation(string msg, int clientId)
+        {
+            int conversationId = MessageProccesing.DeserializeObject(msg) as InvitationId;
+            // If user isint logged return error
+            if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
+
+            // Notyfiy other participans about joining conversation
+            List<string> conversationsParticipansList = activeUsers[clientId].dbConnection.GetConversationsParticipants(conversationId, activeUsers[clientId].username);
+            foreach(string participant in conversationsParticipansList)
+            {
+                whichFunction[participant].Add(new Tuple<Options, string>(Options.ACCEPTED_CALL, activeUsers[clientId].username));
+                eventHandlers[participant].Set();
+            }
+            activeUsers[clientId].dbConnection.UpdateUserConversationStatus(activeUsers[clientId].username, CallStatus.ACCEPTED);
+            // Infro to server connection. Nedded to create udp sockets
+            throw new CustomException(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, conversationId));
+        }
+
+        public string LeaveConversation(string msg, int clientId)
+        {
+            InvitationId conversationId = MessageProccesing.DeserializeObject(msg) as InvitationId;
+            // If user isint logged return error
+            if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
+
+            activeUsers[clientId].dbConnection.DeleteFromConversation(activeUsers[clientId].username);
+            // Notyfiy other participans about leacing conversation
+            List<string> conversationsParticipansList = activeUsers[clientId].dbConnection.GetConversationsParticipants(conversationId, activeUsers[clientId].username);
+            foreach (string participant in conversationsParticipansList)
+            {
+                whichFunction[participant].Add(new Tuple<Options, string>(Options.DECLINED_CALL, activeUsers[clientId].username));
+                eventHandlers[participant].Set();
+            }
+            throw new CustomException(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, conversationId));
+        }
+
 
 
         /// <summary>
@@ -419,12 +497,23 @@ namespace Server
         }
 
 
-        public string SendCall(int clientId, string senderName)
+        public string SendIncommingCall(int clientId, string callId)
         {
-            throw new NotImplementedException();
+            Call call = new Call();
+            call.callId = int.Parse(callId);
+            call.usernames = activeUsers[clientId].dbConnection.GetConversationsParticipants(call.callId, activeUsers[clientId].username);
+            return MessageProccesing.CreateMessage(Options.INCOMMING_CALL, call);
         }
 
+        public string SendDeclinedCall(int clientId, string senderName)
+        {
+            return MessageProccesing.CreateMessage(Options.DECLINED_CALL, new Username(senderName));
+        }
 
+        public string SendAcceptedCall(int clientId, string senderName)
+        {
+            return MessageProccesing.CreateMessage(Options.ACCEPTED_CALL, new Username(senderName));
+        }
 
 
 
@@ -442,11 +531,15 @@ namespace Server
             syncFunctions.Add(Options.ADD_FRIEND, new Functions(AddFriend));
             syncFunctions.Add(Options.ACCEPT_FRIEND, new Functions(AcceptFriend));
             syncFunctions.Add(Options.DECLINE_FRIEND, new Functions(DeclineFriend));
-
+            syncFunctions.Add(Options.INVITE_TO_CONVERSATION, new Functions(InviteToConversation));
+            syncFunctions.Add(Options.JOIN_CONVERSATION, new Functions(JoinConversation));
+            syncFunctions.Add(Options.LEAVE_CONVERSATION, new Functions(LeaveConversation));
 
             asyncFunctions.Add(Options.ACTIVE_FRIENDS, new AsyncFunctions(SendActiveFriends));
             asyncFunctions.Add(Options.FRIEND_INVITATIONS, new AsyncFunctions(SendInvitations));
-            asyncFunctions.Add(Options.INCOMMING_CALL, new AsyncFunctions(SendCall));
+            asyncFunctions.Add(Options.INCOMMING_CALL, new AsyncFunctions(SendIncommingCall));
+            asyncFunctions.Add(Options.ACCEPTED_CALL, new AsyncFunctions(SendAcceptedCall));
+            asyncFunctions.Add(Options.DECLINED_CALL, new AsyncFunctions(SendDeclinedCall));
 
             dbMethods = new DbMethods();
             activeUsers = new List<User>();
@@ -456,6 +549,7 @@ namespace Server
             userInvitationsIds = dbMethods.GetUsersInvitationsIds();
             whichFunction = new Dictionary<string, List<Tuple<Options, string>>>();
         }
+
 
 
         public int AddActiveUser()

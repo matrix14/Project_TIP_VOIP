@@ -36,11 +36,12 @@ namespace Shared
 #endif
 
                 if (option == Options.LOGIN || option == Options.CREATE_USER) return JsonConvert.DeserializeObject<Login>(data);
-                else if (option == Options.CHECK_USER_NAME || option == Options.ADD_FRIEND || option == Options.ACTIVE_FRIENDS) return JsonConvert.DeserializeObject<Username>(data);
+                else if (option == Options.CHECK_USER_NAME || option == Options.ADD_FRIEND || option == Options.ACTIVE_FRIENDS || option == Options.INVITE_TO_CONVERSATION || option == Options.ACCEPTED_CALL
+                    || option == Options.ACCEPTED_CALL || option == Options.DECLINED_CALL) return JsonConvert.DeserializeObject<Username>(data);
                 else if (option == Options.GET_FRIENDS) return JsonConvert.DeserializeObject<List<Friend>>(data);
                 else if (option == Options.FRIEND_INVITATIONS) return JsonConvert.DeserializeObject<List<Invitation>>(data);
                 else if (option == Options.INCOMMING_CALL) return JsonConvert.DeserializeObject<Call>(data);
-                else if (option == Options.ACCEPT_FRIEND || option == Options.DECLINE_FRIEND) return JsonConvert.DeserializeObject<InvitationId>(data);
+                else if (option == Options.ACCEPT_FRIEND || option == Options.DECLINE_FRIEND || option == Options.JOIN_CONVERSATION || option == Options.LEAVE_CONVERSATION) return JsonConvert.DeserializeObject<InvitationId>(data);
             }
             return "";
         }
