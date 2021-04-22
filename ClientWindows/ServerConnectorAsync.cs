@@ -36,7 +36,7 @@ namespace ClientWindows
                 IPEndPoint remoteAddr = new IPEndPoint(ip, port);
                 sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
-                connectDone.WaitOne();
+                //connectDone.WaitOne();
             } catch (Exception e)
             {
                 return; //TODO Add message for client when problem
@@ -53,7 +53,7 @@ namespace ClientWindows
         {
             byte[] byteData = Encoding.ASCII.GetBytes(message);
             sock.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), sock);
-            sendDone.WaitOne();
+            //sendDone.WaitOne();
         }
 
         private static void SendCallback(IAsyncResult res)
