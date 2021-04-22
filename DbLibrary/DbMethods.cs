@@ -7,6 +7,8 @@ using System.Numerics;
 using System.Text;
 
 
+
+// MySql date "yyyy-MM-dd HH:mm:ss"
 namespace DbLibrary
 {
     public class DbMethods : DbConnection
@@ -37,20 +39,103 @@ namespace DbLibrary
             }
 
         }
-        public string AddFriends(int userAID, string usernameB, string iv)
+        public void AddFriends(int invitorId, string inviteeUsername)
         {
-            string userAId = userAID.ToString();
-            string userBId = GetUserId(usernameB).ToString();
-            string query = string.Format("INSERT INTO friends(user1_id,user2_id) VALUES({0},{1})", userAId, userBId);
+            string inviteeId = GetUserId(inviteeUsername).ToString();
+            string query = string.Format("INSERT INTO friends(user1_id,user2_id,date) VALUES({0},{1},'{2}')", invitorId, inviteeId, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Read();
             dataReader.Close();
-            return CreateNewConversation(userAId, usernameB, iv);
 
         }
 
+        public List<string> GetFriendsNames(string username)
+        {
+            List<string> result = new List<string>();
+            string query = string.Format("SELECT f.user2 FROM friends_view f WHERE f.user1 = '{0}'", username);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
 
+            while(dataReader.Read())
+            {
+                result.Add(dataReader.GetString(0));
+            }
+            dataReader.Close();
+
+
+            query = string.Format("SELECT f.user1 FROM friends_view f WHERE f.user2 = '{0}'", username);
+            cmd = new MySqlCommand(query, connection);
+            dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                result.Add(dataReader.GetString(0));
+            }
+            dataReader.Close();
+            return result;
+        }
+
+        public int CreateNewInvitation(string invitorUsername, string inviteeUsername)
+        {
+            int invitorId = GetUserId(invitorUsername);
+            int inviteeId = GetUserId(inviteeUsername);
+            string query = String.Format("INSERT INTO invitations(invitor_id,invitee_id,status,date) VALUES('{0}','{1}','{2}','{3}')", invitorId, inviteeId,0,DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            //Create Command
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            //Create a data reader and Execute the command
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            dataReader.Read();
+            dataReader.Close();
+
+            query = "SELECT LAST_INSERT_ID()";
+            cmd = new MySqlCommand(query, connection);
+            dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            try
+            {
+                return dataReader.GetInt32(0);
+            }
+            catch
+            {
+                return -1;
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+        }
+
+        public void UpdateInvitations(int invitationId,int status)
+        {
+            string query = String.Format("UPDATE invitations SET status={0} WHERE invitation_id = {1}", status, invitationId);
+            //Create Command
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            //Create a data reader and Execute the command
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Close();
+        }
+
+        public Dictionary<int, Invitation> GetInvitations()
+        {
+            string query = String.Format("SELECT * FROM invitations_view");
+            //Create Command
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            //Create a data reader and Execute the command
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            Dictionary<int, Invitation> result = new Dictionary<int, Invitation>();
+            while (dataReader.Read())
+            {
+                Invitation ei = new Invitation();
+                ei.invitationId = dataReader.GetInt32("invitation_id");
+                ei.username = dataReader.GetString("invitor");
+                ei.inviteeUsername = dataReader.GetString("invitee");
+                ei.date = dataReader.GetDateTime("date");
+                result[ei.invitationId] = ei;
+            }
+            dataReader.Close();
+            return result;
+        }
 
         public bool CheckFriends(string usernameA, string usernameB)
         {
@@ -77,7 +162,27 @@ namespace DbLibrary
 
         }
 
+        public Dictionary<int, List<int>> GetUsersInvitationsIds()
+        {
+            Dictionary<int, List<int>> res = new Dictionary<int, List<int>>();
+            string query = String.Format("SELECT invitation_id,invitor_id,invitee_id,status FROM invitations");
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                if (!res.ContainsKey(dataReader.GetInt32("invitor_id"))) res[dataReader.GetInt32("invitor_id")] = new List<int>();
+                res[dataReader.GetInt32("invitor_id")].Add(dataReader.GetInt32("invitation_id"));
+                if (dataReader.GetInt16("status") == 0)
+                {
+                    if (!res.ContainsKey(dataReader.GetInt32("invitee_id"))) res[dataReader.GetInt32("invitee_id")] = new List<int>();
+                    res[dataReader.GetInt32("invitee_id")].Add(dataReader.GetInt32("invitation_id"));
+                }
 
+            }
+            dataReader.Close();
+            return res;
+
+        }
         public bool AddNewUser(string username, string passwordHash)
         {
             string query = String.Format("INSERT INTO users(username,password_hash) VALUES('{0}','{1}')", username, passwordHash);
@@ -193,45 +298,6 @@ namespace DbLibrary
             //close Data Reader
             dataReader.Close();
             return true;
-        }
-
-        public string GetFriends(string username, List<string> activeUsers)
-        {
-            string query = string.Format("SELECT u2.username FROM friends f JOIN users u ON u.user_id = f.user1_id " +
-                "JOIN users u2 ON u2.user_id = f.user2_id  WHERE u.username LIKE '{0}' ", username);
-
-            MySqlCommand cmd = new MySqlCommand(query, connection);
-            MySqlDataReader dataReader = cmd.ExecuteReader();
-
-            List<Friend> friends = new List<Friend>();
-
-            try
-            {
-                for (int i = 0; i < 2; i++)
-                {
-                    while (dataReader.Read())
-                    {
-                        Friend friend = new Friend();
-                        friend.username = dataReader.GetString(0);
-                        if (activeUsers.Contains(friend.username)) friend.active = 1;
-                        else friend.active = 0;
-                        friends.Add(friend);
-                    }
-                    query = string.Format("SELECT u2.username FROM friends f JOIN users u ON u.user_id = f.user2_id " +
-                                    "JOIN users u2 ON u2.user_id = f.user1_id  WHERE u.username LIKE '{0}' ", username);
-
-                    dataReader.Close();
-                    cmd = new MySqlCommand(query, connection);
-                    dataReader = cmd.ExecuteReader();
-                }
-                dataReader.Close();
-                return JsonConvert.SerializeObject(friends);
-            }
-            catch
-            {
-                return "";
-            }
-
         }
 
 

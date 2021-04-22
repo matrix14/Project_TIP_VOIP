@@ -11,14 +11,13 @@ namespace Shared
         GET_FRIENDS = 4,                    //                                                              Error:<>$$Data:<JSONFriend>$$       
         DELETE_ACCOUNT = 5,                 //                                                              Error:<>$$
         ADD_FRIEND = 6,                     //  Data:<JSONUsername>                                         Error:<>$$
-        ACCEPT_FRIEND = 7,                  //  Data:<JSONInvitation>                                       Error:<>$$
-        DECLINE_FRIEND = 8,                 //  Data:<JSONInvitation>                                       Error:<>$$
+        ACCEPT_FRIEND = 7,                  //  Data:<JSONInvitationId>                                     Error:<>$$
+        DECLINE_FRIEND = 8,                 //  Data:<JSONInvitationId>                                     Error:<>$$
 
 
 
-        ACCEPTED_FRIENDS = 20,              //  SERVER ONLY                                                 Option:10$$Data:<JSONFriends>$$
-        ACTIVE_FRIENDS = 21,                //  SERVER ONLY                                                 Option:11$$Data:<JSONFriends>$$
-        FRIEND_INVITATIONS = 22,            //  SERVER ONLY                                                 Option:20$$Data:<JSONInvitation>$$
+        ACTIVE_FRIENDS = 21,                //  SERVER ONLY                                                 Option:11$$Data:<JSONUsername>$$
+        FRIEND_INVITATIONS = 22,            //  SERVER ONLY                                                 Option:20$$Data:<JSONInvitations>$$
         INCOMMING_CALL = 23,                //  SERVER ONLY                                                 Option:21$$Data:<JSONCall>$$
     }
 }
