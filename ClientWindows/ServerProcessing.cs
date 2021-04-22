@@ -13,6 +13,7 @@ namespace ClientWindows
     {
         public static ManualResetEvent tcpClientConnected = new ManualResetEvent(false);
         private static Options lastOptions;
+        //TODO semaphore for sync request (cannot send new request if old not finished)
         public static void ProcessServerMessageCallback(IAsyncResult ar)
         {
             // Get the listener that handles the client request.
@@ -42,8 +43,16 @@ namespace ClientWindows
         {
             if(message[0]=='O') //ASYNC (Incoming Call, Invitation etc)
             {
-
-            } else if(message[0]=='E')
+                String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+                Options opt = (Options)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                switch(opt)
+                {
+                    case Options.FRIEND_INVITATIONS:
+                        LoggedInService.incomingInvitation(message);
+                        break;
+                }
+            }
+            else if(message[0]=='E')
             {
                 switch(lastOptions)
                 {
@@ -55,6 +64,12 @@ namespace ClientWindows
                         break;
                     case Options.LOGOUT:
                         LoggedInService.logoutReply(message);
+                        break;
+                    case Options.GET_FRIENDS:
+                        LoggedInService.getFriendsReply(message);
+                        break;
+                    case Options.ADD_FRIEND:
+                        LoggedInService.addFriendReply(message);
                         break;
                 }
             } else

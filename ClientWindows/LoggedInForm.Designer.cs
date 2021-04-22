@@ -93,6 +93,7 @@ namespace ClientWindows
             this.addFriend_button.Name = "addFriend_button";
             this.addFriend_button.Size = new System.Drawing.Size(104, 22);
             this.addFriend_button.Text = "Dodaj znajomego";
+            this.addFriend_button.Click += new System.EventHandler(this.addFriend_button_Click);
             // 
             // closeApp_button
             // 

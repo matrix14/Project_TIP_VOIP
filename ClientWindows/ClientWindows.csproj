@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddFriendForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddFriendForm.Designer.cs">
+      <DependentUpon>AddFriendForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LoggedInForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -65,6 +71,9 @@
     <Compile Include="ServerConnectorAsync.cs" />
     <Compile Include="ServerConnectorAsyncOLD.cs" />
     <Compile Include="ServerProcessing.cs" />
+    <EmbeddedResource Include="AddFriendForm.resx">
+      <DependentUpon>AddFriendForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoggedInForm.resx">
       <DependentUpon>LoggedInForm.cs</DependentUpon>
     </EmbeddedResource>
