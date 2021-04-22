@@ -39,7 +39,7 @@ namespace Server
         public Dictionary<int, Invitation> invitations;
 
         /// <summary>
-        /// <para> Key: <c>clientId</c>  </para>
+        /// <para> Key: <c>userId</c>  </para>
         /// <para>Value: <c>List(invitationId)</c>  </para>
         /// </summary>
         public Dictionary<int, List<int>> userInvitationsIds;
@@ -81,32 +81,35 @@ namespace Server
             if (!activeUsers[clientId].logged) userLoginHandler[clientId].WaitOne();
             // Wait unit event
             eventHandlers[activeUsers[clientId].username].WaitOne();
-            lock (whichFunction[activeUsers[clientId].username])
+            lock (eventHandlers[activeUsers[clientId].username])
             {
-                foreach (var function in whichFunction[activeUsers[clientId].username])
+                lock (whichFunction[activeUsers[clientId].username])
                 {
-                    item = asyncFunctions[function.Item1](clientId, function.Item2);
-                    whichFunction[activeUsers[clientId].username].Remove(function);
-                    if (item != "") res.Add(item);
+                    foreach (var function in whichFunction[activeUsers[clientId].username])
+                    {
+                        item = asyncFunctions[function.Item1](clientId, function.Item2);
+                        if (item != "") res.Add(item);
+                    }
+                    whichFunction[activeUsers[clientId].username].Clear();
+                    eventHandlers[activeUsers[clientId].username].Reset();
                 }
             }
             return res;
         }
 
-
+        // Mark sended invitations to unseded
         public string Logout(string msg, int clientId)
         {
             lock (userLoginHandler) userLoginHandler[clientId].Reset();
             lock (activeUsers[clientId]) activeUsers[clientId].logged = false;
             lock (eventHandlers) eventHandlers[activeUsers[clientId].username].Reset();
-
-
-            lock (activeUsers)
+            lock (userInvitationsIds[activeUsers[clientId].userId])
             {
-                activeUsers[clientId].userId = -1;
-                activeUsers[clientId].username = null;
+                for (int i = 0; i < userInvitationsIds[activeUsers[clientId].userId].Count; i++)
+                {
+                    invitations[userInvitationsIds[activeUsers[clientId].userId][i]].status = 0;
+                }
             }
-
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
 
@@ -179,8 +182,20 @@ namespace Server
                     }
                 }
                 // Send invitations
-                lock (whichFunction[activeUsers[clientId].username]) whichFunction[activeUsers[clientId].username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
-                eventHandlers[activeUsers[clientId].username].Set();
+                lock (userInvitationsIds)
+                {
+                    // If there isnt any invitation create new List
+                    if (!userInvitationsIds.ContainsKey(activeUsers[clientId].userId))
+                    {
+                        userInvitationsIds[activeUsers[clientId].userId] = new List<int>();
+                    }
+                    // Else send pending invitations
+                    else
+                    {
+                        lock (whichFunction[activeUsers[clientId].username]) whichFunction[activeUsers[clientId].username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
+                        eventHandlers[activeUsers[clientId].username].Set();
+                    }
+                }
                 return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
             }
             else return MessageProccesing.CreateMessage(ErrorCodes.INCORRECT_PASSWORD);
@@ -570,7 +585,14 @@ namespace Server
         public void Disconnect(int clientId)
         {
             userLoginHandler[clientId].Set();
-            eventHandlers[activeUsers[clientId].username].Set();
+            try
+            {
+                eventHandlers[activeUsers[clientId].username].Set();
+            }
+            catch
+            {
+                ;
+            }
             ClearUserData(clientId);
         }
 
