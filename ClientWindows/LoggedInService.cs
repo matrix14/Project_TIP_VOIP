@@ -15,11 +15,14 @@ namespace ClientWindows
         {
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LOGOUT));
             logoutNotFinished = true;
-            do
-            {
+            //do
+            //{
 
-            } while (logoutNotFinished);
-
+            //} while (logoutNotFinished);
+            //String msg = "Pomyślnie wylogowano!";
+            //MessageBoxButtons buttons = MessageBoxButtons.OK;
+            //string title = "Wylogowanie";
+            //MessageBox.Show(msg, title, buttons);
         }
 
         public static void logoutReply(String message)
@@ -32,12 +35,12 @@ namespace ClientWindows
             switch (error)
             {
                 case ErrorCodes.NO_ERROR:
-                    msg = "Pomyślnie wylogowano! NOT_YET_IMPLEMENTED";
-                    MessageBox.Show(msg, title, buttons);
                     Program.isLoggedIn = false;
+                    logoutNotFinished = false;
+                    msg = "Pomyślnie wylogowano!";
+                    MessageBox.Show(msg, title, buttons);
                     break;
             }
-            logoutNotFinished = false;
         }
     }
 }

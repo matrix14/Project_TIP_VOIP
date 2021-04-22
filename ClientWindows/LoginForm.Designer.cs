@@ -29,29 +29,31 @@ namespace ClientWindows
         /// </summary>
         private void InitializeComponent()
         {
-            this.login_button = new System.Windows.Forms.Button();
+            this.confirmAction_button = new System.Windows.Forms.Button();
             this.login_label = new System.Windows.Forms.Label();
             this.login_textbox = new System.Windows.Forms.TextBox();
             this.password_textbox = new System.Windows.Forms.TextBox();
             this.pass_label = new System.Windows.Forms.Label();
-            this.register_button = new System.Windows.Forms.Button();
-            this.register_info_label = new System.Windows.Forms.Label();
+            this.changeMode_button = new System.Windows.Forms.Button();
+            this.changeMode_label = new System.Windows.Forms.Label();
+            this.actualMode_Label = new System.Windows.Forms.Label();
+            this.usernameFree_label = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // login_button
+            // confirmAction_button
             // 
-            this.login_button.Location = new System.Drawing.Point(12, 96);
-            this.login_button.Name = "login_button";
-            this.login_button.Size = new System.Drawing.Size(200, 25);
-            this.login_button.TabIndex = 0;
-            this.login_button.Text = "Zaloguj";
-            this.login_button.UseVisualStyleBackColor = true;
-            this.login_button.Click += new System.EventHandler(this.login_button_Click);
+            this.confirmAction_button.Location = new System.Drawing.Point(12, 125);
+            this.confirmAction_button.Name = "confirmAction_button";
+            this.confirmAction_button.Size = new System.Drawing.Size(200, 25);
+            this.confirmAction_button.TabIndex = 0;
+            this.confirmAction_button.Text = "Zaloguj się";
+            this.confirmAction_button.UseVisualStyleBackColor = true;
+            this.confirmAction_button.Click += new System.EventHandler(this.confirmAction_button_Click);
             // 
             // login_label
             // 
             this.login_label.AutoSize = true;
-            this.login_label.Location = new System.Drawing.Point(12, 15);
+            this.login_label.Location = new System.Drawing.Point(13, 44);
             this.login_label.Name = "login_label";
             this.login_label.Size = new System.Drawing.Size(33, 13);
             this.login_label.TabIndex = 1;
@@ -59,14 +61,15 @@ namespace ClientWindows
             // 
             // login_textbox
             // 
-            this.login_textbox.Location = new System.Drawing.Point(12, 31);
+            this.login_textbox.Location = new System.Drawing.Point(12, 60);
             this.login_textbox.Name = "login_textbox";
             this.login_textbox.Size = new System.Drawing.Size(200, 20);
             this.login_textbox.TabIndex = 2;
+            this.login_textbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.login_textbox_KeyUp);
             // 
             // password_textbox
             // 
-            this.password_textbox.Location = new System.Drawing.Point(12, 70);
+            this.password_textbox.Location = new System.Drawing.Point(12, 99);
             this.password_textbox.Name = "password_textbox";
             this.password_textbox.Size = new System.Drawing.Size(200, 20);
             this.password_textbox.TabIndex = 3;
@@ -74,43 +77,65 @@ namespace ClientWindows
             // pass_label
             // 
             this.pass_label.AutoSize = true;
-            this.pass_label.Location = new System.Drawing.Point(12, 54);
+            this.pass_label.Location = new System.Drawing.Point(13, 83);
             this.pass_label.Name = "pass_label";
             this.pass_label.Size = new System.Drawing.Size(36, 13);
             this.pass_label.TabIndex = 4;
             this.pass_label.Text = "Hasło";
             // 
-            // register_button
+            // changeMode_button
             // 
-            this.register_button.Location = new System.Drawing.Point(12, 161);
-            this.register_button.Name = "register_button";
-            this.register_button.Size = new System.Drawing.Size(200, 25);
-            this.register_button.TabIndex = 5;
-            this.register_button.Text = "Zarejestruj się";
-            this.register_button.UseVisualStyleBackColor = true;
-            this.register_button.Click += new System.EventHandler(this.register_button_Click);
+            this.changeMode_button.Location = new System.Drawing.Point(12, 169);
+            this.changeMode_button.Name = "changeMode_button";
+            this.changeMode_button.Size = new System.Drawing.Size(200, 25);
+            this.changeMode_button.TabIndex = 5;
+            this.changeMode_button.Text = "Zarejestruj się";
+            this.changeMode_button.UseVisualStyleBackColor = true;
+            this.changeMode_button.Click += new System.EventHandler(this.changeMode_button_Click);
             // 
-            // register_info_label
+            // changeMode_label
             // 
-            this.register_info_label.AutoSize = true;
-            this.register_info_label.Location = new System.Drawing.Point(12, 132);
-            this.register_info_label.Name = "register_info_label";
-            this.register_info_label.Size = new System.Drawing.Size(163, 26);
-            this.register_info_label.TabIndex = 6;
-            this.register_info_label.Text = "Nie masz konta?\rWprowadz dane powyżej i kliknij:";
+            this.changeMode_label.AutoSize = true;
+            this.changeMode_label.Location = new System.Drawing.Point(12, 153);
+            this.changeMode_label.Name = "changeMode_label";
+            this.changeMode_label.Size = new System.Drawing.Size(86, 13);
+            this.changeMode_label.TabIndex = 6;
+            this.changeMode_label.Text = "Nie masz konta?\r";
+            // 
+            // actualMode_Label
+            // 
+            this.actualMode_Label.AutoSize = true;
+            this.actualMode_Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.actualMode_Label.Location = new System.Drawing.Point(12, 9);
+            this.actualMode_Label.Name = "actualMode_Label";
+            this.actualMode_Label.Size = new System.Drawing.Size(103, 24);
+            this.actualMode_Label.TabIndex = 7;
+            this.actualMode_Label.Text = "Logowanie";
+            // 
+            // usernameFree_label
+            // 
+            this.usernameFree_label.AutoSize = true;
+            this.usernameFree_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.usernameFree_label.ForeColor = System.Drawing.Color.Red;
+            this.usernameFree_label.Location = new System.Drawing.Point(53, 44);
+            this.usernameFree_label.Name = "usernameFree_label";
+            this.usernameFree_label.Size = new System.Drawing.Size(0, 13);
+            this.usernameFree_label.TabIndex = 8;
             // 
             // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(227, 200);
-            this.Controls.Add(this.register_info_label);
-            this.Controls.Add(this.register_button);
+            this.ClientSize = new System.Drawing.Size(227, 209);
+            this.Controls.Add(this.usernameFree_label);
+            this.Controls.Add(this.actualMode_Label);
+            this.Controls.Add(this.changeMode_label);
+            this.Controls.Add(this.changeMode_button);
             this.Controls.Add(this.pass_label);
             this.Controls.Add(this.password_textbox);
             this.Controls.Add(this.login_textbox);
             this.Controls.Add(this.login_label);
-            this.Controls.Add(this.login_button);
+            this.Controls.Add(this.confirmAction_button);
             this.Name = "LoginForm";
             this.Text = "TIP_VOIP Client";
             this.Load += new System.EventHandler(this.LoginForm_Load);
@@ -121,13 +146,15 @@ namespace ClientWindows
 
         #endregion
 
-        private System.Windows.Forms.Button login_button;
+        private System.Windows.Forms.Button confirmAction_button;
         private System.Windows.Forms.Label login_label;
         private System.Windows.Forms.TextBox login_textbox;
         private System.Windows.Forms.TextBox password_textbox;
         private System.Windows.Forms.Label pass_label;
-        private System.Windows.Forms.Button register_button;
-        private System.Windows.Forms.Label register_info_label;
+        private System.Windows.Forms.Button changeMode_button;
+        private System.Windows.Forms.Label changeMode_label;
+        private System.Windows.Forms.Label actualMode_Label;
+        private System.Windows.Forms.Label usernameFree_label;
     }
 }
 
