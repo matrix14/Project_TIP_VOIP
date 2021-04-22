@@ -156,11 +156,15 @@ namespace Server
             while (true)
             {
                 userNewVoiceHandler[clientIp].WaitOne();
-                if (ct.IsCancellationRequested)
+                lock (userNewVoiceHandler[clientIp])
                 {
-                    return;
+                    if (ct.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                    s.SendTo(voiceToSend[conversationId][clientIp].Dequeue(), ep);
+                    userNewVoiceHandler[clientIp].Reset();
                 }
-                s.SendTo(voiceToSend[conversationId][clientIp].Dequeue(), ep);
             }
         }
 
