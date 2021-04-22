@@ -11,9 +11,8 @@ namespace ClientWindows
     static class LoggedInService
     {
         private static Boolean logoutNotFinished = false;
-        public static void logout(String username, String pass)
+        public static void logout()
         {
-            Login login = new Login(username, pass);
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LOGOUT));
             logoutNotFinished = true;
             do
@@ -28,12 +27,12 @@ namespace ClientWindows
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
             MessageBoxButtons buttons = MessageBoxButtons.OK;
-            string title = "Login";
+            string title = "Wylogowanie";
             String msg = "";
             switch (error)
             {
                 case ErrorCodes.NO_ERROR:
-                    msg = "Succesful logged out!";
+                    msg = "Pomyślnie wylogowano! NOT_YET_IMPLEMENTED";
                     MessageBox.Show(msg, title, buttons);
                     Program.isLoggedIn = false;
                     break;
