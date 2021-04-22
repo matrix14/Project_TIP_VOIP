@@ -15,7 +15,6 @@ namespace Server
         }
 
 
-
         public static string RegisterUser(int clientId,string name,string password,ClientProcessing cp)
         {
             return cp.CreateUser(MessageProccesing.CreateMessage<Login>(Options.CREATE_USER, new Login(name, password)), clientId);
