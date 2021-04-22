@@ -9,9 +9,19 @@ namespace Shared
     {
         public static Object DeserializeObject(string message)
         {
+#if NET472
+            string[] separatorString = {"$$"};
+            string[] fields = message.Split(separatorString, StringSplitOptions.RemoveEmptyEntries);
+#else
             string[] fields = message.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+#endif
 
+#if NET472
+            char[] separatorChar = {':'};
+            int intOption = int.Parse(fields[0].Split(separatorChar, StringSplitOptions.RemoveEmptyEntries)[1]);
+#else
             int intOption = int.Parse(fields[0].Split(':', StringSplitOptions.RemoveEmptyEntries)[1]);
+#endif
             Options option = (Options)intOption;
             //Remove option
             var list = new List<string>(fields);
@@ -19,7 +29,11 @@ namespace Shared
 
             if (list.Count > 0)
             {
-                string data =list[0].Split(':',2, StringSplitOptions.RemoveEmptyEntries)[1];
+#if NET472
+                string data = list[0].Split(separatorChar, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+#else
+                string data = list[0].Split(':', 2, StringSplitOptions.RemoveEmptyEntries)[1];
+#endif
 
                 if (option == Options.LOGIN || option == Options.CREATE_USER) return JsonConvert.DeserializeObject<Login>(data);
                 else if (option == Options.CHECK_USER_NAME || option == Options.ADD_FRIEND || option == Options.ACTIVE_FRIENDS) return JsonConvert.DeserializeObject<Username>(data);
