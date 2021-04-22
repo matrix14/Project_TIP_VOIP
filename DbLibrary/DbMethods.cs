@@ -248,6 +248,7 @@ namespace DbLibrary
                 ei.username = dataReader.GetString("invitor");
                 ei.inviteeUsername = dataReader.GetString("invitee");
                 ei.date = dataReader.GetDateTime("date");
+                ei.status = 0;
                 result[ei.invitationId] = ei;
             }
             dataReader.Close();
@@ -516,6 +517,7 @@ namespace DbLibrary
 
         public void CloseConnection()
         {
+            
             connection.Close();
         }
     }
