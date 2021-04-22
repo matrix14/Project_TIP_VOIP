@@ -106,6 +106,7 @@ namespace Server
                     //Send response
                     stream.Write(message);
                 }
+                
                 catch (Exception e)
                 {
                     udpTokenSource.Cancel();
@@ -114,6 +115,7 @@ namespace Server
                     Console.WriteLine(e.Message);
                     break;
                 }
+                
 
             }
         }
