@@ -135,6 +135,7 @@ namespace ClientWindows
             this.friendsList.Name = "friendsList";
             this.friendsList.Size = new System.Drawing.Size(260, 316);
             this.friendsList.TabIndex = 2;
+            this.friendsList.SelectedIndexChanged += new System.EventHandler(this.friendsList_SelectedIndexChanged);
             // 
             // openFriend_button
             // 

@@ -142,6 +142,7 @@ namespace ClientWindows
             this.serverConnection_Label.Name = "serverConnection_Label";
             this.serverConnection_Label.Size = new System.Drawing.Size(95, 17);
             this.serverConnection_Label.Text = "Brak połączenia";
+            this.serverConnection_Label.Click += new System.EventHandler(this.serverConnection_Label_Click);
             // 
             // LoginForm
             // 

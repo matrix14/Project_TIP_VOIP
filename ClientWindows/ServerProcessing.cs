@@ -13,6 +13,7 @@ namespace ClientWindows
     {
         public static ManualResetEvent tcpClientConnected = new ManualResetEvent(false);
         private static Options lastOptions;
+
         //TODO semaphore for sync request (cannot send new request if old not finished)
         public static void ProcessServerMessageCallback(IAsyncResult ar)
         {
