@@ -10,6 +10,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            ServerConnection serverConnection = new ServerConnection();
             //StartTests();
         }
 
