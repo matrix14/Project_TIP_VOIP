@@ -53,6 +53,9 @@ namespace ClientWindows
                     case Options.CREATE_USER:
                         LoginService.registerReply(message);
                         break;
+                    case Options.LOGOUT:
+                        LoggedInService.logoutReply(message);
+                        break;
                 }
             } else
             {
