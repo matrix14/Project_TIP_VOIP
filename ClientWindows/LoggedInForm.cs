@@ -46,14 +46,12 @@ namespace ClientWindows
 
         private void closeApp_button_Click(object sender, EventArgs e)
         {
-            LoggedInService.logout();
             this.Close();
         }
 
         private void LoggedInForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             LoggedInService.logout();
-            this.Close();
         }
 
         private void addFriend_button_Click(object sender, EventArgs e)
