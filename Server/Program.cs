@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using Shared;
 namespace Server
 {
@@ -10,6 +12,7 @@ namespace Server
         {
             //StartTests();
         }
+
 
 
         public static string RegisterUser(int clientId,string name,string password,ClientProcessing cp)

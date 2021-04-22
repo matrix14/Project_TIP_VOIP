@@ -50,6 +50,125 @@ namespace DbLibrary
 
         }
 
+
+        public int GetConversationId(string username)
+        {
+            string Id = GetUserId(username).ToString();
+            string query = string.Format("SELECT conversation_id FROM conversations c WHERE c.user_id = '{0}'", Id);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            dataReader.Read();
+            try
+            {
+                return dataReader.GetInt32(0);
+            }
+            catch
+            {
+                return -1;
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+        }
+        public bool CheckIfConversationExist(string username)
+        {
+            string query = string.Format("SELECT cv.status FROM conversations_view cv WHERE cv.username = '{0}'", username);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            dataReader.Read();
+            try
+            {
+                dataReader.GetInt32(0);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+        }
+
+        public void UpdateUserConversationStatus(string username, CallStatus status)
+        {
+            string Id = GetUserId(username).ToString();
+            string query = String.Format("UPDATE conversations SET status={0} WHERE user_id = {1}", (int)status, Id);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Close();
+        }
+
+        public int CreateNewConversation(string usernameA, string usernameB)
+        {
+            string IdA = GetUserId(usernameA).ToString();
+            string IdB = GetUserId(usernameB).ToString();
+            string query = String.Format("INSERT INTO conversations(user_id,status) VALUES({0},{1})", IdA,2);
+            //Create Command
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            //Create a data reader and Execute the command
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            dataReader.Read();
+            dataReader.Close();
+
+            query = "SELECT MAX(c.conversation_id) FROM conversations c";
+            cmd = new MySqlCommand(query, connection);
+            dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            dataReader.Close();
+            int conversationId = dataReader.GetInt32(0);
+
+            query = String.Format("INSERT INTO conversations(conversation_id,user_id) VALUES({0},{1})", conversationId,IdB);
+            cmd = new MySqlCommand(query, connection);
+            dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            dataReader.Close();
+
+            return conversationId;
+        }
+
+        public int AddUserToConversation(string invitor,string invitee)
+        {
+            string inviteeId = GetUserId(invitee).ToString();           
+            string query = String.Format("INSERT INTO conversations(conversation_id,user_id) VALUES({0},{1})", GetConversationId(invitor), inviteeId);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            dataReader.Close();
+            return GetConversationId(invitor);
+        }
+
+        public void DeleteFromConversation(string username)
+        {
+            string Id = GetUserId(username).ToString();
+            string query = String.Format("DELETE FROM conversations WHERE user_id = {0}", Id);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Close();
+        }
+
+        public List<string> GetConversationsParticipants(int conversationId,string username)
+        {
+            List<string> result = new List<string>();
+
+            // Status 2 means accepted call
+            string query = string.Format("SELECT cv.username FROM conversations_view cv WHERE cv.conversation_id = '{0}' AND cv.status = 2 AND cv.username != {1}", conversationId, username);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            while (dataReader.Read())
+            {
+                result.Add(dataReader.GetString(0));
+            }
+            dataReader.Close();
+            return result;
+        }
+
         public List<string> GetFriendsNames(string username)
         {
             List<string> result = new List<string>();
@@ -109,9 +228,7 @@ namespace DbLibrary
         public void UpdateInvitations(int invitationId,int status)
         {
             string query = String.Format("UPDATE invitations SET status={0} WHERE invitation_id = {1}", status, invitationId);
-            //Create Command
             MySqlCommand cmd = new MySqlCommand(query, connection);
-            //Create a data reader and Execute the command
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Close();
         }
@@ -217,42 +334,6 @@ namespace DbLibrary
                 dataReader.Close();
             }
         }
-
-        /*
-        public Dictionary<int, ExtendedInvitation> GetInvitations()
-        {
-            string query = String.Format("SELECT * FROM invitations_view");
-            //Create Command
-            MySqlCommand cmd = new MySqlCommand(query, connection);
-            //Create a data reader and Execute the command
-            MySqlDataReader dataReader = cmd.ExecuteReader();
-            Dictionary<int, ExtendedInvitation> result = new Dictionary<int, ExtendedInvitation>();
-            while (dataReader.Read())
-            {
-                ExtendedInvitation ei = new ExtendedInvitation();
-                ei.invitationId = dataReader.GetInt32("invitation_id");
-                ei.sender = dataReader.GetString("sender");
-                ei.reciver = dataReader.GetString("reciver");
-                ei.p = dataReader.GetString("p");
-                ei.g = dataReader.GetString("g");
-                ei.sended = dataReader.GetBoolean("sended");
-                ei.accepted = dataReader.GetBoolean("accepted");
-                ei.encryptedSenderPrivateKey = dataReader.GetString("sender_encypted_private_dh_key");
-                ei.ivToDecryptSenderPrivateKey = dataReader.GetString("sender_iv_to_decrypt_private_dh_key");
-                ei.publicKeySender = dataReader.GetString("sender_public_dh_key");
-
-                if (ei.accepted)
-                {
-                    ei.publicKeyReciver = dataReader.GetString("reciver_public_dh_key");
-                }
-
-                result[ei.invitationId] = ei;
-            }
-            dataReader.Close();
-            return result;
-        }
-        */
-
 
 
 
