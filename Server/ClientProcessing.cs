@@ -26,6 +26,7 @@ namespace Server
         public List<User> activeUsers;
 
         /// <summary>
+        /// Contains list of functions to procces by client
         /// <para> Key: <c>username</c> </para> 
         /// <para> Value: <c>List(option,senderUsername)</c> </para>
         /// </summary>
@@ -75,7 +76,10 @@ namespace Server
         {
             List<string> res = new List<string>();
             string item;
+
+            // Async messages only to logged users
             if (!activeUsers[clientId].logged) userLoginHandler[clientId].WaitOne();
+            // Wait unit event
             eventHandlers[activeUsers[clientId].username].WaitOne();
             lock (whichFunction[activeUsers[clientId].username])
             {
@@ -383,7 +387,11 @@ namespace Server
             bool isActive = false;
             foreach (User active in activeUsers)
             {
-                if (active.username == user.username && active.logged) isActive = true;
+                if (active.username == user.username && active.logged)
+                {
+                    isActive = true;
+                    break;
+                }
             }
             if (!isActive) return MessageProccesing.CreateMessage(ErrorCodes.USER_OFFLINE);
             int conversationId;
@@ -499,12 +507,12 @@ namespace Server
 
         public string SendDeclinedCall(int clientId, string senderName)
         {
-            throw new NotImplementedException();
+            return MessageProccesing.CreateMessage(Options.DECLINED_CALL, new Username(senderName));
         }
 
         public string SendAcceptedCall(int clientId, string senderName)
         {
-            throw new NotImplementedException();
+            return MessageProccesing.CreateMessage(Options.ACCEPTED_CALL, new Username(senderName));
         }
 
 

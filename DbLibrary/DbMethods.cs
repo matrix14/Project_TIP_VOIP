@@ -107,7 +107,7 @@ namespace DbLibrary
         {
             string IdA = GetUserId(usernameA).ToString();
             string IdB = GetUserId(usernameB).ToString();
-            string query = String.Format("INSERT INTO conversations(user_id,status) VALUES({0})", IdA,2);
+            string query = String.Format("INSERT INTO conversations(user_id,status) VALUES({0},{1})", IdA,2);
             //Create Command
             MySqlCommand cmd = new MySqlCommand(query, connection);
             //Create a data reader and Execute the command
