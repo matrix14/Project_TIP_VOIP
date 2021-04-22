@@ -42,5 +42,72 @@ namespace ClientWindows
                     break;
             }
         }
+
+        public static void getFriends()
+        {
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.GET_FRIENDS));
+        }
+
+        public static void getFriendsReply(String message)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            string title = "Lista znajomych";
+            String msg = "";
+            switch (error)
+            {
+                case ErrorCodes.NO_ERROR:
+                    Program.isLoggedIn = false;
+                    logoutNotFinished = false;
+                    msg = "Pomyślnie uzyskano liste znajomych! "+message;
+                    MessageBox.Show(msg, title, buttons);
+                    break;
+            }
+        }
+
+        public static void addFriend(String user)
+        {
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.ADD_FRIEND, new Username(user)));
+        }
+
+        public static void addFriendReply(String message)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            string title = "Dodanie znajomego";
+            String msg = "";
+            switch (error)
+            {
+                case ErrorCodes.NO_ERROR:
+                    msg = "Pomyślnie wysłano zaproszenie!";
+                    break;
+                case ErrorCodes.ALREADY_FRIENDS:
+                    msg = "Jesteście już znajomymi!";
+                    break;
+                case ErrorCodes.SELF_INVITE_ERROR:
+                    msg = "Nie możesz zaprosić samego siebie";
+                    break;
+                case ErrorCodes.NOT_LOGGED_IN:
+                    msg = "Jesteś nie zalogowany!";
+                    break;
+                case ErrorCodes.INVITATION_ALREADY_EXIST:
+                    msg = "Już wysłałeś zaproszenie do tego użytkownika!";
+                    break;
+            }
+            MessageBox.Show(msg, title, buttons);
+        }
+
+        public static void incomingInvitation(String message)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            Options opt = (Options)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            string title = "Przychodzące zaproszenie";
+
+            MessageBox.Show(message, title, buttons);
+        }
     }
 }

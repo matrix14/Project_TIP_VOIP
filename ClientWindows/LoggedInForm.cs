@@ -16,6 +16,7 @@ namespace ClientWindows
         {
             InitializeComponent();
             this.signedInLogin_Text.Text = Program.username;
+            LoggedInService.getFriends();
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -53,6 +54,12 @@ namespace ClientWindows
         {
             LoggedInService.logout();
             this.Close();
+        }
+
+        private void addFriend_button_Click(object sender, EventArgs e)
+        {
+            AddFriendForm aff = new AddFriendForm();
+            aff.ShowDialog();
         }
     }
 }
