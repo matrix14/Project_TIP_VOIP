@@ -16,7 +16,7 @@ namespace Server
         /// Delegate which represents function used to procces client data
         /// </summary>
         public delegate string Functions(string msg, int clientId);
-        public delegate string AsyncFunctions(int clientId,string senderName);
+        public delegate string AsyncFunctions(int clientId, string senderName);
         /// <summary>
         /// List of all avaliable syncFunctions, index of given function is number of that option
         /// </summary>
@@ -30,7 +30,7 @@ namespace Server
         /// <para> Key: <c>username</c> </para> 
         /// <para> Value: <c>List(option,senderUsername)</c> </para>
         /// </summary>
-        private Dictionary<string, List<Tuple<Options,string>>> whichFunction;
+        private Dictionary<string, List<Tuple<Options, string>>> whichFunction;
 
         /// <summary>
         /// <para> Key: <c>InvitationId</c> </para> 
@@ -48,7 +48,7 @@ namespace Server
         /// <para> Key: <c>username</c> </para> 
         /// <para> Value: <c>handler</c> </para>
         /// </summary>
-        private Dictionary<string,EventWaitHandle> eventHandlers;
+        private Dictionary<string, EventWaitHandle> eventHandlers;
 
         /// <summary>
         /// <para> Key: <c>clientId</c> </para>
@@ -108,6 +108,8 @@ namespace Server
                 for (int i = 0; i < userInvitationsIds[activeUsers[clientId].userId].Count; i++)
                 {
                     invitations[userInvitationsIds[activeUsers[clientId].userId][i]].status = 0;
+                    lock (activeUsers[clientId].dbConnection)
+                        lock (activeUsers[clientId].dbConnection) activeUsers[clientId].dbConnection.UpdateInvitations(i, 0);
                 }
             }
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
@@ -121,13 +123,20 @@ namespace Server
             // Check if user doesnt already exists in DB
             DbMethods dbConnection = new DbMethods();
             lock (activeUsers[clientId]) { dbConnection = activeUsers[clientId].dbConnection; }
-            if (dbConnection.CheckIfNameExist(login.username))
-                return MessageProccesing.CreateMessage(ErrorCodes.USER_ALREADY_EXISTS);
+            lock (activeUsers[clientId].dbConnection)
+            {
+                if (dbConnection.CheckIfNameExist(login.username))
+                    return MessageProccesing.CreateMessage(ErrorCodes.USER_ALREADY_EXISTS);
+            }
 
             // Hash password
             login.passwordHash = Security.HashPassword(login.passwordHash);
-            if (dbConnection.AddNewUser(login.username, login.passwordHash)) return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
-            else return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+            lock (activeUsers[clientId].dbConnection)
+            {
+                if (dbConnection.AddNewUser(login.username, login.passwordHash)) return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+                else return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+            }
+
         }
 
         public string Login(string msg, int clientId)
@@ -139,8 +148,11 @@ namespace Server
             string passwordHash;
             DbMethods dbConnection = new DbMethods();
             lock (activeUsers[clientId]) { dbConnection = activeUsers[clientId].dbConnection; }
-            try { passwordHash = dbConnection.GetFromUser("password_hash", login.username); }
-            catch { return MessageProccesing.CreateMessage(ErrorCodes.USER_NOT_FOUND); }
+            lock (activeUsers[clientId].dbConnection)
+            {
+                try { passwordHash = dbConnection.GetFromUser("password_hash", login.username); }
+                catch { return MessageProccesing.CreateMessage(ErrorCodes.USER_NOT_FOUND); }
+            }
 
             // Verify password
             if (Security.VerifyPassword(passwordHash, login.passwordHash))
@@ -161,17 +173,25 @@ namespace Server
                     // If user isnt already logged in, add data to activeUsers
                     activeUsers[clientId].username = login.username;
                     activeUsers[clientId].logged = true;
-                    activeUsers[clientId].userId = dbConnection.GetUserId(login.username);
+                    lock (activeUsers[clientId].dbConnection)
+                    {
+                        activeUsers[clientId].userId = dbConnection.GetUserId(login.username);
+                    }
                 }
                 // Start async thread
                 eventHandlers[activeUsers[clientId].username] = new EventWaitHandle(false, EventResetMode.ManualReset);
                 userLoginHandler[clientId].Set();
                 if (!whichFunction.ContainsKey(activeUsers[clientId].username)) whichFunction[activeUsers[clientId].username] = new List<Tuple<Options, string>>();
-                List<string> friends = activeUsers[clientId].dbConnection.GetFriendsNames(activeUsers[clientId].username);
+
+                List<string> friends = new List<string>();
+                lock (activeUsers[clientId].dbConnection)
+                {
+                    friends = activeUsers[clientId].dbConnection.GetFriendsNames(activeUsers[clientId].username);
+                }
                 foreach (var key in friends)
                 {
                     // Check if friend is active
-                    if (activeUsers.Contains(new User { username = key}))
+                    if (activeUsers.Contains(new User { username = key }))
                     {
                         // Send to active friend information about activity of user
                         lock (whichFunction[key])
@@ -209,9 +229,12 @@ namespace Server
             // Check if user doesnt already exists in DB
             DbMethods dbConnection = new DbMethods();
             lock (activeUsers[clientId]) { dbConnection = activeUsers[clientId].dbConnection; }
-            if (!dbConnection.CheckIfNameExist(username))
-                return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
-            return MessageProccesing.CreateMessage(ErrorCodes.USER_ALREADY_EXISTS);
+            lock (activeUsers[clientId].dbConnection)
+            {
+                if (!dbConnection.CheckIfNameExist(username))
+                    return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+                return MessageProccesing.CreateMessage(ErrorCodes.USER_ALREADY_EXISTS);
+            }
         }
 
         public string AddFriend(string msg, int clientId)
@@ -232,8 +255,11 @@ namespace Server
             // Check if given users arent already friends
             lock (activeUsers[clientId])
             {
-                if (activeUsers[clientId].dbConnection.CheckFriends(inviteeUsername, invitorUsername)) return MessageProccesing.CreateMessage(
+                lock (activeUsers[clientId].dbConnection)
+                {
+                    if (activeUsers[clientId].dbConnection.CheckFriends(inviteeUsername, invitorUsername)) return MessageProccesing.CreateMessage(
                       ErrorCodes.ALREADY_FRIENDS);
+                }
                 ei.username = invitorUsername;
             }
 
@@ -248,7 +274,10 @@ namespace Server
             }
 
             ei.inviteeUsername = inviteeUsername;
-            ei.invitationId = activeUsers[clientId].dbConnection.CreateNewInvitation(ei.username, ei.inviteeUsername);
+            lock (activeUsers[clientId].dbConnection)
+            {
+                ei.invitationId = activeUsers[clientId].dbConnection.CreateNewInvitation(ei.username, ei.inviteeUsername);
+            }
 
             lock (invitations)
             {
@@ -267,16 +296,25 @@ namespace Server
             // Add invite to invitee list of invitations ids
             try
             {
-                userInvitationsIds[activeUsers[clientId].dbConnection.GetUserId(inviteeUsername)].Add(ei.invitationId);
+                lock (activeUsers[clientId].dbConnection)
+                    userInvitationsIds[activeUsers[clientId].dbConnection.GetUserId(inviteeUsername)].Add(ei.invitationId);
             }
             catch
             {
-                userInvitationsIds[activeUsers[clientId].dbConnection.GetUserId(inviteeUsername)] = new List<int> { ei.invitationId };
+                lock (activeUsers[clientId].dbConnection)
+                    userInvitationsIds[activeUsers[clientId].dbConnection.GetUserId(inviteeUsername)] = new List<int> { ei.invitationId };
             }
 
-            // Tells aync Thred that there is a new invitation
-            whichFunction[inviteeUsername].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
-            eventHandlers[inviteeUsername].Set();
+            try
+            {
+                // Tells aync Thred that there is a new invitation
+                whichFunction[inviteeUsername].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
+                eventHandlers[inviteeUsername].Set();
+            }
+            catch
+            {
+                ;
+            }
 
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
@@ -302,19 +340,24 @@ namespace Server
             // Check if given users arent already friends
             lock (activeUsers[clientId])
             {
-                if (activeUsers[clientId].dbConnection.CheckFriends(inv.inviteeUsername, inv.username)) return MessageProccesing.CreateMessage(
+                lock (activeUsers[clientId].dbConnection)
+                {
+                    if (activeUsers[clientId].dbConnection.CheckFriends(inv.inviteeUsername, inv.username)) return MessageProccesing.CreateMessage(
                       ErrorCodes.ALREADY_FRIENDS);
+                }
             }
 
             // Update status
             lock (invitations[invitationId]) invitations[invitationId].status = 2;
-            activeUsers[clientId].dbConnection.UpdateInvitations(invitationId, 2);
+            lock (activeUsers[clientId].dbConnection)
+                activeUsers[clientId].dbConnection.UpdateInvitations(invitationId, 2);
 
             // Create recornd in DB
-            activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invitationId].username);
+            lock (activeUsers[clientId].dbConnection)
+                activeUsers[clientId].dbConnection.AddFriends(activeUsers[clientId].userId, invitations[invitationId].username);
 
             // Delete index in invitee ivitations ids
-            lock(userInvitationsIds[activeUsers[clientId].userId])
+            lock (userInvitationsIds[activeUsers[clientId].userId])
             {
                 userInvitationsIds[activeUsers[clientId].userId].Remove(invitationId);
             }
@@ -345,8 +388,11 @@ namespace Server
             // Check if given users arent already friends
             lock (activeUsers[clientId])
             {
-                if (activeUsers[clientId].dbConnection.CheckFriends(inv.inviteeUsername, inv.username)) return MessageProccesing.CreateMessage(
+                lock (activeUsers[clientId].dbConnection)
+                {
+                    if (activeUsers[clientId].dbConnection.CheckFriends(inv.inviteeUsername, inv.username)) return MessageProccesing.CreateMessage(
                       ErrorCodes.ALREADY_FRIENDS);
+                }
             }
 
             int secondeUserId = activeUsers[clientId].dbConnection.GetUserId(invitations[invitationId].username);
@@ -354,9 +400,10 @@ namespace Server
 
             // Set status a declined
             invitations[invitationId].status = 3;
-            
+
             // Update DB invitation
-            activeUsers[clientId].dbConnection.UpdateInvitations(invitationId, 3);
+            lock (activeUsers[clientId].dbConnection)
+                activeUsers[clientId].dbConnection.UpdateInvitations(invitationId, 3);
 
             // Tell invitor about declined invitation
             whichFunction[inv.username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
@@ -371,11 +418,14 @@ namespace Server
             List<Friend> friends = new List<Friend>();
 
             // Get friends from DB
-            foreach (string friendName in activeUsers[clientId].dbConnection.GetFriendsNames(activeUsers[clientId].username))
+            lock (activeUsers[clientId].dbConnection)
             {
-                Friend friend = new Friend(friendName, 0);
-                if (activeUsers.Contains(new User() { username = friendName })) friend.active = 1;
-                friends.Add(friend);
+                foreach (string friendName in activeUsers[clientId].dbConnection.GetFriendsNames(activeUsers[clientId].username))
+                {
+                    Friend friend = new Friend(friendName, 0);
+                    if (activeUsers.Contains(new User() { username = friendName })) friend.active = 1;
+                    friends.Add(friend);
+                }
             }
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR, friends);
 
@@ -386,7 +436,8 @@ namespace Server
             // If user isint logged return error
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
             // Delete user from DB
-            activeUsers[clientId].dbConnection.DeleteUser(activeUsers[clientId].userId);
+            lock (activeUsers[clientId].dbConnection)
+                activeUsers[clientId].dbConnection.DeleteUser(activeUsers[clientId].userId);
 
             // Delete user informations from memory
             ClearUserData(clientId);
@@ -397,7 +448,9 @@ namespace Server
         {
             // If user isint logged return error
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
-            bool conversationExists = activeUsers[clientId].dbConnection.CheckIfConversationExist(activeUsers[clientId].username);
+            bool conversationExists;
+            lock (activeUsers[clientId].dbConnection)
+                conversationExists = activeUsers[clientId].dbConnection.CheckIfConversationExist(activeUsers[clientId].username);
             Username user = MessageProccesing.DeserializeObject(msg) as Username;
             bool isActive = false;
             foreach (User active in activeUsers)
@@ -414,12 +467,14 @@ namespace Server
             // Invite to existing converstaion
             if (conversationExists)
             {
-                conversationId = activeUsers[clientId].dbConnection.AddUserToConversation(activeUsers[clientId].username, user.username);
+                lock (activeUsers[clientId].dbConnection)
+                    conversationId = activeUsers[clientId].dbConnection.AddUserToConversation(activeUsers[clientId].username, user.username);
             }
             // Create new conversation
             else
             {
-                conversationId = activeUsers[clientId].dbConnection.CreateNewConversation(activeUsers[clientId].username, user.username);
+                lock (activeUsers[clientId].dbConnection)
+                    conversationId = activeUsers[clientId].dbConnection.CreateNewConversation(activeUsers[clientId].username, user.username);
             }
 
             // try catch czy jest zalogowany
@@ -436,13 +491,16 @@ namespace Server
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
 
             // Notyfiy other participans about joining conversation
-            List<string> conversationsParticipansList = activeUsers[clientId].dbConnection.GetConversationsParticipants(conversationId, activeUsers[clientId].username);
-            foreach(string participant in conversationsParticipansList)
+            List<string> conversationsParticipansList = new List<string>();
+            lock (activeUsers[clientId].dbConnection)
+                conversationsParticipansList = activeUsers[clientId].dbConnection.GetConversationsParticipants(conversationId, activeUsers[clientId].username);
+            foreach (string participant in conversationsParticipansList)
             {
                 whichFunction[participant].Add(new Tuple<Options, string>(Options.ACCEPTED_CALL, activeUsers[clientId].username));
                 eventHandlers[participant].Set();
             }
-            activeUsers[clientId].dbConnection.UpdateUserConversationStatus(activeUsers[clientId].username, CallStatus.ACCEPTED);
+            lock (activeUsers[clientId].dbConnection)
+                activeUsers[clientId].dbConnection.UpdateUserConversationStatus(activeUsers[clientId].username, CallStatus.ACCEPTED);
             // Infro to server connection. Nedded to create udp sockets
             throw new CustomException(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, conversationId));
         }
@@ -453,9 +511,12 @@ namespace Server
             // If user isint logged return error
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
 
-            activeUsers[clientId].dbConnection.DeleteFromConversation(activeUsers[clientId].username);
+            lock (activeUsers[clientId].dbConnection)
+                activeUsers[clientId].dbConnection.DeleteFromConversation(activeUsers[clientId].username);
             // Notyfiy other participans about leacing conversation
-            List<string> conversationsParticipansList = activeUsers[clientId].dbConnection.GetConversationsParticipants(conversationId, activeUsers[clientId].username);
+            List<string> conversationsParticipansList = new List<string>();
+            lock (activeUsers[clientId].dbConnection)
+                conversationsParticipansList = activeUsers[clientId].dbConnection.GetConversationsParticipants(conversationId, activeUsers[clientId].username);
             foreach (string participant in conversationsParticipansList)
             {
                 whichFunction[participant].Add(new Tuple<Options, string>(Options.DECLINED_CALL, activeUsers[clientId].username));
@@ -474,20 +535,22 @@ namespace Server
             List<Invitation> result = new List<Invitation>();
             var InvitationsIds = userInvitationsIds[activeUsers[clientId].userId];
             // Check invitations status
-            for (int i=0;i<InvitationsIds.Count;i++)
+            for (int i = 0; i < InvitationsIds.Count; i++)
             {
                 // If invitation wasnt sended
-                if(invitations[InvitationsIds[i]].status == 0 && invitations[InvitationsIds[i]].inviteeUsername == activeUsers[clientId].username)
+                if (invitations[InvitationsIds[i]].status == 0 && invitations[InvitationsIds[i]].inviteeUsername == activeUsers[clientId].username)
                 {
                     invitations[InvitationsIds[i]].status = 1;
                     result.Add(invitations[InvitationsIds[i]]);
-                    activeUsers[clientId].dbConnection.UpdateInvitations(InvitationsIds[i],1);
+                    lock (activeUsers[clientId].dbConnection)
+                        activeUsers[clientId].dbConnection.UpdateInvitations(InvitationsIds[i], 1);
                 }
                 // If invitation was accepted or declined
-                else if(invitations[InvitationsIds[i]].status >= 2 && invitations[InvitationsIds[i]].username == activeUsers[clientId].username)
+                else if (invitations[InvitationsIds[i]].status >= 2 && invitations[InvitationsIds[i]].username == activeUsers[clientId].username)
                 {
                     result.Add(invitations[InvitationsIds[i]]);
-                    activeUsers[clientId].dbConnection.DeleteInvitation(InvitationsIds[i]);
+                    lock (activeUsers[clientId].dbConnection)
+                        activeUsers[clientId].dbConnection.DeleteInvitation(InvitationsIds[i]);
 
                     // Delete invitation
                     lock (invitations[InvitationsIds[i]])
@@ -496,7 +559,7 @@ namespace Server
                     }
 
                     // Delete invitation id
-                    lock(userInvitationsIds[activeUsers[clientId].userId])
+                    lock (userInvitationsIds[activeUsers[clientId].userId])
                     {
                         userInvitationsIds[activeUsers[clientId].userId].Remove(InvitationsIds[i]);
                     }
@@ -506,7 +569,7 @@ namespace Server
         }
 
 
-        public string SendActiveFriends(int clientId,string senderName)
+        public string SendActiveFriends(int clientId, string senderName)
         {
             return MessageProccesing.CreateMessage(Options.ACTIVE_FRIENDS, new Username(senderName));
         }
@@ -516,7 +579,8 @@ namespace Server
         {
             Call call = new Call();
             call.callId = int.Parse(callId);
-            call.usernames = activeUsers[clientId].dbConnection.GetConversationsParticipants(call.callId, activeUsers[clientId].username);
+            lock (activeUsers[clientId].dbConnection)
+                call.usernames = activeUsers[clientId].dbConnection.GetConversationsParticipants(call.callId, activeUsers[clientId].username);
             return MessageProccesing.CreateMessage(Options.INCOMMING_CALL, call);
         }
 
@@ -598,13 +662,14 @@ namespace Server
 
         private void ClearUserData(int clientId)
         {
-            lock (whichFunction) whichFunction.Remove(activeUsers[clientId].username);                   
-            lock (eventHandlers)   eventHandlers.Remove(activeUsers[clientId].username);
-            lock (userLoginHandler)  userLoginHandler.Remove(clientId);
+            lock (whichFunction) whichFunction.Remove(activeUsers[clientId].username);
+            lock (eventHandlers) eventHandlers.Remove(activeUsers[clientId].username);
+            lock (userLoginHandler) userLoginHandler.Remove(clientId);
 
             lock (activeUsers)
             {
-                activeUsers[clientId].dbConnection.CloseConnection();
+                lock (activeUsers[clientId].dbConnection)
+                    activeUsers[clientId].dbConnection.CloseConnection();
                 activeUsers[clientId] = null;
             }
         }
