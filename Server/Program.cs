@@ -10,10 +10,9 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            ServerConnection serverConnection = new ServerConnection();
+            ServerConnection s = new ServerConnection();
             //StartTests();
         }
-
 
 
         public static string RegisterUser(int clientId,string name,string password,ClientProcessing cp)
