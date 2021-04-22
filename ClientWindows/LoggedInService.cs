@@ -11,6 +11,8 @@ namespace ClientWindows
     static class LoggedInService
     {
         private static Boolean logoutNotFinished = false;
+        public static GetFriendsCallback getFriendsCallback;
+
         public static void logout()
         {
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LOGOUT));
@@ -61,7 +63,8 @@ namespace ClientWindows
                     Program.isLoggedIn = false;
                     logoutNotFinished = false;
                     msg = "Pomyślnie uzyskano liste znajomych! "+message;
-                    MessageBox.Show(msg, title, buttons);
+                    //MessageBox.Show(msg, title, buttons);
+                    getFriendsCallback(message);
                     break;
             }
         }
