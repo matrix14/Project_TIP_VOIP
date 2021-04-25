@@ -194,6 +194,8 @@ namespace Server
         public ServerConnection()
         {
             menager = new ClientProcessing();
+            userNewVoiceHandler = new Dictionary<IPAddress, EventWaitHandle>();
+            voiceToSend = new Dictionary<int, Dictionary<IPAddress, Queue<byte[]>>>();
             port = 11000;
             RunServer();
         }
