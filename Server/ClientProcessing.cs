@@ -638,6 +638,7 @@ namespace Server
                 if (activeUsers[i] == null)
                 {
                     activeUsers[i] = new User();
+                    userLoginHandler.Add(i, new EventWaitHandle(false, EventResetMode.ManualReset));
                     return i;
                 }
             }
