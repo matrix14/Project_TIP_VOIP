@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Shared;
@@ -11,6 +12,20 @@ namespace ClientWindows
     static class LoggedInService
     {
         private static Boolean logoutNotFinished = false;
+        private static StringCallback getFriendsCallback;
+        private static StringCallback newInvitationCallback;
+
+        private static ManualResetEvent invitationCallbackSet = new ManualResetEvent(false);
+
+        public static StringCallback NewInvitationCallback {
+            get => newInvitationCallback; 
+            set {
+                newInvitationCallback = value;
+                invitationCallbackSet.Set();
+            } 
+        }
+        public static StringCallback GetFriendsCallback { get => getFriendsCallback; set => getFriendsCallback = value; }
+
         public static void logout()
         {
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LOGOUT));
@@ -61,7 +76,8 @@ namespace ClientWindows
                     Program.isLoggedIn = false;
                     logoutNotFinished = false;
                     msg = "Pomyślnie uzyskano liste znajomych! "+message;
-                    MessageBox.Show(msg, title, buttons);
+                    //MessageBox.Show(msg, title, buttons);
+                    getFriendsCallback(message);
                     break;
             }
         }
@@ -104,10 +120,32 @@ namespace ClientWindows
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             Options opt = (Options)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
 
-            MessageBoxButtons buttons = MessageBoxButtons.OK;
-            string title = "Przychodzące zaproszenie";
+            invitationCallbackSet.WaitOne();
+            newInvitationCallback(message);
+        }
 
-            MessageBox.Show(message, title, buttons);
+        public static void acceptInvitation(Invitation inv)
+        {
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.ACCEPT_FRIEND, inv.invitationId));
+        }
+
+        public static void acceptInvitationReply(String message)
+        {
+            MessageBox.Show("Zaproszenie pomyślnie zaakceptowane!");
+            getFriends();
+            //TODO handle faults, remove invitation from list
+        }
+
+        public static void declineInvitation(Invitation inv)
+        {
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.DECLINE_FRIEND, inv.invitationId));
+        }
+
+        public static void declineInvitationReply(String message)
+        {
+            MessageBox.Show("Zaproszenie pomyślnie odrzucone!");
+            getFriends();
+            //TODO handle faults, remove invitation from list
         }
     }
 }

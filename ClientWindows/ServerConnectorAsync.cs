@@ -24,6 +24,8 @@ namespace ClientWindows
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
+        private static Boolean connectionAlive = false;
+
         private static String reply = String.Empty;
 
         private static Socket sock;
@@ -36,7 +38,7 @@ namespace ClientWindows
                 IPEndPoint remoteAddr = new IPEndPoint(ip, port);
                 sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
-                connectDone.WaitOne();
+                //connectDone.WaitOne();
             } catch (Exception e)
             {
                 return; //TODO Add message for client when problem
@@ -45,15 +47,22 @@ namespace ClientWindows
 
         public static void StopConnection()
         {
+            connectionAlive = false;
             sock.Shutdown(SocketShutdown.Both);
             sock.Close();
         }
 
         public static void SendMessage(String message)
         {
-            byte[] byteData = Encoding.ASCII.GetBytes(message);
-            sock.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), sock);
-            sendDone.WaitOne();
+            try
+            {
+                byte[] byteData = Encoding.ASCII.GetBytes(message);
+                sock.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), sock);
+            } catch (Exception e)
+            {
+                return;
+            }
+            //sendDone.WaitOne();
         }
 
         private static void SendCallback(IAsyncResult res)
@@ -121,11 +130,17 @@ namespace ClientWindows
                 Socket sockInt = (Socket)res.AsyncState;
                 sockInt.EndConnect(res);
                 connectDone.Set();
+                connectionAlive = true;
             } catch (Exception e)
             {
                 return;
                 //TODO Implement faults
             }
+        }
+
+        public static Boolean getConnectionState()
+        {
+            return connectionAlive;
         }
     }
 }

@@ -17,5 +17,10 @@ namespace Shared
         {
             active = 0;
         }
+
+        public override string ToString()
+        {
+            return username;
+        }
     }
 }
