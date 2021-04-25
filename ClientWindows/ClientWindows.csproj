@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SelectInvitationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectInvitationForm.Designer.cs">
+      <DependentUpon>SelectInvitationForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AddFriendForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -71,6 +77,9 @@
     <Compile Include="ServerConnectorAsync.cs" />
     <Compile Include="ServerConnectorAsyncOLD.cs" />
     <Compile Include="ServerProcessing.cs" />
+    <EmbeddedResource Include="SelectInvitationForm.resx">
+      <DependentUpon>SelectInvitationForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AddFriendForm.resx">
       <DependentUpon>AddFriendForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -89,6 +98,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

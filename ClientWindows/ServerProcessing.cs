@@ -72,6 +72,12 @@ namespace ClientWindows
                     case Options.ADD_FRIEND:
                         LoggedInService.addFriendReply(message);
                         break;
+                    case Options.ACCEPT_FRIEND:
+                        LoggedInService.acceptInvitationReply(message);
+                        break;
+                    case Options.DECLINE_FRIEND:
+                        LoggedInService.declineInvitationReply(message);
+                        break;
                 }
             } else
             {
