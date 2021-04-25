@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,9 +16,14 @@ namespace ClientWindows
         private Boolean registerMode = false;
 
         private Boolean registerSwitch = false; //TODO temporary
+
+        private Boolean connectionAlive = false;
         public LoginForm()
         {
             InitializeComponent();
+            connectionAlive = ServerConnectorAsync.getConnectionState();
+            updateConnectionState();
+            Task.Run(stateChecker);
         }
 
         private void LoginForm_Load(object sender, EventArgs e)
@@ -82,6 +88,34 @@ namespace ClientWindows
                     lif.Show();
                     this.Hide();
                 }
+            }
+        }
+
+        private void updateConnectionState()
+        {
+            if(connectionAlive)
+            {
+                this.serverConnection_Label.Text = "Połączono";
+                this.serverConnection_Label.ForeColor = Color.Green;
+            } else
+            {
+                this.serverConnection_Label.Text = "Brak połączenia!";
+                this.serverConnection_Label.ForeColor = Color.Red;
+            }
+        }
+
+        private void serverConnection_Label_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void stateChecker()
+        {
+            while(true)
+            {
+                Thread.Sleep(1000);
+                connectionAlive = ServerConnectorAsync.getConnectionState();
+                updateConnectionState();
             }
         }
     }

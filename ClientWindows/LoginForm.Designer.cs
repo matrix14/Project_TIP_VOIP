@@ -38,6 +38,9 @@ namespace ClientWindows
             this.changeMode_label = new System.Windows.Forms.Label();
             this.actualMode_Label = new System.Windows.Forms.Label();
             this.usernameFree_label = new System.Windows.Forms.Label();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.serverConnection_Label = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // confirmAction_button
@@ -122,11 +125,31 @@ namespace ClientWindows
             this.usernameFree_label.Size = new System.Drawing.Size(0, 13);
             this.usernameFree_label.TabIndex = 8;
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.serverConnection_Label});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 203);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(227, 22);
+            this.statusStrip1.TabIndex = 9;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // serverConnection_Label
+            // 
+            this.serverConnection_Label.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.serverConnection_Label.ForeColor = System.Drawing.Color.Red;
+            this.serverConnection_Label.Name = "serverConnection_Label";
+            this.serverConnection_Label.Size = new System.Drawing.Size(95, 17);
+            this.serverConnection_Label.Text = "Brak połączenia";
+            this.serverConnection_Label.Click += new System.EventHandler(this.serverConnection_Label_Click);
+            // 
             // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(227, 209);
+            this.ClientSize = new System.Drawing.Size(227, 225);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.usernameFree_label);
             this.Controls.Add(this.actualMode_Label);
             this.Controls.Add(this.changeMode_label);
@@ -139,6 +162,8 @@ namespace ClientWindows
             this.Name = "LoginForm";
             this.Text = "TIP_VOIP Client";
             this.Load += new System.EventHandler(this.LoginForm_Load);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -155,6 +180,8 @@ namespace ClientWindows
         private System.Windows.Forms.Label changeMode_label;
         private System.Windows.Forms.Label actualMode_Label;
         private System.Windows.Forms.Label usernameFree_label;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel serverConnection_Label;
     }
 }
 
