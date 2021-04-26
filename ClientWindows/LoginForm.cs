@@ -20,8 +20,6 @@ namespace ClientWindows
         private System.Timers.Timer checkUsernameTimer = new System.Timers.Timer();
         private Boolean checkUsernameTimerStopped = true;
 
-        private Boolean registerSwitch = false; //TODO temporary
-
         private Boolean connectionAlive = false;
         public LoginForm()
         {
@@ -63,24 +61,7 @@ namespace ClientWindows
                 checkUsernameTimer.Stop();
                 checkUsernameTimer.Start();
                 checkUsernameTimerStopped = false;
-                //LoginService.checkIsUserExist(this.login_textbox.Text);
-                /*if (this.registerMode)
-                {
-                    if (registerSwitch)
-                    { //TODO temporary
-                        this.usernameFree_label.Text = "Login niedostępny!";
-                        this.usernameFree_label.ForeColor = Color.Red;
-                        registerSwitch = false;
-                    }
-                    else
-                    {
-                        this.usernameFree_label.Text = "Login dostępny";
-                        this.usernameFree_label.ForeColor = Color.Green;
-                        registerSwitch = true;
-                    }
-                }*/
             }
-            //TODO check if username is free
         }
 
         public void usernameCheckUpdateInfo(Boolean exist)

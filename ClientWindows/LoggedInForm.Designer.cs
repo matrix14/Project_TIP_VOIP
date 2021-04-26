@@ -43,6 +43,7 @@ namespace ClientWindows
             this.callUser = new System.Windows.Forms.Button();
             this.removeFriend = new System.Windows.Forms.Button();
             this.activeUserWindow = new System.Windows.Forms.Label();
+            this.invitingList_button = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -113,6 +114,7 @@ namespace ClientWindows
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.invitingList_button);
             this.splitContainer1.Panel1.Controls.Add(this.friendsList);
             this.splitContainer1.Panel1.Controls.Add(this.openFriend_button);
             this.splitContainer1.Panel1.Controls.Add(this.friendList_label);
@@ -128,6 +130,7 @@ namespace ClientWindows
             // 
             // friendsList
             // 
+            this.friendsList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.friendsList.FormattingEnabled = true;
             this.friendsList.Items.AddRange(new object[] {
             "Wczytywanie..."});
@@ -135,17 +138,20 @@ namespace ClientWindows
             this.friendsList.Name = "friendsList";
             this.friendsList.Size = new System.Drawing.Size(260, 316);
             this.friendsList.TabIndex = 2;
+            this.friendsList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.friendList_DrawItem);
+            this.friendsList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.friendList_MeasureItem);
             this.friendsList.SelectedIndexChanged += new System.EventHandler(this.friendsList_SelectedIndexChanged);
             // 
             // openFriend_button
             // 
             this.openFriend_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.openFriend_button.Location = new System.Drawing.Point(3, 366);
+            this.openFriend_button.Location = new System.Drawing.Point(3, 326);
             this.openFriend_button.Name = "openFriend_button";
             this.openFriend_button.Size = new System.Drawing.Size(260, 34);
             this.openFriend_button.TabIndex = 1;
             this.openFriend_button.Text = "Otwórz";
             this.openFriend_button.UseVisualStyleBackColor = true;
+            this.openFriend_button.Visible = false;
             this.openFriend_button.Click += new System.EventHandler(this.openFriend_button_Click);
             // 
             // friendList_label
@@ -191,6 +197,17 @@ namespace ClientWindows
             this.activeUserWindow.Visible = false;
             this.activeUserWindow.Click += new System.EventHandler(this.label1_Click_1);
             // 
+            // invitingList_button
+            // 
+            this.invitingList_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.invitingList_button.Location = new System.Drawing.Point(3, 364);
+            this.invitingList_button.Name = "invitingList_button";
+            this.invitingList_button.Size = new System.Drawing.Size(260, 34);
+            this.invitingList_button.TabIndex = 3;
+            this.invitingList_button.Text = "Zaproszenia (_)";
+            this.invitingList_button.UseVisualStyleBackColor = true;
+            this.invitingList_button.Click += new System.EventHandler(this.invitingList_button_Click);
+            // 
             // LoggedInForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -230,7 +247,8 @@ namespace ClientWindows
         private System.Windows.Forms.Button openFriend_button;
         private System.Windows.Forms.ListBox friendsList;
         private System.Windows.Forms.Label activeUserWindow;
-        private System.Windows.Forms.Button callUser;
         private System.Windows.Forms.Button removeFriend;
+        private System.Windows.Forms.Button callUser;
+        private System.Windows.Forms.Button invitingList_button;
     }
 }
