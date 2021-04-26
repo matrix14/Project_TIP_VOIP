@@ -96,11 +96,13 @@ namespace ClientWindows
                 {
                     this.usernameFree_label.Text = "Login niedostępny!";
                     this.usernameFree_label.ForeColor = Color.Red;
+                    this.confirmAction_button.Enabled = false;
                 }
                 else
                 {
                     this.usernameFree_label.Text = "Login dostępny";
                     this.usernameFree_label.ForeColor = Color.Green;
+                    this.confirmAction_button.Enabled = true;
                 }
                 return;
             }
@@ -119,6 +121,7 @@ namespace ClientWindows
                 this.usernameFree_label.Visible = false;
                 checkUsernameTimer.Stop();
                 checkUsernameTimerStopped = true;
+                this.confirmAction_button.Enabled = true;
             } else {
                 registerMode = true;
                 this.actualMode_Label.Text = "Rejestracja";
@@ -127,6 +130,7 @@ namespace ClientWindows
                 this.changeMode_button.Text = "Zaloguj się";
                 this.usernameFree_label.Visible = true;
                 this.usernameFree_label.Text = "";
+                this.confirmAction_button.Enabled = false;
             }
         }
 
@@ -135,6 +139,7 @@ namespace ClientWindows
             if (this.registerMode)
             {
                 LoginService.register(this.login_textbox.Text, this.password_textbox.Text);
+                this.confirmAction_button.Enabled = false;
             }
             else
             {

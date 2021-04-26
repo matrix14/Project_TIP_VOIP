@@ -20,6 +20,8 @@ namespace ClientWindows
             BooleanCallback callback = usernameCheckUpdateInfo;
             LoggedInService.CheckUsernameCallback = callback;
 
+            this.addFriend_button.Enabled = false;
+
             checkUsernameTimer.Interval = 150;
             checkUsernameTimer.Elapsed += usernameCheckOnTimerElapsed;
             checkUsernameTimer.AutoReset = false;
@@ -28,6 +30,7 @@ namespace ClientWindows
         private void addFriend_button_Click(object sender, EventArgs e)
         {
             LoggedInService.addFriend(this.username_input.Text);
+            this.addFriend_button.Enabled = false;
             this.Close();
         }
         private void usernameCheckOnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -57,11 +60,13 @@ namespace ClientWindows
             { 
                 this.isUserExists_label.Text = "Znaleziono użytkownika!";
                 this.isUserExists_label.ForeColor = Color.Green;
+                this.addFriend_button.Enabled = true;
             }
             else
             {
                 this.isUserExists_label.Text = "Nie znaleziono użytkownika!";
                 this.isUserExists_label.ForeColor = Color.Red;
+                this.addFriend_button.Enabled = false;
             }
         }
 
