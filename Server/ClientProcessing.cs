@@ -77,6 +77,7 @@ namespace Server
             List<string> res = new List<string>();
             string item;
 
+
             // Async messages only to logged users
             if (!activeUsers[clientId].logged) userLoginHandler[clientId].WaitOne();
             // Wait unit event
@@ -102,7 +103,7 @@ namespace Server
         {
             lock (userLoginHandler) userLoginHandler[clientId].Reset();
             lock (activeUsers[clientId]) activeUsers[clientId].logged = false;
-            lock (eventHandlers) eventHandlers[activeUsers[clientId].username].Reset();
+            lock (eventHandlers) eventHandlers[activeUsers[clientId].username].Set();
             lock (userInvitationsIds[activeUsers[clientId].userId])
             {
                 for (int i = 0; i < userInvitationsIds[activeUsers[clientId].userId].Count; i++)
@@ -112,6 +113,8 @@ namespace Server
                         lock (activeUsers[clientId].dbConnection) activeUsers[clientId].dbConnection.UpdateInvitations(i, 0);
                 }
             }
+            lock (eventHandlers) eventHandlers.Remove(activeUsers[clientId].username);
+            lock (whichFunction[activeUsers[clientId].username]) whichFunction.Remove(activeUsers[clientId].username);
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
 
@@ -362,8 +365,15 @@ namespace Server
                 userInvitationsIds[activeUsers[clientId].userId].Remove(invitationId);
             }
             // Tell async invitor Thread about accepted invitation
-            whichFunction[inv.username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
-            eventHandlers[inv.username].Set();
+            try
+            {
+                whichFunction[inv.username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
+                eventHandlers[inv.username].Set();
+            }
+            catch
+            {
+                ;
+            }
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
 
@@ -405,9 +415,22 @@ namespace Server
             lock (activeUsers[clientId].dbConnection)
                 activeUsers[clientId].dbConnection.UpdateInvitations(invitationId, 3);
 
+            // Delete index in invitee ivitations ids
+            lock (userInvitationsIds[activeUsers[clientId].userId])
+            {
+                userInvitationsIds[activeUsers[clientId].userId].Remove(invitationId);
+            }
+
             // Tell invitor about declined invitation
-            whichFunction[inv.username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
-            eventHandlers[invitations[invitationId].username].Set();
+            try
+            {
+                whichFunction[inv.username].Add(new Tuple<Options, string>(Options.FRIEND_INVITATIONS, activeUsers[clientId].username));
+                eventHandlers[invitations[invitationId].username].Set();
+            }
+            catch
+            {
+                ;
+            }
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
 
@@ -664,15 +687,14 @@ namespace Server
         private void ClearUserData(int clientId)
         {
             lock (whichFunction) whichFunction.Remove(activeUsers[clientId].username);
-            lock (eventHandlers) eventHandlers.Remove(activeUsers[clientId].username);
-            lock (userLoginHandler) userLoginHandler.Remove(clientId);
-
             lock (activeUsers)
             {
                 lock (activeUsers[clientId].dbConnection)
                     activeUsers[clientId].dbConnection.CloseConnection();
                 activeUsers[clientId] = null;
             }
+            //lock (eventHandlers) eventHandlers.Remove(activeUsers[clientId].username);
+            lock (userLoginHandler) userLoginHandler.Remove(clientId);
         }
 
     }
