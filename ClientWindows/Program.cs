@@ -11,7 +11,8 @@ namespace ClientWindows
         public static String username = "";
         public static Boolean isLoggedIn = false;
         public static Form activeForm;
-        
+
+
         /// <summary>
         /// Główny punkt wejścia dla aplikacji.
         /// </summary>

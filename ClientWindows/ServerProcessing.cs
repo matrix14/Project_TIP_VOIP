@@ -64,7 +64,13 @@ namespace ClientWindows
                         LoggedInService.declineInvitationReply(message);
                         break;
                     case Options.CHECK_USER_NAME:
-                        //TODO: handle it
+                        if(Program.isLoggedIn)
+                        {
+                            LoggedInService.checkIsUserExistReply(message);
+                        } else
+                        {
+                            LoginService.checkIsUserExistReply(message);
+                        }
                         break;
                 }
                 syncProcessNotCompleted.Set();

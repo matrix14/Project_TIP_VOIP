@@ -11,10 +11,14 @@ using System.Windows.Forms;
 
 namespace ClientWindows
 {
+    public delegate void BooleanCallback(Boolean exist);
     public partial class LoginForm : Form
     {
         //TODO: password check, username length check
         private Boolean registerMode = false;
+
+        private System.Timers.Timer checkUsernameTimer = new System.Timers.Timer();
+        private Boolean checkUsernameTimerStopped = true;
 
         private Boolean registerSwitch = false; //TODO temporary
 
@@ -22,6 +26,14 @@ namespace ClientWindows
         public LoginForm()
         {
             InitializeComponent();
+
+            checkUsernameTimer.Interval = 150;
+            checkUsernameTimer.Elapsed += usernameCheckOnTimerElapsed;
+            checkUsernameTimer.AutoReset = false;
+
+            BooleanCallback callback = usernameCheckUpdateInfo;
+            LoginService.CheckUsernameCallback = callback;
+
             connectionAlive = ServerConnectorAsync.getConnectionState();
             updateConnectionState();
             Task.Run(stateChecker);
@@ -32,22 +44,66 @@ namespace ClientWindows
 
         }
 
+        private void usernameCheckOnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (checkUsernameTimerStopped == false)
+            {
+                checkUsernameTimer.Stop();
+                checkUsernameTimerStopped = true;
+                LoginService.checkIsUserExist(this.login_textbox.Text);
+                
+            }
+        }
+
         private void login_textbox_KeyUp(object sender, KeyEventArgs e)
         {
-            if(this.registerMode)
+            if (registerMode == false) return;
+            if (this.login_textbox.Text.Length >= 3)
             {
-                if (registerSwitch) { //TODO temporary
+                checkUsernameTimer.Stop();
+                checkUsernameTimer.Start();
+                checkUsernameTimerStopped = false;
+                //LoginService.checkIsUserExist(this.login_textbox.Text);
+                /*if (this.registerMode)
+                {
+                    if (registerSwitch)
+                    { //TODO temporary
+                        this.usernameFree_label.Text = "Login niedostępny!";
+                        this.usernameFree_label.ForeColor = Color.Red;
+                        registerSwitch = false;
+                    }
+                    else
+                    {
+                        this.usernameFree_label.Text = "Login dostępny";
+                        this.usernameFree_label.ForeColor = Color.Green;
+                        registerSwitch = true;
+                    }
+                }*/
+            }
+            //TODO check if username is free
+        }
+
+        public void usernameCheckUpdateInfo(Boolean exist)
+        {
+            if (usernameFree_label.InvokeRequired)
+            {
+                usernameFree_label.Invoke(new MethodInvoker(() => { usernameCheckUpdateInfo(exist); }));
+                return;
+            }
+            else
+            {
+                if (exist)
+                {
                     this.usernameFree_label.Text = "Login niedostępny!";
                     this.usernameFree_label.ForeColor = Color.Red;
-                    registerSwitch = false;
-                } else
+                }
+                else
                 {
                     this.usernameFree_label.Text = "Login dostępny";
                     this.usernameFree_label.ForeColor = Color.Green;
-                    registerSwitch = true;
                 }
+                return;
             }
-            //TODO check if username is free
         }
 
         private void changeMode_button_Click(object sender, EventArgs e)
@@ -60,12 +116,16 @@ namespace ClientWindows
                 this.changeMode_label.Text = "Nie masz konta?";
                 this.changeMode_button.Text = "Zarejestruj się";
                 this.usernameFree_label.Text = "";
+                this.usernameFree_label.Visible = false;
+                checkUsernameTimer.Stop();
+                checkUsernameTimerStopped = true;
             } else {
                 registerMode = true;
                 this.actualMode_Label.Text = "Rejestracja";
                 this.confirmAction_button.Text = "Zarejestruj się";
                 this.changeMode_label.Text = "Masz już konto?";
                 this.changeMode_button.Text = "Zaloguj się";
+                this.usernameFree_label.Visible = true;
                 this.usernameFree_label.Text = "";
             }
         }

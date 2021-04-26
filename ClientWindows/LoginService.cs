@@ -11,6 +11,9 @@ namespace ClientWindows
     static class LoginService
     {
         private static Boolean loginNotFinished = false;
+        private static BooleanCallback checkUsernameCallback;
+
+        public static BooleanCallback CheckUsernameCallback { get => checkUsernameCallback; set => checkUsernameCallback = value; }
 
         public static void login(String username, String pass)
         {
@@ -78,6 +81,32 @@ namespace ClientWindows
                 case ErrorCodes.USER_ALREADY_EXISTS:
                     msg = "Taki użytkownik już istnieje!";
                     MessageBox.Show(msg, title, buttons);
+                    break;
+            }
+        }
+
+        public static void checkIsUserExist(String username)
+        {
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.CHECK_USER_NAME, new Username(username)));
+        }
+
+        public static void checkIsUserExistReply(String message)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+
+            if(checkUsernameCallback==null)
+            {
+                return;
+            }
+
+            switch (error)
+            {
+                case ErrorCodes.NO_ERROR:
+                    checkUsernameCallback(false);
+                    break;
+                case ErrorCodes.USER_ALREADY_EXISTS:
+                    checkUsernameCallback(true);
                     break;
             }
         }
