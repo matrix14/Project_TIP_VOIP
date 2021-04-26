@@ -126,7 +126,7 @@ namespace ClientWindows
 
         public static void acceptInvitation(Invitation inv)
         {
-            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.ACCEPT_FRIEND, inv.invitationId));
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.ACCEPT_FRIEND, new InvitationId(inv.invitationId)));
         }
 
         public static void acceptInvitationReply(String message)
@@ -138,7 +138,7 @@ namespace ClientWindows
 
         public static void declineInvitation(Invitation inv)
         {
-            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.DECLINE_FRIEND, inv.invitationId));
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.DECLINE_FRIEND, new InvitationId(inv.invitationId)));
         }
 
         public static void declineInvitationReply(String message)
