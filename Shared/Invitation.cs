@@ -29,7 +29,7 @@ namespace Shared
         }
         public override string ToString()
         {
-            return inviteeUsername;
+            return this.username;
         }
 
     }

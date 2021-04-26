@@ -13,6 +13,7 @@ namespace ClientWindows
 {
     public partial class LoginForm : Form
     {
+        //TODO: password check, username length check
         private Boolean registerMode = false;
 
         private Boolean registerSwitch = false; //TODO temporary
