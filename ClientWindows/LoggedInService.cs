@@ -15,6 +15,7 @@ namespace ClientWindows
         private static StringCallback getFriendsCallback;
         private static StringCallback newInvitationCallback;
         private static InvitationCallback invitationProcessedCallback;
+        private static BooleanCallback checkUsernameCallback;
         private static Invitation lastProcessedInvitation = new Invitation();
 
         private static ManualResetEvent invitationCallbackSet = new ManualResetEvent(false);
@@ -29,6 +30,8 @@ namespace ClientWindows
         }
         public static StringCallback GetFriendsCallback { get => getFriendsCallback; set => getFriendsCallback = value; }
         public static InvitationCallback InvitationProcessedCallback { get => invitationProcessedCallback; set => invitationProcessedCallback = value; }
+        public static BooleanCallback CheckUsernameCallback { get => checkUsernameCallback; set => checkUsernameCallback = value; }
+
 
         public static void logout()
         {
@@ -54,8 +57,8 @@ namespace ClientWindows
             switch (error)
             {
                 case ErrorCodes.NO_ERROR:
-                    Program.isLoggedIn = false;
                     logoutNotFinished = false;
+                    Program.isLoggedIn = false;
                     msg = "Pomyślnie wylogowano!";
                     MessageBox.Show(msg, title, buttons);
                     break;
@@ -77,7 +80,6 @@ namespace ClientWindows
             switch (error)
             {
                 case ErrorCodes.NO_ERROR:
-                    Program.isLoggedIn = false;
                     logoutNotFinished = false;
                     msg = "Pomyślnie uzyskano liste znajomych! "+message;
                     //MessageBox.Show(msg, title, buttons);
@@ -165,8 +167,6 @@ namespace ClientWindows
             lastProcessedInvitation.status = 2;
             invitationProcessedCallback(lastProcessedInvitation);
             invitationProcessing.Set();
-            //getFriends();
-            //TODO remove invitation from list
         }
 
         public static void declineInvitation(Invitation inv)
@@ -202,7 +202,7 @@ namespace ClientWindows
                     msg = "Jesteś nie zalogowany!";
                     break;
                 case ErrorCodes.WRONG_INVATATION_ID:
-                    msg = "Zły idnetyfikator zaproszenia!";
+                    msg = "Zły identyfikator zaproszenia!";
                     break;
             }
             MessageBox.Show(msg, title, buttons);
@@ -217,7 +217,23 @@ namespace ClientWindows
 
         public static void checkIsUserExistReply(String message)
         {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
 
+            if (checkUsernameCallback == null)
+            {
+                return;
+            }
+
+            switch (error)
+            {
+                case ErrorCodes.NO_ERROR:
+                    checkUsernameCallback(false);
+                    break;
+                case ErrorCodes.USER_ALREADY_EXISTS:
+                    checkUsernameCallback(true);
+                    break;
+            }
         }
     }
 }

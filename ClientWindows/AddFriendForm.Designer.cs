@@ -84,6 +84,7 @@ namespace ClientWindows
             this.Controls.Add(this.username_label);
             this.Name = "AddFriendForm";
             this.Text = "Dodaj znajomego";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddFriendForm_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
