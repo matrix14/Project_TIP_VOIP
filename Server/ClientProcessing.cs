@@ -115,6 +115,24 @@ namespace Server
             }
             lock (eventHandlers) eventHandlers.Remove(activeUsers[clientId].username);
             lock (whichFunction[activeUsers[clientId].username]) whichFunction.Remove(activeUsers[clientId].username);
+            List<string> friends = new List<string>();
+            lock (activeUsers[clientId].dbConnection)
+            {
+                friends = activeUsers[clientId].dbConnection.GetFriendsNames(activeUsers[clientId].username);
+            }
+            foreach (var key in friends)
+            {
+                // Check if friend is active
+                if (activeUsers.Contains(new User { username = key }))
+                {
+                    // Send to active friend information about activity of user
+                    lock (whichFunction[key])
+                    {
+                        whichFunction[key].Add(new Tuple<Options, string>(Options.INACTIVE_FRIENDS, activeUsers[clientId].username));
+                        eventHandlers[key].Set();
+                    }
+                }
+            }
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
         }
 
@@ -597,6 +615,11 @@ namespace Server
             return MessageProccesing.CreateMessage(Options.ACTIVE_FRIENDS, new Username(senderName));
         }
 
+        private string SendInactiveFriends(int clientId, string senderName)
+        {
+            return MessageProccesing.CreateMessage(Options.INACTIVE_FRIENDS, new Username(senderName));
+        }
+
 
         public string SendIncommingCall(int clientId, string callId)
         {
@@ -642,6 +665,7 @@ namespace Server
             asyncFunctions.Add(Options.INCOMMING_CALL, new AsyncFunctions(SendIncommingCall));
             asyncFunctions.Add(Options.ACCEPTED_CALL, new AsyncFunctions(SendAcceptedCall));
             asyncFunctions.Add(Options.DECLINED_CALL, new AsyncFunctions(SendDeclinedCall));
+            asyncFunctions.Add(Options.INACTIVE_FRIENDS, new AsyncFunctions(SendInactiveFriends));
 
             dbMethods = new DbMethods();
             activeUsers = new List<User>();
@@ -651,7 +675,6 @@ namespace Server
             userInvitationsIds = dbMethods.GetUsersInvitationsIds();
             whichFunction = new Dictionary<string, List<Tuple<Options, string>>>();
         }
-
 
 
         public int AddActiveUser()
