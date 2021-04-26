@@ -14,6 +14,7 @@ namespace ClientWindows
 {
 
     public delegate void StringCallback(String message);
+    public delegate void InvitationCallback(Invitation inv);
     public partial class LoggedInForm : Form
     {
         //public static List<Friend> callbackFriendsContainer;
@@ -32,10 +33,12 @@ namespace ClientWindows
             StringCallback callback2 = writeToInvitingList;
             LoggedInService.NewInvitationCallback = callback2;
             this.signedInLogin_Text.Text = Program.username;
-            //callbackFriendsContainer = friendsContainer;
 
             StringCallback callback = writeToFriendContainer;
             LoggedInService.GetFriendsCallback = callback;
+
+            InvitationCallback callback3 = removeFromInvitingList;
+            LoggedInService.InvitationProcessedCallback = callback3;
 
             LoggedInService.getFriends();
         }
@@ -136,14 +139,26 @@ namespace ClientWindows
 
         public void writeToInvitingList(String message)
         {
+            Boolean updateFriends = false;
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             String frListStr = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
             List<Invitation> invitations = MessageProccesing.DeserializeObject(Options.FRIEND_INVITATIONS, frListStr) as List<Invitation>;
             foreach (Invitation inv in invitations)
             {
-                invitationContainer.Add(inv);
+                if(inv.status<2)
+                {
+                    invitationContainer.Add(inv);
+                } else if(inv.status==2)
+                {
+                    updateFriends = true;
+                    //if adding to friend container - it should be active or not active - Friend
+                }
             }
             updateFriendList();
+            if(updateFriends)
+            {
+                LoggedInService.getFriends();
+            }
             //MessageBox.Show("Invitations updated v2");
         }
 

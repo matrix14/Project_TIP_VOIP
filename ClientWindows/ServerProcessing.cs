@@ -12,28 +12,13 @@ namespace ClientWindows
     class ServerProcessing
     {
         public static ManualResetEvent tcpClientConnected = new ManualResetEvent(false);
+        public static ManualResetEvent syncProcessNotCompleted = new ManualResetEvent(true);
         private static Options lastOptions;
-
-        //TODO semaphore for sync request (cannot send new request if old not finished)
-        public static void ProcessServerMessageCallback(IAsyncResult ar)
-        {
-            // Get the listener that handles the client request.
-            TcpListener listener = (TcpListener)ar.AsyncState;
-
-            // End the operation and display the received data on
-            // the console.
-            TcpClient client = listener.EndAcceptTcpClient(ar);
-
-            // Process the connection here. (Add the client to a
-            // server table, read data, etc.)
-            Console.WriteLine("Client connected completed");
-
-            // Signal the calling thread to continue.
-            tcpClientConnected.Set();
-        }
 
         public static void processSendMessage(String message)
         {
+            syncProcessNotCompleted.WaitOne();
+            syncProcessNotCompleted.Reset();
             lastOptions = (Options)int.Parse((message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries)[0])
                 .Split(new String[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
             ServerConnectorAsync.SendMessage(message);
@@ -78,7 +63,11 @@ namespace ClientWindows
                     case Options.DECLINE_FRIEND:
                         LoggedInService.declineInvitationReply(message);
                         break;
+                    case Options.CHECK_USER_NAME:
+                        //TODO: handle it
+                        break;
                 }
+                syncProcessNotCompleted.Set();
             } else
             {
                 //TODO Implement faults
