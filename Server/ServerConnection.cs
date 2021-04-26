@@ -124,7 +124,7 @@ namespace Server
         public void ServerMessages(int clientID,NetworkStream stream, CancellationToken ct)
         {
             List<string> messagesToSend = new List<string>();
-            try
+            
             {
                 while (true)
                 {
@@ -132,7 +132,16 @@ namespace Server
                     {
                         return;
                     }
-                    messagesToSend = menager.CheckServerMessages(clientID);
+
+                    try
+                    {
+                        messagesToSend = menager.CheckServerMessages(clientID);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
 
                     foreach (string message in messagesToSend)
                     {
@@ -141,11 +150,6 @@ namespace Server
                     }
                     messagesToSend.Clear();
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return;
             }
         }
 
