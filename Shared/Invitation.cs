@@ -11,7 +11,6 @@ namespace Shared
         /// <summary>
         /// 0 - Created 1 - Sended 2 - Accepted 3 - Declined
         /// </summary>
-        [NonSerialized]
         public int status;
 
         public DateTime date;
