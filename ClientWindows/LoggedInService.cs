@@ -162,6 +162,7 @@ namespace ClientWindows
                     break;
             }
             MessageBox.Show(msg, title, buttons);
+            lastProcessedInvitation.status = 2;
             invitationProcessedCallback(lastProcessedInvitation);
             invitationProcessing.Set();
             //getFriends();
