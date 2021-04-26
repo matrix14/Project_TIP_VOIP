@@ -75,7 +75,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerConnectorAsync.cs" />
-    <Compile Include="ServerConnectorAsyncOLD.cs" />
     <Compile Include="ServerProcessing.cs" />
     <EmbeddedResource Include="SelectInvitationForm.resx">
       <DependentUpon>SelectInvitationForm.cs</DependentUpon>

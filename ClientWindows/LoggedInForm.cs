@@ -57,12 +57,12 @@ namespace ClientWindows
                 friendListDetails["invitationsStart"] = 0;
                 friendListDetails["invitationsAmount"] = 0;
                 friendsList.Items.Clear();
-                friendsList.Items.Add("ZNAJOMI:");
+                //friendsList.Items.Add("ZNAJOMI:");
                 int i = 1;
                 if (friendsContainer == null || friendsContainer.Count == 0)
                 {
                     i++;
-                    friendsList.Items.Add("- Nie masz znajomych");
+                    //friendsList.Items.Add("- Nie masz znajomych");
                 }
                 else
                 {
@@ -74,7 +74,8 @@ namespace ClientWindows
                     }
                 }
                 friendListDetails["invitationsStart"] = i;
-                friendsList.Items.Add("ZAPROSZENIA:");
+                //friendsList.Items.Add("ZAPROSZENIA:");
+                /*
                 if (invitationContainer == null || invitationContainer.Count == 0)
                 {
                     friendsList.Items.Add("- Nie masz zaproszeń");
@@ -86,6 +87,7 @@ namespace ClientWindows
                         friendsList.Items.Add(inv);
                     }
                 }
+                */
                 return;
             }
         }
@@ -193,6 +195,72 @@ namespace ClientWindows
 
         }
 
+        private void friendList_MeasureItem(object sender, MeasureItemEventArgs e)
+        {
+            if (e.Index == -1) return;
+            ListBox lb = sender as ListBox;
+            if (lb.Items.Count < 1) return;
+            
+            Friend fr = lb.Items[e.Index] as Friend;
+            if (fr == null) return;
+
+            SizeF txt_size = e.Graphics.MeasureString(fr.username, this.Font);
+
+            e.ItemHeight = (int)txt_size.Height + 2*5;
+            e.ItemWidth = (int)txt_size.Width;
+        }
+
+        private void friendList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index == -1) return;
+            // Get the ListBox and the item.
+            ListBox lst = sender as ListBox;
+            if (lst.Items.Count < 1) return;
+            Friend fr = lst.Items[e.Index] as Friend;
+            if (fr == null) return;
+
+            SolidBrush redBrush = new SolidBrush(Color.Red);
+            SolidBrush greenBrush = new SolidBrush(Color.Green);
+
+            // Draw the background.
+            e.DrawBackground();
+
+
+            e.DrawFocusRectangle();
+            //e.Graphics.DrawEllipse(Pens.Blue, new Rectangle(1, 1 + e.Index * 15, 100, 10));
+            //e.Graphics.DrawString(l.Items[e.Index].ToString(), new Font(FontFamily.GenericSansSerif, 9, FontStyle.Regular), Brushes.Red, e.Bounds);
+
+
+            // See if the item is selected.
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                // Selected. Draw with the system highlight color.
+                if(fr.active==1)
+                    e.Graphics.FillEllipse(greenBrush, 4, 4+e.Index*23, 15, 15);
+                else
+                    e.Graphics.FillEllipse(redBrush, 4, 4 + e.Index * 23, 15, 15);
+                e.Graphics.DrawString(fr.username, this.Font,
+                    SystemBrushes.HighlightText, 25,
+                        e.Bounds.Top + 5);
+            }
+            else
+            {
+                // Not selected. Draw with ListBox's foreground color.
+                using (SolidBrush br = new SolidBrush(e.ForeColor))
+                {
+                    if (fr.active == 1)
+                        e.Graphics.FillEllipse(greenBrush, 4, 4 + e.Index * 23, 15, 15);
+                    else
+                        e.Graphics.FillEllipse(redBrush, 4, 4 + e.Index * 23, 15, 15);
+                    e.Graphics.DrawString(fr.username, this.Font, br,
+                        25, e.Bounds.Top + 5);
+                }
+            }
+
+            // Draw the focus rectangle if appropriate.
+            e.DrawFocusRectangle();
+        }
+
         private void button1_Click_1(object sender, EventArgs e)
         {
 
@@ -214,6 +282,13 @@ namespace ClientWindows
             aff.ShowDialog();
         }
 
+        private void showFriendContext()
+        {
+            activeUserWindow.Visible = true;
+            removeFriend.Visible = true;
+            callUser.Visible = true;
+        }
+
         private void friendsList_SelectedIndexChanged(object sender, EventArgs e)
         {
             ListBox lb = (ListBox)sender;
@@ -230,7 +305,8 @@ namespace ClientWindows
             if(lb.SelectedIndex>=startFriends&&lb.SelectedIndex<=endFriends)
             {
                 Friend fr = (Friend)lb.Items[lb.SelectedIndex];
-                MessageBox.Show("FR " + fr.username.ToString());
+                activeUserWindow.Text = fr.username;
+                showFriendContext();
             }
             if (lb.SelectedIndex >= startInvitations && lb.SelectedIndex <= endInvitations)
             {
@@ -238,6 +314,11 @@ namespace ClientWindows
                 SelectInvitationForm sif = new SelectInvitationForm(inv);
                 sif.ShowDialog();
             }
+        }
+
+        private void invitingList_button_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

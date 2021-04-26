@@ -37,14 +37,6 @@ namespace ClientWindows
         {
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LOGOUT));
             logoutNotFinished = true;
-            //do
-            //{
-
-            //} while (logoutNotFinished);
-            //String msg = "Pomyślnie wylogowano!";
-            //MessageBoxButtons buttons = MessageBoxButtons.OK;
-            //string title = "Wylogowanie";
-            //MessageBox.Show(msg, title, buttons);
         }
 
         public static void logoutReply(String message)
