@@ -164,7 +164,7 @@ namespace ClientWindows
             MessageBox.Show(msg, title, buttons);
             invitationProcessedCallback(lastProcessedInvitation);
             invitationProcessing.Set();
-            getFriends();
+            //getFriends();
             //TODO remove invitation from list
         }
 
@@ -207,8 +207,6 @@ namespace ClientWindows
             MessageBox.Show(msg, title, buttons);
             invitationProcessedCallback(lastProcessedInvitation);
             invitationProcessing.Set();
-            getFriends();
-            //TODO remove invitation from list
         }
 
         public static void checkIsUserExist(String username)

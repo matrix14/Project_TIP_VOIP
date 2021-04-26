@@ -137,9 +137,14 @@ namespace ClientWindows
             //}
         }
 
+        public void addToFriendContainer(Friend fr)
+        {
+            friendsContainer.Add(fr);
+            updateFriendList();
+        }
+
         public void writeToInvitingList(String message)
         {
-            Boolean updateFriends = false;
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             String frListStr = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
             List<Invitation> invitations = MessageProccesing.DeserializeObject(Options.FRIEND_INVITATIONS, frListStr) as List<Invitation>;
@@ -150,21 +155,21 @@ namespace ClientWindows
                     invitationContainer.Add(inv);
                 } else if(inv.status==2)
                 {
-                    updateFriends = true;
-                    //if adding to friend container - it should be active or not active - Friend
+                    Friend newFr = new Friend(inv.inviteeUsername, 1);
+                    friendsContainer.Add(newFr);
                 }
             }
             updateFriendList();
-            if(updateFriends)
-            {
-                LoggedInService.getFriends();
-            }
             //MessageBox.Show("Invitations updated v2");
         }
 
         public void removeFromInvitingList(Invitation inv)
         {
             invitationContainer.Remove(inv);
+            if(inv.status==2)
+            {
+                friendsContainer.Add(new Friend(inv.username, 1));
+            }
             updateFriendList();
 
         }
