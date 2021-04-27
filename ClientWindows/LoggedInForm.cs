@@ -388,7 +388,7 @@ namespace ClientWindows
         {
             foreach(Friend fr in friendsContainer)
             {
-                if(fr.username== activeUserWindow.Text)
+                if(fr.username==activeUserWindow.Text)
                 {
                     callUser.Enabled = (fr.active == 1);
                     if(callUser.Enabled)

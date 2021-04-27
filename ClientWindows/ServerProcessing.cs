@@ -90,6 +90,12 @@ namespace ClientWindows
                     case Options.INVITE_TO_CONVERSATION:
                         LoggedInService.inviteToConversationReply(message);
                         break;
+                    case Options.LEAVE_CONVERSATION:
+                        //TODO: do nothing
+                        break;
+                    case Options.JOIN_CONVERSATION:
+                        LoggedInService.joinConversationAccepted(message);
+                        break;
                 }
                 syncProcessNotCompleted.Set();
             } else

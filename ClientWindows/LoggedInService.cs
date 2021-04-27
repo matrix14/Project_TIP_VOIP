@@ -306,7 +306,9 @@ namespace ClientWindows
             String userString = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
             Call c = MessageProccesing.DeserializeObject(Options.INCOMMING_CALL, userString) as Call;
 
-            MessageBox.Show("INCOMING CALL");
+            //MessageBox.Show("INCOMING CALL\n\r"+message);
+            IncomingCallForm icf = new IncomingCallForm(c);
+            icf.ShowDialog();
 
             //if (inviteToConversationReplyOk == null || inviteToConversationReplyFromUser == null)
             //{
@@ -315,5 +317,20 @@ namespace ClientWindows
 
             //inviteToConversationReplyFromUser(ack);
         }
+
+        public static void acceptCall(Call call)
+        {
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, call));
+        }
+
+        public static void declineCall(Call call)
+        {
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, call));
+        }
+
+        public static void joinConversationAccepted(String message)
+        {
+            MessageBox.Show("ACK CONV \n" + message);
+        } 
     }
 }
