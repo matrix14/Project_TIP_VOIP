@@ -16,6 +16,10 @@ namespace ClientWindows
         private static StringCallback newInvitationCallback;
         private static InvitationCallback invitationProcessedCallback;
         private static BooleanCallback checkUsernameCallback;
+        private static UsernameCallback newActiveFriend;
+        private static UsernameCallback newInactiveFriend;
+
+
         private static Invitation lastProcessedInvitation = new Invitation();
 
         private static ManualResetEvent invitationCallbackSet = new ManualResetEvent(false);
@@ -31,7 +35,8 @@ namespace ClientWindows
         public static StringCallback GetFriendsCallback { get => getFriendsCallback; set => getFriendsCallback = value; }
         public static InvitationCallback InvitationProcessedCallback { get => invitationProcessedCallback; set => invitationProcessedCallback = value; }
         public static BooleanCallback CheckUsernameCallback { get => checkUsernameCallback; set => checkUsernameCallback = value; }
-
+        public static UsernameCallback NewActiveFriend { get => newActiveFriend; set => newActiveFriend = value; }
+        public static UsernameCallback NewInactiveFriend { get => newInactiveFriend; set => newInactiveFriend = value; }
 
         public static void logout()
         {
@@ -120,6 +125,26 @@ namespace ClientWindows
 
             invitationCallbackSet.WaitOne();
             newInvitationCallback(message);
+        }
+
+        public static void newActiveFriends(String message)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            String userString = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+            Username us = MessageProccesing.DeserializeObject(Options.ACTIVE_FRIENDS, userString) as Username;
+
+            invitationCallbackSet.WaitOne();
+            newActiveFriend(us);
+        }
+
+        public static void newInactiveFriends(String message)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            String userString = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+            Username us = MessageProccesing.DeserializeObject(Options.INACTIVE_FRIENDS, userString) as Username;
+
+            invitationCallbackSet.WaitOne();
+            newInactiveFriend(us);
         }
 
         public static void acceptInvitation(Invitation inv)

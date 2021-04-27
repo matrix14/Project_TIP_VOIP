@@ -36,6 +36,12 @@ namespace ClientWindows
                     case Options.FRIEND_INVITATIONS:
                         LoggedInService.incomingInvitation(message);
                         break;
+                    case Options.ACTIVE_FRIENDS:
+                        LoggedInService.newActiveFriends(message);
+                        break;
+                    case Options.INACTIVE_FRIENDS:
+                        LoggedInService.newInactiveFriends(message);
+                        break;
                 }
             }
             else if(message[0]=='E')
