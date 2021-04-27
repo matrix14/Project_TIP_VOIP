@@ -320,12 +320,12 @@ namespace ClientWindows
 
         public static void acceptCall(Call call)
         {
-            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, call.callId));
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, new Id(call.callId)));
         }
 
         public static void declineCall(Call call)
         {
-            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, call.callId));
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, new Id(call.callId)));
         }
 
         public static void joinConversationAccepted(String message)
