@@ -10,7 +10,6 @@ namespace ClientWindows
     {
         public static String username = "";
         public static Boolean isLoggedIn = false;
-        public static Form activeForm;
 
 
         /// <summary>
@@ -24,24 +23,8 @@ namespace ClientWindows
             ServerConnectorAsync.StartConnection();
 
             Task.Run(() => ServerConnectorAsync.ReceiveWhile());
-            activeForm = new LoginForm();
-            Application.Run(activeForm);
+            Application.Run(new LoginForm());
             ServerConnectorAsync.StopConnection();
-        }
-
-        delegate Form GetActiveFormCallback();
-        public static Form GetActiveForm()
-        {
-            if (activeForm.InvokeRequired)
-            {
-                Form a = null;
-                Action showMethod = delegate () { a = activeForm; };
-                return a;
-            }
-            else
-            {
-                return activeForm;
-            }
         }
     }
 }

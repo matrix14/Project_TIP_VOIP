@@ -18,6 +18,8 @@ namespace ClientWindows
         private static BooleanCallback checkUsernameCallback;
         private static UsernameCallback newActiveFriend;
         private static UsernameCallback newInactiveFriend;
+        private static DefaultCallback inviteToConversationReplyOk;
+        private static BooleanCallback inviteToConversationReplyFromUser;
 
 
         private static Invitation lastProcessedInvitation = new Invitation();
@@ -37,6 +39,8 @@ namespace ClientWindows
         public static BooleanCallback CheckUsernameCallback { get => checkUsernameCallback; set => checkUsernameCallback = value; }
         public static UsernameCallback NewActiveFriend { get => newActiveFriend; set => newActiveFriend = value; }
         public static UsernameCallback NewInactiveFriend { get => newInactiveFriend; set => newInactiveFriend = value; }
+        public static DefaultCallback InviteToConversationReplyOk { get => inviteToConversationReplyOk; set => inviteToConversationReplyOk = value; }
+        public static BooleanCallback InviteToConversationReplyFromUser { get => inviteToConversationReplyFromUser; set => inviteToConversationReplyFromUser = value; }
 
         public static void logout()
         {
@@ -251,6 +255,49 @@ namespace ClientWindows
                     checkUsernameCallback(true);
                     break;
             }
+        }
+
+        public static void inviteToConversation(Username u)
+        {
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.INVITE_TO_CONVERSATION, u));
+        }
+
+        public static void inviteToConversationReply(String message)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+
+            if (inviteToConversationReplyOk == null || inviteToConversationReplyFromUser == null)
+            {
+                return;
+            }
+
+            switch (error)
+            {
+                case ErrorCodes.NO_ERROR:
+                    inviteToConversationReplyOk();
+                    break;
+                case ErrorCodes.USER_OFFLINE:
+                    inviteToConversationReplyFromUser(false);
+                    break;
+                case ErrorCodes.NOT_LOGGED_IN:
+                    MessageBox.Show("Jesteś nie zalogowany!");
+                    break;
+            }
+        }
+
+        public static void inviteToConversationReplyFromUserFunc(String message, Boolean ack)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            String userString = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+            Username us = MessageProccesing.DeserializeObject(Options.ACCEPTED_CALL, userString) as Username;
+
+            if (inviteToConversationReplyOk == null || inviteToConversationReplyFromUser == null)
+            {
+                return;
+            }
+
+            inviteToConversationReplyFromUser(ack);
         }
     }
 }
