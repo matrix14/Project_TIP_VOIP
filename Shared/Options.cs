@@ -20,9 +20,10 @@ namespace Shared
 
 
         ACTIVE_FRIENDS = 21,                //  SERVER ONLY                                                 Option:21$$Data:<JSONUsername>$$
-        FRIEND_INVITATIONS = 22,            //  SERVER ONLY                                                 Option:22$$Data:<JSONInvitations>$$
-        INCOMMING_CALL = 23,                //  SERVER ONLY                                                 Option:23$$Data:<JSONCall>$$
-        ACCEPTED_CALL = 24,                 //  SERVER ONLY                                                 Option:24$$Data:<Username>$$
-        DECLINED_CALL = 25,                 //  SERVER ONLY                                                 Option:24$$Data:<Username>$$
+        INACTIVE_FRIENDS = 22,              //  SERVER ONLY                                                 Option:21$$Data:<JSONUsername>$$
+        FRIEND_INVITATIONS = 23,            //  SERVER ONLY                                                 Option:22$$Data:<JSONInvitations>$$
+        INCOMMING_CALL = 24,                //  SERVER ONLY                                                 Option:23$$Data:<JSONCall>$$
+        ACCEPTED_CALL = 25,                 //  SERVER ONLY                                                 Option:24$$Data:<Username>$$
+        DECLINED_CALL = 26,                 //  SERVER ONLY                                                 Option:24$$Data:<Username>$$
     }
 }
