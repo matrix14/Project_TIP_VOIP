@@ -348,7 +348,7 @@ namespace Server
                 if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
             }
 
-            InvitationId invitationId = MessageProccesing.DeserializeObject(msg) as InvitationId;
+            Id invitationId = MessageProccesing.DeserializeObject(msg) as Id;
 
             // Check if given invitatation exists
             if (!invitations.ContainsKey(invitationId)) return MessageProccesing.CreateMessage(ErrorCodes.WRONG_INVATATION_ID);
@@ -403,7 +403,7 @@ namespace Server
                 if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
             }
 
-            InvitationId invitationId = MessageProccesing.DeserializeObject(msg) as InvitationId;
+            Id invitationId = MessageProccesing.DeserializeObject(msg) as Id;
 
             // Check if given invitatation exists
             if (!invitations.ContainsKey(invitationId)) return MessageProccesing.CreateMessage(ErrorCodes.WRONG_INVATATION_ID);
@@ -527,7 +527,7 @@ namespace Server
         // Tell serverconnection
         public string JoinConversation(string msg, int clientId)
         {
-            int conversationId = MessageProccesing.DeserializeObject(msg) as InvitationId;
+            int conversationId = MessageProccesing.DeserializeObject(msg) as Id;
             // If user isint logged return error
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
 
@@ -548,7 +548,7 @@ namespace Server
 
         public string LeaveConversation(string msg, int clientId)
         {
-            InvitationId conversationId = MessageProccesing.DeserializeObject(msg) as InvitationId;
+            Id conversationId = MessageProccesing.DeserializeObject(msg) as Id;
             // If user isint logged return error
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
 

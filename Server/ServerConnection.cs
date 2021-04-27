@@ -87,12 +87,12 @@ namespace Server
                         // Start new UDPs and return no error
                         string[] fields = e.Message.Split("$$", StringSplitOptions.RemoveEmptyEntries);
                         Options option = (Options)int.Parse(fields[0].Split(':', StringSplitOptions.RemoveEmptyEntries)[1]);
-                        InvitationId conversationId = MessageProccesing.DeserializeObject(e.Message) as InvitationId;
+                        Id conversationId = MessageProccesing.DeserializeObject(e.Message) as Id;
 
                         if (option == Options.JOIN_CONVERSATION)
                         {
-                            Task.Run(() => UdpRead(clientIp, port,conversationId.invitationId));
-                            Task.Run(() => UdpWrite(clientIp,port, conversationId.invitationId, token), token);
+                            Task.Run(() => UdpRead(clientIp, port,conversationId.id));
+                            Task.Run(() => UdpWrite(clientIp,port, conversationId.id, token), token);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
                         }
                         else if(option == Options.LEAVE_CONVERSATION)
@@ -133,14 +133,9 @@ namespace Server
                         return;
                     }
 
-                    try
-                    {
+
                         messagesToSend = menager.CheckServerMessages(clientID);
-                    }
-                    catch
-                    {
-                        continue;
-                    }
+
 
 
                     foreach (string message in messagesToSend)
