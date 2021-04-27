@@ -15,6 +15,7 @@ namespace ClientWindows
 
     public delegate void StringCallback(String message);
     public delegate void InvitationCallback(Invitation inv);
+    public delegate void UsernameCallback(Username u);
     public partial class LoggedInForm : Form
     {
         //public static List<Friend> callbackFriendsContainer;
@@ -30,6 +31,12 @@ namespace ClientWindows
         public LoggedInForm()
         {
             InitializeComponent();
+
+            UsernameCallback callback4 = newInactiveFriendFunc;
+            UsernameCallback callback5 = newActiveFriendFunc;
+            LoggedInService.NewInactiveFriend = callback4;
+            LoggedInService.NewActiveFriend = callback5;
+
             StringCallback callback2 = writeToInvitingList;
             LoggedInService.NewInvitationCallback = callback2;
             this.signedInLogin_Text.Text = Program.username;
@@ -174,6 +181,26 @@ namespace ClientWindows
             }
             updateFriendList();
 
+        }
+
+        public void newActiveFriendFunc(Username u)
+        {
+            foreach(Friend fr in friendsContainer)
+            {
+                if (fr.username == u.username)
+                    fr.active = 1;
+            }
+            updateFriendList();
+        }
+
+        public void newInactiveFriendFunc(Username u)
+        {
+            foreach (Friend fr in friendsContainer)
+            {
+                if (fr.username == u.username)
+                    fr.active = 0;
+            }
+            updateFriendList();
         }
         private void label1_Click(object sender, EventArgs e)
         {
