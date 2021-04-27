@@ -16,6 +16,7 @@ namespace ClientWindows
     public delegate void StringCallback(String message);
     public delegate void InvitationCallback(Invitation inv);
     public delegate void UsernameCallback(Username u);
+    public delegate void DefaultCallback();
     public partial class LoggedInForm : Form
     {
         //public static List<Friend> callbackFriendsContainer;
@@ -34,8 +35,12 @@ namespace ClientWindows
 
             UsernameCallback callback4 = newInactiveFriendFunc;
             UsernameCallback callback5 = newActiveFriendFunc;
+            DefaultCallback callback6 = callUserReply;
+            BooleanCallback callback7 = callUserReplyFromUser;
             LoggedInService.NewInactiveFriend = callback4;
             LoggedInService.NewActiveFriend = callback5;
+            LoggedInService.InviteToConversationReplyOk = callback6;
+            LoggedInService.InviteToConversationReplyFromUser = callback7;
 
             StringCallback callback2 = writeToInvitingList;
             LoggedInService.NewInvitationCallback = callback2;
@@ -48,6 +53,27 @@ namespace ClientWindows
             LoggedInService.InvitationProcessedCallback = callback3;
 
             LoggedInService.getFriends();
+        }
+
+        public void updateInvitationButton()
+        {
+            if (this.invitingList_button.InvokeRequired)
+            {
+                friendsList.Invoke(new MethodInvoker(() => { updateInvitationButton(); }));
+                return;
+            }
+            else
+            {
+                int amount = 0;
+                foreach (Invitation inv in invitationContainer)
+                {
+                    if (inv.status < 2)
+                    {
+                        amount++;
+                    }
+                }
+                this.invitingList_button.Text = "Zaproszenia (" + amount.ToString() + ")";
+            }
         }
 
         public void updateFriendList()
@@ -140,7 +166,6 @@ namespace ClientWindows
                 }
             */
             updateFriendList();
-                //TODO: update friend list
                 //callbackFriendsList.Items.Add(s);
                 //callbackFriendsList.TopIndex = callbackFriendsList.Items.Count - (callbackFriendsList.Height / callbackFriendsList.ItemHeight);
             //}
@@ -168,7 +193,7 @@ namespace ClientWindows
                     friendsContainer.Add(newFr);
                 }
             }
-            updateFriendList();
+            updateInvitationButton();
             //MessageBox.Show("Invitations updated v2");
         }
 
@@ -179,7 +204,7 @@ namespace ClientWindows
             {
                 friendsContainer.Add(new Friend(inv.username, 1));
             }
-            updateFriendList();
+            updateInvitationButton();
 
         }
 
@@ -191,6 +216,7 @@ namespace ClientWindows
                     fr.active = 1;
             }
             updateFriendList();
+            updateFriendWindowStatus();
         }
 
         public void newInactiveFriendFunc(Username u)
@@ -201,6 +227,7 @@ namespace ClientWindows
                     fr.active = 0;
             }
             updateFriendList();
+            updateFriendWindowStatus();
         }
         private void label1_Click(object sender, EventArgs e)
         {
@@ -286,11 +313,6 @@ namespace ClientWindows
             e.DrawFocusRectangle();
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
         private void closeApp_button_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -310,7 +332,7 @@ namespace ClientWindows
         private void showFriendContext()
         {
             activeUserWindow.Visible = true;
-            removeFriend.Visible = true;
+            activeFriendStatus_Label.Visible = true;
             callUser.Visible = true;
         }
 
@@ -318,7 +340,7 @@ namespace ClientWindows
         {
             ListBox lb = (ListBox)sender;
 
-            int startFriends = (int)friendListDetails["friendsStart"]+1;
+            /*int startFriends = (int)friendListDetails["friendsStart"]+1;
             int endFriends = (int)friendListDetails["friendsStart"] + (int)friendListDetails["friendsAmount"];
             int startInvitations = (int)friendListDetails["invitationsStart"]+1;
             int endInvitations = (int)friendListDetails["invitationsStart"] + (int)friendListDetails["invitationsAmount"];
@@ -328,22 +350,103 @@ namespace ClientWindows
                 lb.SelectedIndex == (int)friendListDetails["invitationsStart"]) { return; }
             
             if(lb.SelectedIndex>=startFriends&&lb.SelectedIndex<=endFriends)
-            {
+            {*/
                 Friend fr = (Friend)lb.Items[lb.SelectedIndex];
                 activeUserWindow.Text = fr.username;
-                showFriendContext();
-            }
+                callUser.Enabled = (fr.active==1);
+                if (callUser.Enabled)
+                {
+                    activeFriendStatus_Label.Text = "Aktywny";
+                    activeFriendStatus_Label.ForeColor = Color.Green;
+                }
+                else
+                {
+                    activeFriendStatus_Label.Text = "Nieaktywny";
+                    activeFriendStatus_Label.ForeColor = Color.Red;
+                }
+            showFriendContext();
+            /*}
             if (lb.SelectedIndex >= startInvitations && lb.SelectedIndex <= endInvitations)
             {
                 Invitation inv = (Invitation)lb.Items[lb.SelectedIndex];
                 SelectInvitationForm sif = new SelectInvitationForm(inv);
                 sif.ShowDialog();
-            }
+            }*/
         }
 
         private void invitingList_button_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void updateFriendWindowStatus()
+        {
+            foreach(Friend fr in friendsContainer)
+            {
+                if(fr.username== activeUserWindow.Text)
+                {
+                    callUser.Enabled = (fr.active == 1);
+                    if(callUser.Enabled)
+                    {
+                        activeFriendStatus_Label.Text = "Aktywny";
+                        activeFriendStatus_Label.ForeColor = Color.Green;
+                    } else
+                    {
+                        activeFriendStatus_Label.Text = "Nieaktywny";
+                        activeFriendStatus_Label.ForeColor = Color.Red;
+                    }
+                    return;
+                }
+            }
+        }
+
+        private void callUser_Click(object sender, EventArgs e)
+        {
+            LoggedInService.inviteToConversation(new Username(activeUserWindow.Text));
+        }
+
+        public void callUserReply()
+        {
+            if (callingStatusLabel.InvokeRequired)
+            {
+                callingStatusLabel.Invoke(new MethodInvoker(() => { callUserReply(); }));
+            }
+            else
+            {
+                callUser.Enabled = false;
+                callingStatusLabel.Visible = true;
+                callingStatusLabel.Text = "Oczekuje na odpowiedź...";
+                callingStatusLabel.ForeColor = Color.Green;
+            }
+        }
+
+        public void callUserReplyFromUser(Boolean reply)
+        {
+            if (callingStatusLabel.InvokeRequired)
+            {
+                callingStatusLabel.Invoke(new MethodInvoker(() => { callUserReplyFromUser(reply); }));
+            }
+            else
+            {
+                callingStatusLabel.Visible = true;
+                if (reply==true)
+                {
+                    callUser.Enabled = false;
+                    callingStatusLabel.Text = "Zaakceptowano!";
+                    callingStatusLabel.ForeColor = Color.Green;
+                } else
+                {
+                    callUser.Enabled = true;
+                    callingStatusLabel.Text = "Odrzucono połączenie!";
+                    callingStatusLabel.ForeColor = Color.Red;
+                }
+                
+            }
         }
     }
 }

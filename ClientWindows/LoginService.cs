@@ -24,6 +24,7 @@ namespace ClientWindows
             {
 
             } while (loginNotFinished);
+            //TODO: handle it in other way
 
         }
 

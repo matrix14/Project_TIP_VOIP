@@ -42,6 +42,12 @@ namespace ClientWindows
                     case Options.INACTIVE_FRIENDS:
                         LoggedInService.newInactiveFriends(message);
                         break;
+                    case Options.ACCEPTED_CALL:
+                        LoggedInService.inviteToConversationReplyFromUserFunc(message, true);
+                        break;
+                    case Options.DECLINED_CALL:
+                        LoggedInService.inviteToConversationReplyFromUserFunc(message, false);
+                        break;
                 }
             }
             else if(message[0]=='E')
@@ -77,6 +83,9 @@ namespace ClientWindows
                         {
                             LoginService.checkIsUserExistReply(message);
                         }
+                        break;
+                    case Options.INVITE_TO_CONVERSATION:
+                        LoggedInService.inviteToConversationReply(message);
                         break;
                 }
                 syncProcessNotCompleted.Set();

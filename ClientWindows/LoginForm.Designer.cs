@@ -141,8 +141,8 @@ namespace ClientWindows
             this.serverConnection_Label.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.serverConnection_Label.ForeColor = System.Drawing.Color.Red;
             this.serverConnection_Label.Name = "serverConnection_Label";
-            this.serverConnection_Label.Size = new System.Drawing.Size(95, 17);
-            this.serverConnection_Label.Text = "Brak połączenia";
+            this.serverConnection_Label.Size = new System.Drawing.Size(99, 17);
+            this.serverConnection_Label.Text = "Brak połączenia!";
             this.serverConnection_Label.Click += new System.EventHandler(this.serverConnection_Label_Click);
             // 
             // LoginForm
@@ -163,6 +163,7 @@ namespace ClientWindows
             this.Name = "LoginForm";
             this.Text = "TIP_VOIP Client";
             this.Load += new System.EventHandler(this.LoginForm_Load);
+            this.VisibleChanged += new System.EventHandler(this.LoginForm_VisibleChanged);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);

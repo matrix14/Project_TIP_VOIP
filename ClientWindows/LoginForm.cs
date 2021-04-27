@@ -18,6 +18,7 @@ namespace ClientWindows
         private Boolean registerMode = false;
 
         private System.Timers.Timer checkUsernameTimer = new System.Timers.Timer();
+        private System.Timers.Timer checkConnectionTimer = new System.Timers.Timer();
         private Boolean checkUsernameTimerStopped = true;
 
         private Boolean connectionAlive = false;
@@ -29,12 +30,14 @@ namespace ClientWindows
             checkUsernameTimer.Elapsed += usernameCheckOnTimerElapsed;
             checkUsernameTimer.AutoReset = false;
 
+            checkConnectionTimer.Interval = 1000;
+            checkConnectionTimer.Elapsed += checkConnectionOnTimerElapsed;
+            checkConnectionTimer.AutoReset = true;
+
             BooleanCallback callback = usernameCheckUpdateInfo;
             LoginService.CheckUsernameCallback = callback;
 
-            connectionAlive = ServerConnectorAsync.getConnectionState();
-            updateConnectionState();
-            Task.Run(stateChecker);
+            checkConnectionTimer.Start();
         }
 
         private void LoginForm_Load(object sender, EventArgs e)
@@ -49,8 +52,14 @@ namespace ClientWindows
                 checkUsernameTimer.Stop();
                 checkUsernameTimerStopped = true;
                 LoginService.checkIsUserExist(this.login_textbox.Text);
-                
+
             }
+        }
+
+        private void checkConnectionOnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            connectionAlive = ServerConnectorAsync.getConnectionState();
+            updateConnectionState();
         }
 
         private void login_textbox_KeyUp(object sender, KeyEventArgs e)
@@ -112,6 +121,10 @@ namespace ClientWindows
                 this.usernameFree_label.Visible = true;
                 this.usernameFree_label.Text = "";
                 this.confirmAction_button.Enabled = false;
+                if(this.login_textbox.Text.Length>=3)
+                {
+                    LoginService.checkIsUserExist(this.login_textbox.Text);
+                }
             }
         }
 
@@ -140,14 +153,23 @@ namespace ClientWindows
 
         private void updateConnectionState()
         {
-            if(connectionAlive)
+            if (statusStrip1.InvokeRequired)
             {
-                this.serverConnection_Label.Text = "Połączono";
-                this.serverConnection_Label.ForeColor = Color.Green;
-            } else
+                statusStrip1.Invoke(new MethodInvoker(() => { updateConnectionState(); }));
+                return;
+            }
+            else
             {
-                this.serverConnection_Label.Text = "Brak połączenia!";
-                this.serverConnection_Label.ForeColor = Color.Red;
+                if (connectionAlive)
+                {
+                    this.serverConnection_Label.Text = "Połączono";
+                    this.serverConnection_Label.ForeColor = Color.Green;
+                }
+                else
+                {
+                    this.serverConnection_Label.Text = "Brak połączenia!";
+                    this.serverConnection_Label.ForeColor = Color.Red;
+                }
             }
         }
 
@@ -156,13 +178,14 @@ namespace ClientWindows
 
         }
 
-        private void stateChecker()
+        private void LoginForm_VisibleChanged(object sender, EventArgs e)
         {
-            while(true)
+            if(this.Visible)
             {
-                Thread.Sleep(1000);
-                connectionAlive = ServerConnectorAsync.getConnectionState();
-                updateConnectionState();
+                checkConnectionTimer.Start();
+            } else
+            {
+                checkConnectionTimer.Stop();
             }
         }
     }

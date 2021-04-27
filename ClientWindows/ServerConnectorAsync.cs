@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace ClientWindows
 {
@@ -24,21 +25,24 @@ namespace ClientWindows
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
-        private static Boolean connectionAlive = false;
-
-        private static String reply = String.Empty;
+        private static System.Timers.Timer connectionTimer = new System.Timers.Timer();
 
         private static Socket sock;
 
         public static void StartConnection()
         {
+            connectionTimer.Interval = 5000;
+            connectionTimer.Elapsed += new ElapsedEventHandler(connectionTimerOnTimerElapsed);
+            connectionTimer.AutoReset = false;
+
+
             try
             {
                 IPAddress ip = IPAddress.Parse(address);
                 IPEndPoint remoteAddr = new IPEndPoint(ip, port);
                 sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
-                //connectDone.WaitOne();
+                connectionTimer.Start();
             } catch (Exception e)
             {
                 return; //TODO Add message for client when problem
@@ -47,9 +51,37 @@ namespace ClientWindows
 
         public static void StopConnection()
         {
-            connectionAlive = false;
             sock.Shutdown(SocketShutdown.Both);
             sock.Close();
+        }
+
+        private static void connectionTimerOnTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            if (sock.Connected)
+            {
+                connectionTimer.Stop();
+            } else
+            {
+                connectionTimer.Stop();
+                Reconnect();
+            }
+        }
+
+        public static void Reconnect()
+        {
+            sock.Close();
+            try
+            {
+                IPAddress ip = IPAddress.Parse(address);
+                IPEndPoint remoteAddr = new IPEndPoint(ip, port);
+                sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
+                connectionTimer.Start();
+            }
+            catch (Exception e)
+            {
+                return; //TODO Add message for client when problem
+            }
         }
 
         public static void SendMessage(String message)
@@ -58,7 +90,14 @@ namespace ClientWindows
             {
                 byte[] byteData = Encoding.ASCII.GetBytes(message);
                 sock.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), sock);
-            } catch (Exception e)
+            } catch(System.Net.Sockets.SocketException e)
+            {
+                if(!sock.Connected)
+                {
+                    //TODO do something when connection is lost
+                }
+            } 
+            catch (Exception e)
             {
                 return;
             }
@@ -129,8 +168,11 @@ namespace ClientWindows
             {
                 Socket sockInt = (Socket)res.AsyncState;
                 sockInt.EndConnect(res);
+                if(sockInt.Connected)
+                {
+                    connectionTimer.Stop();
+                }
                 connectDone.Set();
-                connectionAlive = true;
             } catch (Exception e)
             {
                 return;
@@ -140,7 +182,7 @@ namespace ClientWindows
 
         public static Boolean getConnectionState()
         {
-            return connectionAlive;
+            return sock.Connected;
         }
     }
 }
