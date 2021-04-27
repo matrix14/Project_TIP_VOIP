@@ -156,7 +156,7 @@ namespace ClientWindows
             invitationProcessing.WaitOne();
             invitationProcessing.Reset();
             lastProcessedInvitation = inv;
-            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.ACCEPT_FRIEND, new InvitationId(inv.invitationId)));
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.ACCEPT_FRIEND, new Id(inv.invitationId)));
         }
 
         public static void acceptInvitationReply(String message)
@@ -195,7 +195,7 @@ namespace ClientWindows
             invitationProcessing.WaitOne();
             invitationProcessing.Reset();
             lastProcessedInvitation = inv;
-            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.DECLINE_FRIEND, new InvitationId(inv.invitationId)));
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.DECLINE_FRIEND, new Id(inv.invitationId)));
         }
 
         public static void declineInvitationReply(String message)
