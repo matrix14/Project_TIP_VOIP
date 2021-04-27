@@ -219,8 +219,8 @@ namespace ClientWindows
             Friend fr = lst.Items[e.Index] as Friend;
             if (fr == null) return;
 
-            SolidBrush redBrush = new SolidBrush(Color.Red);
-            SolidBrush greenBrush = new SolidBrush(Color.Green);
+            SolidBrush redDot = new SolidBrush(Color.Red);
+            SolidBrush greenDot = new SolidBrush(Color.Green);
 
             // Draw the background.
             e.DrawBackground();
@@ -234,14 +234,12 @@ namespace ClientWindows
             // See if the item is selected.
             if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
             {
-                // Selected. Draw with the system highlight color.
                 if(fr.active==1)
-                    e.Graphics.FillEllipse(greenBrush, 4, 4+e.Index*23, 15, 15);
+                    e.Graphics.FillEllipse(greenDot, 4, e.Bounds.Top+4, 15, 15);
                 else
-                    e.Graphics.FillEllipse(redBrush, 4, 4 + e.Index * 23, 15, 15);
-                e.Graphics.DrawString(fr.username, this.Font,
-                    SystemBrushes.HighlightText, 25,
-                        e.Bounds.Top + 5);
+                    e.Graphics.FillEllipse(redDot, 4, e.Bounds.Top+4, 15, 15);
+
+                e.Graphics.DrawString(fr.username, this.Font, SystemBrushes.HighlightText, 23, e.Bounds.Top+5);
             }
             else
             {
@@ -249,11 +247,11 @@ namespace ClientWindows
                 using (SolidBrush br = new SolidBrush(e.ForeColor))
                 {
                     if (fr.active == 1)
-                        e.Graphics.FillEllipse(greenBrush, 4, 4 + e.Index * 23, 15, 15);
+                        e.Graphics.FillEllipse(greenDot, 4, e.Bounds.Top+4, 15, 15);
                     else
-                        e.Graphics.FillEllipse(redBrush, 4, 4 + e.Index * 23, 15, 15);
-                    e.Graphics.DrawString(fr.username, this.Font, br,
-                        25, e.Bounds.Top + 5);
+                        e.Graphics.FillEllipse(redDot, 4, e.Bounds.Top+4, 15, 15);
+
+                    e.Graphics.DrawString(fr.username, this.Font, br, 23, e.Bounds.Top+5);
                 }
             }
 
