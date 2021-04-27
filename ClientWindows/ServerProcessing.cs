@@ -48,6 +48,9 @@ namespace ClientWindows
                     case Options.DECLINED_CALL:
                         LoggedInService.inviteToConversationReplyFromUserFunc(message, false);
                         break;
+                    case Options.INCOMMING_CALL:
+                        LoggedInService.incomingCall(message);
+                        break;
                 }
             }
             else if(message[0]=='E')
