@@ -157,7 +157,7 @@ namespace DbLibrary
             List<string> result = new List<string>();
 
             // Status 2 means accepted call
-            string query = string.Format("SELECT cv.username FROM conversations_view cv WHERE cv.conversation_id = '{0}' AND cv.status = 2 AND cv.username != {1}", conversationId, username);
+            string query = string.Format("SELECT cv.username FROM conversations_view cv WHERE cv.conversation_id = {0} AND cv.status = 2 AND cv.username != '{1}'", conversationId, username);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
