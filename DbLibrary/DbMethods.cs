@@ -120,8 +120,8 @@ namespace DbLibrary
             cmd = new MySqlCommand(query, connection);
             dataReader = cmd.ExecuteReader();
             dataReader.Read();
-            dataReader.Close();
             int conversationId = dataReader.GetInt32(0);
+            dataReader.Close();
 
             query = String.Format("INSERT INTO conversations(conversation_id,user_id) VALUES({0},{1})", conversationId,IdB);
             cmd = new MySqlCommand(query, connection);
