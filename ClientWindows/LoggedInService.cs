@@ -299,5 +299,21 @@ namespace ClientWindows
 
             inviteToConversationReplyFromUser(ack);
         }
+
+        public static void incomingCall(String message)
+        {
+            String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
+            String userString = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+            Call c = MessageProccesing.DeserializeObject(Options.INCOMMING_CALL, userString) as Call;
+
+            MessageBox.Show("INCOMING CALL");
+
+            //if (inviteToConversationReplyOk == null || inviteToConversationReplyFromUser == null)
+            //{
+            //    return;
+            //}
+
+            //inviteToConversationReplyFromUser(ack);
+        }
     }
 }
