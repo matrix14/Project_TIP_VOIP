@@ -503,25 +503,25 @@ namespace Server
                 }
             }
             if (!isActive) return MessageProccesing.CreateMessage(ErrorCodes.USER_OFFLINE);
-            int conversationId;
+            Id conversationId = new Id();
 
             // Invite to existing converstaion
             if (conversationExists)
             {
                 lock (activeUsers[clientId].dbConnection)
-                    conversationId = activeUsers[clientId].dbConnection.AddUserToConversation(activeUsers[clientId].username, user.username);
+                    conversationId.id = activeUsers[clientId].dbConnection.AddUserToConversation(activeUsers[clientId].username, user.username);
             }
             // Create new conversation
             else
             {
                 lock (activeUsers[clientId].dbConnection)
-                    conversationId = activeUsers[clientId].dbConnection.CreateNewConversation(activeUsers[clientId].username, user.username);
+                    conversationId.id = activeUsers[clientId].dbConnection.CreateNewConversation(activeUsers[clientId].username, user.username);
             }
 
             // try catch czy jest zalogowany
             whichFunction[user.username].Add(new Tuple<Options, string>(Options.INCOMMING_CALL, conversationId.ToString()));
             eventHandlers[user.username].Set();
-            return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+            return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
         }
 
         // Tell serverconnection

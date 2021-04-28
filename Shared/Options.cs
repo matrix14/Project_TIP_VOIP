@@ -13,7 +13,7 @@ namespace Shared
         ADD_FRIEND = 6,                     //  Data:<JSONUsername>$$                                       Error:<>$$
         ACCEPT_FRIEND = 7,                  //  Data:<JSONInvitationId>$$                                   Error:<>$$
         DECLINE_FRIEND = 8,                 //  Data:<JSONInvitationId>$$                                   Error:<>$$
-        INVITE_TO_CONVERSATION = 9,         //  Data:<JSONUsername>$$                                       Error:<>$$
+        INVITE_TO_CONVERSATION = 9,         //  Data:<JSONUsername>$$                                       Error:<>$$Data:<JSONInvitationId>$$
         JOIN_CONVERSATION = 10,             //  Data:<JSONInvitationId>$$                                   Error:<>$$
         LEAVE_CONVERSATION = 11,            //  Data:<JSONInvitationId>$$                                   Error:<>$$
 
