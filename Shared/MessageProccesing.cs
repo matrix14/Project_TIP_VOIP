@@ -58,6 +58,13 @@ namespace Shared
             return null;
         }
 
+        public static Object DeserializeObjectOnErrorCode(Options option, string data)
+        {
+            if (option == Options.GET_FRIENDS) return JsonConvert.DeserializeObject<List<Friend>>(data);
+            else if (option == Options.INVITE_TO_CONVERSATION) return JsonConvert.DeserializeObject<Id>(data);
+            return null;
+        }
+
         public static string CreateMessage<T>(Options option,T obj)
         {
             return String.Format("{0}Data:{1}$$", CreateMessage(option), JsonConvert.SerializeObject(obj));

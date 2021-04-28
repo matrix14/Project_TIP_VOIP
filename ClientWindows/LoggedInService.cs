@@ -18,7 +18,7 @@ namespace ClientWindows
         private static BooleanCallback checkUsernameCallback;
         private static UsernameCallback newActiveFriend;
         private static UsernameCallback newInactiveFriend;
-        private static DefaultCallback inviteToConversationReplyOk;
+        private static IdCallback inviteToConversationReplyOk;
         private static BooleanCallback inviteToConversationReplyFromUser;
 
 
@@ -39,7 +39,7 @@ namespace ClientWindows
         public static BooleanCallback CheckUsernameCallback { get => checkUsernameCallback; set => checkUsernameCallback = value; }
         public static UsernameCallback NewActiveFriend { get => newActiveFriend; set => newActiveFriend = value; }
         public static UsernameCallback NewInactiveFriend { get => newInactiveFriend; set => newInactiveFriend = value; }
-        public static DefaultCallback InviteToConversationReplyOk { get => inviteToConversationReplyOk; set => inviteToConversationReplyOk = value; }
+        public static IdCallback InviteToConversationReplyOk { get => inviteToConversationReplyOk; set => inviteToConversationReplyOk = value; }
         public static BooleanCallback InviteToConversationReplyFromUser { get => inviteToConversationReplyFromUser; set => inviteToConversationReplyFromUser = value; }
 
         public static void logout()
@@ -267,6 +267,9 @@ namespace ClientWindows
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
 
+            String frListStr = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+            Id callId = MessageProccesing.DeserializeObjectOnErrorCode(Options.INVITE_TO_CONVERSATION, frListStr) as Id;
+
             if (inviteToConversationReplyOk == null || inviteToConversationReplyFromUser == null)
             {
                 return;
@@ -275,7 +278,7 @@ namespace ClientWindows
             switch (error)
             {
                 case ErrorCodes.NO_ERROR:
-                    inviteToConversationReplyOk();
+                    inviteToConversationReplyOk(callId);
                     break;
                 case ErrorCodes.USER_OFFLINE:
                     inviteToConversationReplyFromUser(false);
@@ -295,11 +298,6 @@ namespace ClientWindows
             if (inviteToConversationReplyOk == null || inviteToConversationReplyFromUser == null)
             {
                 return;
-            }
-            if(ack)
-            {
-                InCallForm icf = new InCallForm(us);
-                icf.ShowDialog();
             }
             inviteToConversationReplyFromUser(ack);
         }
@@ -322,16 +320,16 @@ namespace ClientWindows
             //inviteToConversationReplyFromUser(ack);
         }
 
-        public static void acceptCall(Call call)
+        public static void acceptCall(Id cId)
         {
-            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, new Id(call.callId)));
-            InCallForm icf = new InCallForm(call);
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, cId));
+            InCallForm icf = new InCallForm(cId);
             icf.ShowDialog();
         }
 
-        public static void declineCall(Call call)
+        public static void declineCall(Id cId)
         {
-            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, new Id(call.callId)));
+            ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, cId));
         }
 
         public static void joinConversationAccepted(String message)
