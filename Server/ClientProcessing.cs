@@ -519,7 +519,7 @@ namespace Server
             }
 
             // try catch czy jest zalogowany
-            whichFunction[user.username].Add(new Tuple<Options, string>(Options.INCOMMING_CALL, conversationId.ToString()));
+            whichFunction[user.username].Add(new Tuple<Options, string>(Options.INCOMMING_CALL, conversationId.id.ToString()));
             eventHandlers[user.username].Set();
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
         }
