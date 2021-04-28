@@ -133,8 +133,15 @@ namespace Server
                         return;
                     }
 
-
+                    try
+                    {
                         messagesToSend = menager.CheckServerMessages(clientID);
+                    }
+                    catch(CustomException e)
+                    {
+                        Console.WriteLine("Async Error \n" + e.Message);
+                        continue;
+                    }
 
 
 
