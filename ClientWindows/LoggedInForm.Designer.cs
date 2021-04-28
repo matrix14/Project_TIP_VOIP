@@ -42,10 +42,10 @@ namespace ClientWindows
             this.friendsList = new System.Windows.Forms.ListBox();
             this.openFriend_button = new System.Windows.Forms.Button();
             this.friendList_label = new System.Windows.Forms.Label();
+            this.callingStatusLabel = new System.Windows.Forms.Label();
             this.activeFriendStatus_Label = new System.Windows.Forms.Label();
             this.callUser = new System.Windows.Forms.Button();
             this.activeUserWindow = new System.Windows.Forms.Label();
-            this.callingStatusLabel = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -198,6 +198,18 @@ namespace ClientWindows
             this.friendList_label.TabIndex = 0;
             this.friendList_label.Text = "Znajomi";
             // 
+            // callingStatusLabel
+            // 
+            this.callingStatusLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.callingStatusLabel.ForeColor = System.Drawing.Color.Green;
+            this.callingStatusLabel.Location = new System.Drawing.Point(1, 330);
+            this.callingStatusLabel.Name = "callingStatusLabel";
+            this.callingStatusLabel.Size = new System.Drawing.Size(259, 31);
+            this.callingStatusLabel.TabIndex = 4;
+            this.callingStatusLabel.Text = "Oczekuje na odpowiedź...";
+            this.callingStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.callingStatusLabel.Visible = false;
+            // 
             // activeFriendStatus_Label
             // 
             this.activeFriendStatus_Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
@@ -234,18 +246,6 @@ namespace ClientWindows
             this.activeUserWindow.Visible = false;
             this.activeUserWindow.Click += new System.EventHandler(this.label1_Click_1);
             // 
-            // callingStatusLabel
-            // 
-            this.callingStatusLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.callingStatusLabel.ForeColor = System.Drawing.Color.Green;
-            this.callingStatusLabel.Location = new System.Drawing.Point(1, 330);
-            this.callingStatusLabel.Name = "callingStatusLabel";
-            this.callingStatusLabel.Size = new System.Drawing.Size(259, 31);
-            this.callingStatusLabel.TabIndex = 4;
-            this.callingStatusLabel.Text = "Oczekuje na odpowiedź...";
-            this.callingStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.callingStatusLabel.Visible = false;
-            // 
             // LoggedInForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -259,6 +259,7 @@ namespace ClientWindows
             this.Name = "LoggedInForm";
             this.Text = "TIP_VOIP Client";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.LoggedInForm_FormClosing);
+            this.Load += new System.EventHandler(this.LoggedInForm_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);

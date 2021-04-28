@@ -448,5 +448,10 @@ namespace ClientWindows
                 
             }
         }
+
+        private void LoggedInForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

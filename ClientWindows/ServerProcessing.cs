@@ -22,6 +22,7 @@ namespace ClientWindows
             lastOptions = (Options)int.Parse((message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries)[0])
                 .Split(new String[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
             ServerConnectorAsync.SendMessage(message);
+            if (lastOptions == Options.JOIN_CONVERSATION || lastOptions == Options.LEAVE_CONVERSATION) syncProcessNotCompleted.Set();
             return;
         }
 
@@ -94,7 +95,7 @@ namespace ClientWindows
                         //TODO: do nothing
                         break;
                     case Options.JOIN_CONVERSATION:
-                        LoggedInService.joinConversationAccepted(message);
+                        LoggedInService.joinConversationAccepted(message); //TODO ???
                         break;
                 }
                 syncProcessNotCompleted.Set();

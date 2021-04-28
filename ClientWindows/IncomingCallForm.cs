@@ -47,6 +47,7 @@ namespace ClientWindows
         {
             if (this.call == null) return;
             LoggedInService.acceptCall(this.call);
+
             //TODO open call window
             this.Close();
         }
