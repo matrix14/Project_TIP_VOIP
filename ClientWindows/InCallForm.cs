@@ -14,7 +14,7 @@ namespace ClientWindows
     public partial class InCallForm : Form
     {
 
-        private Username username = null;
+        private Id callId = null;
         private Call call = null;
 
         public InCallForm()
@@ -25,6 +25,7 @@ namespace ClientWindows
         public InCallForm(Call c)
         {
             this.call = c;
+            this.callId = new Id(c.callId);
             InitializeComponent();
             String usersListStr = "";
             foreach (String u in call.usernames)
@@ -38,9 +39,9 @@ namespace ClientWindows
             this.callUsersList_label.Text = usersListStr;
         }
 
-        public InCallForm(Username u)
+        public InCallForm(Id id)
         {
-            this.username = u;
+            this.callId = id;
             InitializeComponent();
         }
 
@@ -52,7 +53,7 @@ namespace ClientWindows
         private void leaveCall_button_Click(object sender, EventArgs e)
         {
             if (this.call == null) return;
-            LoggedInService.declineCall(this.call);
+            LoggedInService.declineCall(this.callId);
         }
     }
 }

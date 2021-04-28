@@ -16,13 +16,14 @@ namespace ClientWindows
     public delegate void StringCallback(String message);
     public delegate void InvitationCallback(Invitation inv);
     public delegate void UsernameCallback(Username u);
-    public delegate void DefaultCallback();
+    public delegate void IdCallback(Id id);
     public partial class LoggedInForm : Form
     {
         //public static List<Friend> callbackFriendsContainer;
 
         private static List<Friend> friendsContainer = new List<Friend>();
         private static List<Invitation> invitationContainer = new List<Invitation>();
+        private static Id lastCallId = null;
         private Hashtable friendListDetails = new Hashtable(){
             {"friendsStart", 0},
             {"friendsAmount", 0},
@@ -35,7 +36,7 @@ namespace ClientWindows
 
             UsernameCallback callback4 = newInactiveFriendFunc;
             UsernameCallback callback5 = newActiveFriendFunc;
-            DefaultCallback callback6 = callUserReply;
+            IdCallback callback6 = callUserReply;
             BooleanCallback callback7 = callUserReplyFromUser;
             LoggedInService.NewInactiveFriend = callback4;
             LoggedInService.NewActiveFriend = callback5;
@@ -129,7 +130,7 @@ namespace ClientWindows
         {
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             String frListStr = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-            List<Friend> friends = MessageProccesing.DeserializeObject(Options.GET_FRIENDS, frListStr) as List<Friend>;
+            List<Friend> friends = MessageProccesing.DeserializeObjectOnErrorCode(Options.GET_FRIENDS, frListStr) as List<Friend>;
             friendsContainer.Clear();
             foreach (Friend fr in friends)
             {
@@ -410,14 +411,15 @@ namespace ClientWindows
             LoggedInService.inviteToConversation(new Username(activeUserWindow.Text));
         }
 
-        public void callUserReply()
+        public void callUserReply(Id callId)
         {
             if (callingStatusLabel.InvokeRequired)
             {
-                callingStatusLabel.Invoke(new MethodInvoker(() => { callUserReply(); }));
+                callingStatusLabel.Invoke(new MethodInvoker(() => { callUserReply(callId); }));
             }
             else
             {
+                lastCallId = callId;
                 callUser.Enabled = false;
                 callingStatusLabel.Visible = true;
                 callingStatusLabel.Text = "Oczekuje na odpowiedź...";
@@ -439,6 +441,11 @@ namespace ClientWindows
                     callUser.Enabled = false;
                     callingStatusLabel.Text = "Zaakceptowano!";
                     callingStatusLabel.ForeColor = Color.Green;
+                    if (reply)
+                    {
+                        InCallForm icf = new InCallForm(lastCallId);
+                        icf.ShowDialog();
+                    }
                 } else
                 {
                     callUser.Enabled = true;

@@ -46,7 +46,7 @@ namespace ClientWindows
         private void acceptCall_button_Click(object sender, EventArgs e)
         {
             if (this.call == null) return;
-            LoggedInService.acceptCall(this.call);
+            LoggedInService.acceptCall(new Id(this.call.callId));
 
             //TODO open call window
             this.Close();
@@ -55,7 +55,7 @@ namespace ClientWindows
         private void declineCall_button_Click(object sender, EventArgs e)
         {
             if (this.call == null) return;
-            LoggedInService.declineCall(this.call);
+            LoggedInService.declineCall(new Id(this.call.callId));
             this.Close();
         }
     }
