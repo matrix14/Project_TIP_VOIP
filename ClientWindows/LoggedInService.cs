@@ -296,7 +296,11 @@ namespace ClientWindows
             {
                 return;
             }
-
+            if(ack)
+            {
+                InCallForm icf = new InCallForm(us);
+                icf.ShowDialog();
+            }
             inviteToConversationReplyFromUser(ack);
         }
 
@@ -321,6 +325,8 @@ namespace ClientWindows
         public static void acceptCall(Call call)
         {
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, new Id(call.callId)));
+            InCallForm icf = new InCallForm(call);
+            icf.ShowDialog();
         }
 
         public static void declineCall(Call call)
@@ -330,7 +336,7 @@ namespace ClientWindows
 
         public static void joinConversationAccepted(String message)
         {
-            MessageBox.Show("ACK CONV \n" + message);
+            //MessageBox.Show("ACK CONV \n" + message);
         } 
     }
 }
