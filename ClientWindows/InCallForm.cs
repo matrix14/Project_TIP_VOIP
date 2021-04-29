@@ -39,10 +39,11 @@ namespace ClientWindows
             this.callUsersList_label.Text = usersListStr;
         }
 
-        public InCallForm(Id id)
+        public InCallForm(Id id, Username user)
         {
             this.callId = id;
             InitializeComponent();
+            this.callUsersList_label.Text = user.username;
         }
 
         private void InCallForm_Load(object sender, EventArgs e)
@@ -52,7 +53,12 @@ namespace ClientWindows
 
         private void leaveCall_button_Click(object sender, EventArgs e)
         {
-            if (this.call == null) return;
+            this.Close();
+        }
+
+        private void InCallForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (this.callId == null) return;
             LoggedInService.declineCall(this.callId);
         }
     }

@@ -323,8 +323,6 @@ namespace ClientWindows
         public static void acceptCall(Id cId)
         {
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.JOIN_CONVERSATION, cId));
-            InCallForm icf = new InCallForm(cId);
-            icf.ShowDialog();
         }
 
         public static void declineCall(Id cId)

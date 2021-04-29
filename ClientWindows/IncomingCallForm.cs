@@ -49,6 +49,9 @@ namespace ClientWindows
             LoggedInService.acceptCall(new Id(this.call.callId));
 
             //TODO open call window
+            this.Hide();
+            InCallForm icf = new InCallForm(this.call);
+            icf.ShowDialog();
             this.Close();
         }
 
@@ -57,6 +60,11 @@ namespace ClientWindows
             if (this.call == null) return;
             LoggedInService.declineCall(new Id(this.call.callId));
             this.Close();
+        }
+
+        private void IncomingCallForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
