@@ -110,6 +110,7 @@ namespace ClientWindows
             this.Controls.Add(this.acceptCall_button);
             this.Name = "IncomingCallForm";
             this.Text = "Przychodzące połączenie";
+            this.Load += new System.EventHandler(this.IncomingCallForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

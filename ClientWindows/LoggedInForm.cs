@@ -24,6 +24,7 @@ namespace ClientWindows
         private static List<Friend> friendsContainer = new List<Friend>();
         private static List<Invitation> invitationContainer = new List<Invitation>();
         private static Id lastCallId = null;
+        private static Username lastCallUsername = null;
         private Hashtable friendListDetails = new Hashtable(){
             {"friendsStart", 0},
             {"friendsAmount", 0},
@@ -352,19 +353,20 @@ namespace ClientWindows
             
             if(lb.SelectedIndex>=startFriends&&lb.SelectedIndex<=endFriends)
             {*/
-                Friend fr = (Friend)lb.Items[lb.SelectedIndex];
-                activeUserWindow.Text = fr.username;
-                callUser.Enabled = (fr.active==1);
-                if (callUser.Enabled)
-                {
-                    activeFriendStatus_Label.Text = "Aktywny";
-                    activeFriendStatus_Label.ForeColor = Color.Green;
-                }
-                else
-                {
-                    activeFriendStatus_Label.Text = "Nieaktywny";
-                    activeFriendStatus_Label.ForeColor = Color.Red;
-                }
+            Friend fr = (Friend)lb.Items[lb.SelectedIndex];
+            activeUserWindow.Text = fr.username;
+            callUser.Enabled = (fr.active==1);
+            this.callingStatusLabel.Visible = false;
+            if (callUser.Enabled)
+            {
+                activeFriendStatus_Label.Text = "Aktywny";
+                activeFriendStatus_Label.ForeColor = Color.Green;
+            }
+            else
+            {
+                activeFriendStatus_Label.Text = "Nieaktywny";
+                activeFriendStatus_Label.ForeColor = Color.Red;
+            }
             showFriendContext();
             /*}
             if (lb.SelectedIndex >= startInvitations && lb.SelectedIndex <= endInvitations)
@@ -409,6 +411,7 @@ namespace ClientWindows
         private void callUser_Click(object sender, EventArgs e)
         {
             LoggedInService.inviteToConversation(new Username(activeUserWindow.Text));
+            lastCallUsername = new Username(activeUserWindow.Text);
         }
 
         public void callUserReply(Id callId)
@@ -441,11 +444,8 @@ namespace ClientWindows
                     callUser.Enabled = false;
                     callingStatusLabel.Text = "Zaakceptowano!";
                     callingStatusLabel.ForeColor = Color.Green;
-                    if (reply)
-                    {
-                        InCallForm icf = new InCallForm(lastCallId);
-                        icf.ShowDialog();
-                    }
+                    InCallForm icf = new InCallForm(lastCallId, lastCallUsername);
+                    icf.ShowDialog();
                 } else
                 {
                     callUser.Enabled = true;
