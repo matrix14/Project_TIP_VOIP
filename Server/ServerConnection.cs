@@ -61,7 +61,7 @@ namespace Server
             Decoder decoder = Encoding.ASCII.GetDecoder();
             while (true)
             {
-                try
+                //try
                 {
                     string sendMessage = "";
                     byte[] buffer = new byte[2048];
@@ -106,7 +106,7 @@ namespace Server
                     //Send response
                     stream.Write(message);
                 }
-                
+                /*
                 catch (Exception e)
                 {
                     udpTokenSource.Cancel();
@@ -115,6 +115,7 @@ namespace Server
                     Console.WriteLine(e.Message);
                     break;
                 }
+                */
                 
 
             }
@@ -161,6 +162,7 @@ namespace Server
         {
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ep = new IPEndPoint(clientIp, port);
+            if (!userNewVoiceHandler.ContainsKey(clientIp)) userNewVoiceHandler[clientIp] = new EventWaitHandle(false, EventResetMode.ManualReset);
             while (true)
             {
                 userNewVoiceHandler[clientIp].WaitOne();
@@ -179,12 +181,18 @@ namespace Server
         // One Task for one Client, make try catch
         public void UdpRead(IPAddress clientIp,int port,int conversationId)
         {
+            lock (voiceToSend)
+            {
+                if (!voiceToSend.ContainsKey(conversationId)) voiceToSend[conversationId] = new Dictionary<IPAddress, Queue<byte[]>>();
+            }
             voiceToSend[conversationId][clientIp] = new Queue<byte[]>();
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(clientIp, port);
             UdpClient receivingUdpClient = new UdpClient(11000);
             while (true)
             {
                 byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
+                if (receiveBytes == null || receiveBytes.Length == 0)
+                    return;
                 foreach (var key in voiceToSend[conversationId].Keys)
                 {
                     // Key is clientIp

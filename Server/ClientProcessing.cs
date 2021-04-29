@@ -527,7 +527,7 @@ namespace Server
         // Tell serverconnection
         public string JoinConversation(string msg, int clientId)
         {
-            int conversationId = MessageProccesing.DeserializeObject(msg) as Id;
+            Id conversationId = MessageProccesing.DeserializeObject(msg) as Id;
             // If user isint logged return error
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
 
