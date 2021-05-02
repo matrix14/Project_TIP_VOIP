@@ -10,15 +10,17 @@ namespace ClientWindows
 {
     class CallProcessing
     {
-        private static int connectionPort = 11000;
+        private static int connectionPortRecv = 11000;
+        private static int connectionPortSend = 11001;
         private static String connectionIp = "10.1.1.1"; //TODO: server IP address
 
         private static ByteCallback receiveMsgCallback;
 
         private struct UdpState
         {
-            public UdpClient uClient;
-            public IPEndPoint ePointRec;
+            public UdpClient uClientRecv;
+            public UdpClient uClientSend;
+            public IPEndPoint ePointRecv;
             public IPEndPoint ePointSend;
         }
 
@@ -31,27 +33,30 @@ namespace ClientWindows
             IPAddress ip;
             IPAddress.TryParse(connectionIp, out ip);
 
-            IPEndPoint e = new IPEndPoint(IPAddress.Any, connectionPort);
-            IPEndPoint eSend = new IPEndPoint(ip, connectionPort);
-            UdpClient u = new UdpClient(e);
+            IPEndPoint eRecv = new IPEndPoint(IPAddress.Any, connectionPortRecv);
+            IPEndPoint eSend = new IPEndPoint(ip, connectionPortSend);
+            UdpClient uRecv = new UdpClient(eRecv);
+            UdpClient uSend = new UdpClient(eSend);
 
-            udpState.ePointRec = e;
+            udpState.ePointRecv = eRecv;
             udpState.ePointSend = eSend;
-            udpState.uClient = u;
+            udpState.uClientRecv = uRecv;
+            udpState.uClientSend = uSend;
 
             ReceiveMessages();
         }
 
         public static void Stop()
         {
-            udpState.uClient.Close();
+            udpState.uClientRecv.Close();
+            udpState.uClientSend.Close();
         }
 
         
         public static void ReceiveCallback(IAsyncResult ar)
         {
-            UdpClient u = ((UdpState)(ar.AsyncState)).uClient;
-            IPEndPoint e = ((UdpState)(ar.AsyncState)).ePointRec;
+            UdpClient u = ((UdpState)(ar.AsyncState)).uClientRecv;
+            IPEndPoint e = ((UdpState)(ar.AsyncState)).ePointRecv;
 
             byte[] receiveBytes = u.EndReceive(ar, ref e);
             ReceiveMsgCallback(receiveBytes);
@@ -62,12 +67,12 @@ namespace ClientWindows
 
         public static void ReceiveMessages()
         {
-            (udpState.uClient).BeginReceive(new AsyncCallback(ReceiveCallback), udpState);
+            (udpState.uClientRecv).BeginReceive(new AsyncCallback(ReceiveCallback), udpState);
         }
 
         public static void SendMessages(byte[] msg)
         {
-            (udpState.uClient).SendAsync(msg, msg.Length, udpState.ePointSend);
+            (udpState.uClientSend).SendAsync(msg, msg.Length, udpState.ePointSend);
         }
     }
 }
