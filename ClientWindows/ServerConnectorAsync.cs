@@ -19,7 +19,7 @@ namespace ClientWindows
     class ServerConnectorAsync
     {
         private static int port = 13579;
-        private static String address = "127.0.0.1";
+        private static String address = "10.1.1.1"; //TODO: server IP address
 
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
