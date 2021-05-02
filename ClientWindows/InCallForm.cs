@@ -45,8 +45,8 @@ namespace ClientWindows
 
             ByteCallback callback = incomingTraffic;
             CallProcessing.ReceiveMsgCallback = callback;
-            //CallProcessing.Start();
-            //Task.Run(sentBytes);
+            CallProcessing.Start();
+            Task.Run(sentBytes);
         }
 
         public InCallForm(Id id, Username user)
@@ -58,8 +58,8 @@ namespace ClientWindows
 
             ByteCallback callback = incomingTraffic;
             CallProcessing.ReceiveMsgCallback = callback;
-            //CallProcessing.Start();
-            //Task.Run(sentBytes);
+            CallProcessing.Start();
+            Task.Run(sentBytes);
         }
 
         private void InCallForm_Load(object sender, EventArgs e)
