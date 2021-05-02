@@ -445,7 +445,7 @@ namespace ClientWindows
                     callingStatusLabel.Text = "Zaakceptowano!";
                     callingStatusLabel.ForeColor = Color.Green;
                     InCallForm icf = new InCallForm(lastCallId, lastCallUsername);
-                    icf.ShowDialog();
+                    icf.Show();
                 } else
                 {
                     callUser.Enabled = true;

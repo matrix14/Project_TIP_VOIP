@@ -38,6 +38,9 @@ namespace ClientWindows
             this.muteSound_button = new System.Windows.Forms.Button();
             this.soundSettings_button = new System.Windows.Forms.Button();
             this.addUserCall_button = new System.Windows.Forms.Button();
+            this.incomingTraffic_label = new System.Windows.Forms.Label();
+            this.incomingTraffic_bar = new System.Windows.Forms.ProgressBar();
+            this.incomingMsg_label = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // activeCallWith_label
@@ -134,11 +137,46 @@ namespace ClientWindows
             this.addUserCall_button.Text = "Dodaj uczestnika";
             this.addUserCall_button.UseVisualStyleBackColor = true;
             // 
+            // incomingTraffic_label
+            // 
+            this.incomingTraffic_label.AutoSize = true;
+            this.incomingTraffic_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.incomingTraffic_label.Location = new System.Drawing.Point(12, 175);
+            this.incomingTraffic_label.Name = "incomingTraffic_label";
+            this.incomingTraffic_label.Size = new System.Drawing.Size(124, 20);
+            this.incomingTraffic_label.TabIndex = 9;
+            this.incomingTraffic_label.Text = "Stan połączenia";
+            this.incomingTraffic_label.Click += new System.EventHandler(this.incomingTraffic_label_Click);
+            // 
+            // incomingTraffic_bar
+            // 
+            this.incomingTraffic_bar.Location = new System.Drawing.Point(142, 175);
+            this.incomingTraffic_bar.MarqueeAnimationSpeed = 23;
+            this.incomingTraffic_bar.Maximum = 1;
+            this.incomingTraffic_bar.MaximumSize = new System.Drawing.Size(23, 23);
+            this.incomingTraffic_bar.MinimumSize = new System.Drawing.Size(23, 23);
+            this.incomingTraffic_bar.Name = "incomingTraffic_bar";
+            this.incomingTraffic_bar.Size = new System.Drawing.Size(23, 23);
+            this.incomingTraffic_bar.Step = 1;
+            this.incomingTraffic_bar.TabIndex = 0;
+            // 
+            // incomingMsg_label
+            // 
+            this.incomingMsg_label.AutoSize = true;
+            this.incomingMsg_label.Location = new System.Drawing.Point(13, 149);
+            this.incomingMsg_label.Name = "incomingMsg_label";
+            this.incomingMsg_label.Size = new System.Drawing.Size(35, 13);
+            this.incomingMsg_label.TabIndex = 10;
+            this.incomingMsg_label.Text = "label1";
+            // 
             // InCallForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(450, 212);
+            this.Controls.Add(this.incomingMsg_label);
+            this.Controls.Add(this.incomingTraffic_bar);
+            this.Controls.Add(this.incomingTraffic_label);
             this.Controls.Add(this.addUserCall_button);
             this.Controls.Add(this.soundSettings_button);
             this.Controls.Add(this.soundState_label);
@@ -168,5 +206,8 @@ namespace ClientWindows
         private System.Windows.Forms.Button muteSound_button;
         private System.Windows.Forms.Button soundSettings_button;
         private System.Windows.Forms.Button addUserCall_button;
+        private System.Windows.Forms.Label incomingTraffic_label;
+        private System.Windows.Forms.ProgressBar incomingTraffic_bar;
+        private System.Windows.Forms.Label incomingMsg_label;
     }
 }
