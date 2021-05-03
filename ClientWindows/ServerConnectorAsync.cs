@@ -19,7 +19,6 @@ namespace ClientWindows
     class ServerConnectorAsync
     {
         private static int port = 13579;
-        private static String address = "10.8.0.2"; //TODO: server IP address
 
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
@@ -38,7 +37,7 @@ namespace ClientWindows
 
             try
             {
-                IPAddress ip = IPAddress.Parse(address);
+                IPAddress ip = IPAddress.Parse(Shared.IP.serverIp);
                 IPEndPoint remoteAddr = new IPEndPoint(ip, port);
                 sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
@@ -72,7 +71,7 @@ namespace ClientWindows
             sock.Close();
             try
             {
-                IPAddress ip = IPAddress.Parse(address);
+                IPAddress ip = IPAddress.Parse(Shared.IP.serverIp);
                 IPEndPoint remoteAddr = new IPEndPoint(ip, port);
                 sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
