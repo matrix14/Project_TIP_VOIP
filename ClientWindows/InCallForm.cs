@@ -41,7 +41,7 @@ namespace ClientWindows
                 usersListStr += u;
             }
             this.callUsersList_label.Text = usersListStr;
-            Task.Run(progBarIncrease);
+            //Task.Run(progBarIncrease);
 
             ByteCallback callback = incomingTraffic;
             CallProcessing.ReceiveMsgCallback = callback;
@@ -54,7 +54,7 @@ namespace ClientWindows
             this.callId = id;
             InitializeComponent();
             this.callUsersList_label.Text = user.username;
-            Task.Run(progBarIncrease);
+            //Task.Run(progBarIncrease);
 
             ByteCallback callback = incomingTraffic;
             CallProcessing.ReceiveMsgCallback = callback;
@@ -84,8 +84,13 @@ namespace ClientWindows
             
         }
 
-        private void progBarIncrease()
+        /*private void progBarIncrease()
         {
+            if(incomingTraffic_bar.InvokeRequired)
+            {
+                incomingTraffic_bar.Invoke(new MethodInvoker(() => { progBarIncrease(); }));
+                return;
+            }
             incomingTraffic_bar.Visible = true;
             incomingTraffic_bar.Minimum = 0;
             incomingTraffic_bar.Maximum = 1;
@@ -97,10 +102,10 @@ namespace ClientWindows
                     incomingTraffic_bar.Value = 0;
                 else
                     incomingTraffic_bar.PerformStep();
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(500);
             }
             
-        }
+        }*/
 
         public void incomingTraffic(byte[] b)
         {
@@ -116,30 +121,33 @@ namespace ClientWindows
 
         public void sentBytes()
         {
-            byte b = (byte)'Z';
-            switch (i)
+            do
             {
-                case 0:
-                    b = (byte)'A';
-                    break;
-                case 1:
-                    b = (byte)'B';
-                    break;
-                case 2:
-                    b = (byte)'C';
-                    break;
-                case 3:
-                    b = (byte)'D';
-                    break;
-            }
+                byte b = (byte)'Z';
+                switch (i)
+                {
+                    case 0:
+                        b = (byte)'A';
+                        break;
+                    case 1:
+                        b = (byte)'B';
+                        break;
+                    case 2:
+                        b = (byte)'C';
+                        break;
+                    case 3:
+                        b = (byte)'D';
+                        break;
+                }
 
-            CallProcessing.SendMessages(new byte[] { b });
-            i++;
-            if(i==4)
-            {
-                i = 0;
-            }
-            System.Threading.Thread.Sleep(100);
+                CallProcessing.SendMessages(new byte[] { b });
+                i++;
+                if (i == 4)
+                {
+                    i = 0;
+                }
+                System.Threading.Thread.Sleep(100);
+            } while (true);
         }
     }
 }
