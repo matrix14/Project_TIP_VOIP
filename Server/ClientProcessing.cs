@@ -521,6 +521,12 @@ namespace Server
             // try catch czy jest zalogowany
             whichFunction[user.username].Add(new Tuple<Options, string>(Options.INCOMMING_CALL, conversationId.id.ToString()));
             eventHandlers[user.username].Set();
+
+            // If user create new conversation, create udp threads
+            if(!conversationExists)
+            {
+                throw new CustomException(MessageProccesing.CreateMessage(Options.CREATE_UDP, conversationId));
+            }
             return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
         }
 
