@@ -174,6 +174,7 @@ namespace Server
                 {
                     if (ct.IsCancellationRequested)
                     {
+                        lock (userNewVoiceHandler) userNewVoiceHandler.Remove(clientIp);
                         return;
                     }
                     s.SendTo(voiceToSend[conversationId][clientIp].Dequeue(), ep);
@@ -196,7 +197,10 @@ namespace Server
             {
                 byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
                 if (receiveBytes == null || receiveBytes.Length == 0)
+                {
+                    lock (voiceToSend[conversationId]) voiceToSend[conversationId].Remove(clientIp);
                     return;
+                }
                 foreach (var key in voiceToSend[conversationId].Keys)
                 {
                     // Key is clientIp
