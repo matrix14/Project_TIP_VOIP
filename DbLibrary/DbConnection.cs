@@ -11,7 +11,7 @@ namespace DbLibrary
         protected string password;
         public DbConnection()
         {
-            server = "10.8.0.1";
+            server = "37.187.107.7";
             database = "projekt_kacper_tip";
             uid = "user_io";
             password = "DN8OHj8mUkNmXBRm";
