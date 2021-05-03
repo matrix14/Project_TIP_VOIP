@@ -16,6 +16,7 @@ namespace ClientWindows
     {
 
         private Id callId = null;
+        private Boolean callStopped = false;
         private Call call = null;
 
         private int i = 0;
@@ -78,6 +79,7 @@ namespace ClientWindows
         private void InCallForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (this.callId == null) return;
+            callStopped = true;
             CallProcessing.SendMessages(new byte[] { 0x00 });
             CallProcessing.SendMessages(new byte[] { 0xFF });
             CallProcessing.SendMessages(new byte[] { });
@@ -155,7 +157,7 @@ namespace ClientWindows
                     i = 0;
                 }
                 System.Threading.Thread.Sleep(100);
-            } while (true);
+            } while (callStopped==false);
         }
     }
 }
