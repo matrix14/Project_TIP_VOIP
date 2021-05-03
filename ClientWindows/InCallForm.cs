@@ -28,6 +28,7 @@ namespace ClientWindows
 
         public InCallForm(Call c)
         {
+            
             this.call = c;
             this.callId = new Id(c.callId);
             InitializeComponent();
@@ -47,6 +48,7 @@ namespace ClientWindows
             CallProcessing.ReceiveMsgCallback = callback;
             CallProcessing.Start();
             Task.Run(sentBytes);
+            Program.isInCall = true;
         }
 
         public InCallForm(Id id, Username user)
@@ -60,6 +62,7 @@ namespace ClientWindows
             CallProcessing.ReceiveMsgCallback = callback;
             CallProcessing.Start();
             Task.Run(sentBytes);
+            Program.isInCall = true;
         }
 
         private void InCallForm_Load(object sender, EventArgs e)
@@ -75,8 +78,13 @@ namespace ClientWindows
         private void InCallForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (this.callId == null) return;
-            LoggedInService.declineCall(this.callId);
+            CallProcessing.SendMessages(new byte[] { 0x00 });
+            CallProcessing.SendMessages(new byte[] { 0xFF });
+            CallProcessing.SendMessages(new byte[] { });
+            CallProcessing.SendMessages(null);
             CallProcessing.Stop();
+            LoggedInService.declineCall(this.callId);
+            Program.isInCall = false;
         }
 
         private void incomingTraffic_label_Click(object sender, EventArgs e)

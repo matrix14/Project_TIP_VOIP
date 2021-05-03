@@ -10,6 +10,7 @@ namespace ClientWindows
     {
         public static String username = "";
         public static Boolean isLoggedIn = false;
+        public static Boolean isInCall = false;
 
 
         /// <summary>
