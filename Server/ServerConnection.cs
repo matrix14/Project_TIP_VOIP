@@ -24,7 +24,7 @@ namespace Server
         /// <para> Value: <c>handler</c> </para>
         /// </summary>
         private Dictionary<IPAddress, EventWaitHandle> userNewVoiceHandler;
-
+        private UdpClient receivingUdpClient;
         public void RunServer()
         {
             // Create a TCP/IP (IPv4) socket and listen for incoming connections.
@@ -92,8 +92,14 @@ namespace Server
                         if (option == Options.JOIN_CONVERSATION)
                         {
                             Task.Run(() => UdpRead(clientIp, IP.serverPort,conversationId.id));
-                            Task.Run(() => UdpWrite(clientIp,IP.clientPort, conversationId.id, token), token);
+                            Task.Run(() => UdpWrite(clientIp,IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+                        }
+                        else if(option == Options.CREATE_UDP)
+                        {
+                            Task.Run(() => UdpRead(clientIp, IP.serverPort, conversationId.id));
+                            Task.Run(() => UdpWrite(clientIp, IP.clientPort, conversationId.id, udpToken), udpToken);
+                            sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
                         }
                         else if(option == Options.LEAVE_CONVERSATION)
                         {
@@ -144,8 +150,6 @@ namespace Server
                         continue;
                     }
 
-
-
                     foreach (string message in messagesToSend)
                     {
                         byte[] send = Encoding.ASCII.GetBytes(message);
@@ -187,7 +191,7 @@ namespace Server
             }
             voiceToSend[conversationId][clientIp] = new Queue<byte[]>();
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(clientIp, port);
-            UdpClient receivingUdpClient = new UdpClient(port);
+            
             while (true)
             {
                 byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
@@ -210,6 +214,7 @@ namespace Server
             menager = new ClientProcessing();
             userNewVoiceHandler = new Dictionary<IPAddress, EventWaitHandle>();
             voiceToSend = new Dictionary<int, Dictionary<IPAddress, Queue<byte[]>>>();
+            receivingUdpClient = new UdpClient(IP.serverPort);
             RunServer();
         }
     }
