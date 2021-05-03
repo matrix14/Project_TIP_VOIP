@@ -41,7 +41,7 @@ namespace Shared
                 else if (option == Options.GET_FRIENDS) return JsonConvert.DeserializeObject<List<Friend>>(data);
                 else if (option == Options.FRIEND_INVITATIONS) return JsonConvert.DeserializeObject<List<Invitation>>(data);
                 else if (option == Options.INCOMMING_CALL) return JsonConvert.DeserializeObject<Call>(data);
-                else if (option == Options.ACCEPT_FRIEND || option == Options.DECLINE_FRIEND || option == Options.JOIN_CONVERSATION || option == Options.LEAVE_CONVERSATION) return JsonConvert.DeserializeObject<Id>(data);
+                else if (option == Options.ACCEPT_FRIEND || option == Options.DECLINE_FRIEND || option == Options.JOIN_CONVERSATION || option == Options.LEAVE_CONVERSATION || option == Options.CREATE_UDP) return JsonConvert.DeserializeObject<Id>(data);
             }
             return "";
         }
