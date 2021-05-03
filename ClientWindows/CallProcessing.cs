@@ -40,6 +40,19 @@ namespace ClientWindows
             //UdpClient uSend = new UdpClient(eSend);
 
             Socket sSend = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+            /*
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ipa in host.AddressList)
+            {
+                if (ipa.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    sSend.Bind(new IPEndPoint(IPAddress.Parse(ipa.ToString()), Shared.IP.clientPort));
+                    break;
+                }
+            }
+            */
+
             IPEndPoint eSend = new IPEndPoint(ip, connectionPortSend);
 
             udpState.ePointRecv = eRecv;

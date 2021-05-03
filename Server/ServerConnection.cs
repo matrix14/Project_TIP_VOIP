@@ -178,7 +178,14 @@ namespace Server
                         lock (userNewVoiceHandler) userNewVoiceHandler.Remove(clientIp);
                         return;
                     }
-                    s.SendTo(voiceToSend[conversationId][clientIp].Dequeue(), ep);
+                    try
+                    {
+                        s.SendTo(voiceToSend[conversationId][clientIp].Dequeue(), ep);
+                    }
+                    catch
+                    {
+                        ;
+                    }
                     userNewVoiceHandler[clientIp].Reset();
                 }
             }
@@ -192,7 +199,7 @@ namespace Server
                 if (!voiceToSend.ContainsKey(conversationId)) voiceToSend[conversationId] = new Dictionary<IPAddress, Queue<byte[]>>();
             }
             voiceToSend[conversationId][clientIp] = new Queue<byte[]>();
-            IPEndPoint RemoteIpEndPoint = new IPEndPoint(clientIp, port);
+            IPEndPoint RemoteIpEndPoint = new IPEndPoint(clientIp, IP.clientPort);
             
             while (true)
             {
@@ -215,6 +222,9 @@ namespace Server
             }
 
         }
+        
+
+        
         public ServerConnection()
         {
             menager = new ClientProcessing();
