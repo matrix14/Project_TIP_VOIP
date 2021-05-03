@@ -25,6 +25,8 @@ namespace Server
         /// </summary>
         private Dictionary<IPAddress, EventWaitHandle> userNewVoiceHandler;
         private UdpClient receivingUdpClient;
+        private Dictionary<IPAddress, int> usersConversations;
+
         public void RunServer()
         {
             // Create a TCP/IP (IPv4) socket and listen for incoming connections.
@@ -59,6 +61,7 @@ namespace Server
             #pragma warning restore CS4014 
             byte[] message;
             Decoder decoder = Encoding.ASCII.GetDecoder();
+            Task udpTask = null;
             while (true)
             {
                 //try
@@ -88,17 +91,20 @@ namespace Server
                         string[] fields = e.Message.Split("$$", StringSplitOptions.RemoveEmptyEntries);
                         Options option = (Options)int.Parse(fields[0].Split(':', StringSplitOptions.RemoveEmptyEntries)[1]);
                         Id conversationId = MessageProccesing.DeserializeObject(e.Message) as Id;
+                        
 
                         if (option == Options.JOIN_CONVERSATION)
                         {
-                            Task.Run(() => UdpRead(clientIp, IP.serverPort,conversationId.id));
-                            Task.Run(() => UdpWrite(clientIp,IP.clientPort, conversationId.id, udpToken), udpToken);
+                            if (udpTask != null) await udpTask;
+                            //Task.Run(() => UdpRead(clientIp, IP.serverPort,conversationId.id));
+                            udpTask = Task.Run(() => UdpWrite(clientIp,IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
                         }
                         else if(option == Options.CREATE_UDP)
                         {
-                            Task.Run(() => UdpRead(clientIp, IP.serverPort, conversationId.id));
-                            Task.Run(() => UdpWrite(clientIp, IP.clientPort, conversationId.id, udpToken), udpToken);
+                            if (udpTask != null) await udpTask;
+                            //Task.Run(() => UdpRead(clientIp, IP.serverPort, conversationId.id));
+                            udpTask = Task.Run(() => UdpWrite(clientIp, IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
                         }
                         else if(option == Options.LEAVE_CONVERSATION)
@@ -106,6 +112,12 @@ namespace Server
                             udpTokenSource.Cancel();
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
                             userNewVoiceHandler[clientIp].Set();
+                            if (udpTask != null) await udpTask;
+                            udpTokenSource.Dispose();
+                            udpTask.Dispose();
+                            udpTokenSource = new CancellationTokenSource();
+                            udpToken = udpTokenSource.Token;
+
                         }
         
                     }                 
@@ -165,28 +177,36 @@ namespace Server
         // One Task for one Client
         public void UdpWrite(IPAddress clientIp,int port, int conversationId, CancellationToken ct)
         {
+            lock (usersConversations) usersConversations[clientIp] = conversationId;
+            lock (voiceToSend)
+            {
+                if (!voiceToSend.ContainsKey(conversationId)) voiceToSend[conversationId] = new Dictionary<IPAddress, Queue<byte[]>>();
+            }
+            voiceToSend[conversationId][clientIp] = new Queue<byte[]>();
+            if (!userNewVoiceHandler.ContainsKey(clientIp)) userNewVoiceHandler[clientIp] = new EventWaitHandle(false, EventResetMode.ManualReset);
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ep = new IPEndPoint(clientIp, port);
-            if (!userNewVoiceHandler.ContainsKey(clientIp)) userNewVoiceHandler[clientIp] = new EventWaitHandle(false, EventResetMode.ManualReset);
             while (true)
             {
-                userNewVoiceHandler[clientIp].WaitOne();
-                lock (userNewVoiceHandler[clientIp])
+                try
                 {
-                    if (ct.IsCancellationRequested)
+                    userNewVoiceHandler[clientIp].WaitOne();
+                    lock (userNewVoiceHandler[clientIp])
                     {
-                        lock (userNewVoiceHandler) userNewVoiceHandler.Remove(clientIp);
-                        return;
-                    }
-                    try
-                    {
+                        if (ct.IsCancellationRequested)
+                        {
+                            lock (userNewVoiceHandler) userNewVoiceHandler.Remove(clientIp);
+                            return;
+                        }
+
                         s.SendTo(voiceToSend[conversationId][clientIp].Dequeue(), ep);
+
+                        userNewVoiceHandler[clientIp].Reset();
                     }
-                    catch
-                    {
-                        ;
-                    }
-                    userNewVoiceHandler[clientIp].Reset();
+                }
+                catch
+                {
+                    continue;
                 }
             }
         }
@@ -223,14 +243,58 @@ namespace Server
 
         }
         
-
+        public void UdpReadv2()
+        {
+            IPEndPoint RemoteIpEndPoint = null;
+            while (true)
+            {
+                byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
+                Task.Run(() => { PrepareData(RemoteIpEndPoint.Address, receiveBytes); });
+              
+            }
+        }
         
+        public void PrepareData(IPAddress clientIp, byte[] receiveBytes)
+        {
+            int conversationId;
+            try
+            {
+                conversationId = usersConversations[clientIp];
+            }
+            catch
+            {
+                return;
+            }
+            if (receiveBytes.Length == 4 && BitConverter.ToInt32(receiveBytes, 0) == conversationId)
+            {
+                lock (voiceToSend[conversationId])
+                {
+                    if (voiceToSend[conversationId].ContainsKey(clientIp))
+                    {
+                        voiceToSend[conversationId].Remove(clientIp);
+                    }
+                }
+                return;
+            }
+            foreach (var key in voiceToSend[conversationId].Keys)
+            {
+                // Key is clientIp
+                if (key.ToString() != clientIp.ToString())
+                {
+                    lock (voiceToSend[conversationId][key]) voiceToSend[conversationId][key].Enqueue(receiveBytes);
+                    lock (userNewVoiceHandler[key]) userNewVoiceHandler[key].Set();
+                }
+            }
+        }
+
         public ServerConnection()
         {
             menager = new ClientProcessing();
             userNewVoiceHandler = new Dictionary<IPAddress, EventWaitHandle>();
             voiceToSend = new Dictionary<int, Dictionary<IPAddress, Queue<byte[]>>>();
+            usersConversations = new Dictionary<IPAddress, int>();
             receivingUdpClient = new UdpClient(IP.serverPort);
+            Task.Run(() => { UdpReadv2(); });
             RunServer();
         }
     }
