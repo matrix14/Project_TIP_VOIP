@@ -25,5 +25,9 @@ namespace Shared
         INCOMMING_CALL = 24,                //  SERVER ONLY                                                 Option:23$$Data:<JSONCall>$$
         ACCEPTED_CALL = 25,                 //  SERVER ONLY                                                 Option:24$$Data:<Username>$$
         DECLINED_CALL = 26,                 //  SERVER ONLY                                                 Option:24$$Data:<Username>$$
+
+
+        // Special
+        CREATE_UDP = 100                    // Data:<JSONId>$$
     }
 }
