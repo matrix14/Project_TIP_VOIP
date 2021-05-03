@@ -10,7 +10,6 @@ namespace ClientWindows
     {
         public static String username = "";
         public static Boolean isLoggedIn = false;
-        public static String serverIp = "127.0.0.1";
 
 
         /// <summary>
@@ -21,8 +20,12 @@ namespace ClientWindows
         {
             if(args.Length==1)
             {
-                serverIp = args[0];
+                Shared.IP.serverIp = args[0];
             }
+           /* else
+            {
+                Shared.IP.serverIp = "127.0.0.1";
+            }*/
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

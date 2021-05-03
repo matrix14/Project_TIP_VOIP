@@ -12,7 +12,7 @@ namespace ClientWindows
     {
         private static int connectionPortRecv = 11000;
         private static int connectionPortSend = 11001;
-        private static String connectionIp = Program.serverIp;
+        private static String connectionIp = Shared.IP.serverIp;
 
         private static ByteCallback receiveMsgCallback;
 
