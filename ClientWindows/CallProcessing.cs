@@ -36,7 +36,7 @@ namespace ClientWindows
 
             IPEndPoint eRecv = new IPEndPoint(ip, connectionPortRecv);
             //IPEndPoint eSend = new IPEndPoint(ip, connectionPortSend);
-            UdpClient uRecv = new UdpClient(eRecv);
+            UdpClient uRecv = new UdpClient(connectionPortRecv);
             //UdpClient uSend = new UdpClient(eSend);
 
             Socket sSend = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -56,6 +56,10 @@ namespace ClientWindows
             udpState.uClientRecv.Close();
             //udpState.uClientSend.Close();
             udpState.socketSend.Close();
+            udpState.ePointRecv = null;
+            udpState.ePointSend = null;
+            udpState.socketSend = null;
+            udpState.uClientRecv = null;
         }
 
         
@@ -64,8 +68,15 @@ namespace ClientWindows
             UdpClient u = ((UdpState)(ar.AsyncState)).uClientRecv;
             IPEndPoint e = ((UdpState)(ar.AsyncState)).ePointRecv;
 
+            if(u==null||e==null||u.Client==null)
+                return;
+
             byte[] receiveBytes = u.EndReceive(ar, ref e);
             ReceiveMsgCallback(receiveBytes);
+
+            if (u == null || e == null || u.Client == null)
+                return;
+
             ReceiveMessages();
             //TODO: callback to inCallForm with sound or to sound processing method
             //string receiveString = Encoding.ASCII.GetString(receiveBytes);
