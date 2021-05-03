@@ -12,7 +12,7 @@ namespace Server
         {
             if (args.Length == 1)
             {
-                IP.serverIp = args[0];
+                Shared.IP.serverIp = args[0];
             }
             ServerConnection s = new ServerConnection();
             //StartTests();

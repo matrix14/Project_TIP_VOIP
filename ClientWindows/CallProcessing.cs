@@ -89,7 +89,7 @@ namespace ClientWindows
 
         public static void SendMessages(byte[] msg)
         {
-            if (udpState.socketSend == null || udpState.ePointSend == null || udpState.socketSend.Connected == false)
+            if (udpState.socketSend == null || udpState.ePointSend == null)
                 return;
             (udpState.socketSend).SendTo(msg, udpState.ePointSend);
         }
