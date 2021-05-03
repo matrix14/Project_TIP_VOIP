@@ -12,14 +12,15 @@ namespace ClientWindows
     {
         private static int connectionPortRecv = 11000;
         private static int connectionPortSend = 11001;
-        private static String connectionIp = "10.1.1.1"; //TODO: server IP address
+        private static String connectionIp = Program.serverIp;
 
         private static ByteCallback receiveMsgCallback;
 
         private struct UdpState
         {
             public UdpClient uClientRecv;
-            public UdpClient uClientSend;
+            //public UdpClient uClientSend;
+            public Socket socketSend;
             public IPEndPoint ePointRecv;
             public IPEndPoint ePointSend;
         }
@@ -33,15 +34,19 @@ namespace ClientWindows
             IPAddress ip;
             IPAddress.TryParse(connectionIp, out ip);
 
-            IPEndPoint eRecv = new IPEndPoint(IPAddress.Any, connectionPortRecv);
-            IPEndPoint eSend = new IPEndPoint(ip, connectionPortSend);
+            IPEndPoint eRecv = new IPEndPoint(ip, connectionPortRecv);
+            //IPEndPoint eSend = new IPEndPoint(ip, connectionPortSend);
             UdpClient uRecv = new UdpClient(eRecv);
-            UdpClient uSend = new UdpClient(eSend);
+            //UdpClient uSend = new UdpClient(eSend);
+
+            Socket sSend = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            IPEndPoint eSend = new IPEndPoint(ip, connectionPortSend);
 
             udpState.ePointRecv = eRecv;
             udpState.ePointSend = eSend;
             udpState.uClientRecv = uRecv;
-            udpState.uClientSend = uSend;
+            udpState.socketSend = sSend;
+            //udpState.uClientSend = uSend;
 
             ReceiveMessages();
         }
@@ -49,7 +54,8 @@ namespace ClientWindows
         public static void Stop()
         {
             udpState.uClientRecv.Close();
-            udpState.uClientSend.Close();
+            //udpState.uClientSend.Close();
+            udpState.socketSend.Close();
         }
 
         
@@ -72,7 +78,8 @@ namespace ClientWindows
 
         public static void SendMessages(byte[] msg)
         {
-            (udpState.uClientSend).SendAsync(msg, msg.Length, udpState.ePointSend);
+            //(udpState.uClientSend).SendAsync(msg, msg.Length, udpState.ePointSend);
+            (udpState.socketSend).SendTo(msg, udpState.ePointSend);
         }
     }
 }
