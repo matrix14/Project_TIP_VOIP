@@ -80,9 +80,8 @@ namespace ClientWindows
         {
             if (this.callId == null) return;
             callStopped = true;
-            CallProcessing.SendMessages(new byte[] { 0x00 });
-            CallProcessing.SendMessages(new byte[] { 0xFF });
-            CallProcessing.SendMessages(new byte[] { });
+            CallProcessing.SendMessages(null);
+            CallProcessing.SendMessages(null);
             CallProcessing.SendMessages(null);
             CallProcessing.Stop();
             LoggedInService.declineCall(this.callId);
