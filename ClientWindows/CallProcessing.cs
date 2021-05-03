@@ -65,21 +65,27 @@ namespace ClientWindows
         
         public static void ReceiveCallback(IAsyncResult ar)
         {
-            UdpClient u = ((UdpState)(ar.AsyncState)).uClientRecv;
-            IPEndPoint e = ((UdpState)(ar.AsyncState)).ePointRecv;
+            try
+            {
+                UdpClient u = ((UdpState)(ar.AsyncState)).uClientRecv;
+                IPEndPoint e = ((UdpState)(ar.AsyncState)).ePointRecv;
 
-            if(u==null||e==null||u.Client==null)
+                if (u == null || e == null || u.Client == null)
+                    return;
+
+                byte[] receiveBytes = u.EndReceive(ar, ref e);
+                ReceiveMsgCallback(receiveBytes);
+
+                if (u == null || e == null || u.Client == null)
+                    return;
+
+                ReceiveMessages();
+                //TODO: callback to inCallForm with sound or to sound processing method
+                //string receiveString = Encoding.ASCII.GetString(receiveBytes);
+            } catch (Exception e)
+            {
                 return;
-
-            byte[] receiveBytes = u.EndReceive(ar, ref e);
-            ReceiveMsgCallback(receiveBytes);
-
-            if (u == null || e == null || u.Client == null)
-                return;
-
-            ReceiveMessages();
-            //TODO: callback to inCallForm with sound or to sound processing method
-            //string receiveString = Encoding.ASCII.GetString(receiveBytes);
+            }
         }
 
         public static void ReceiveMessages()

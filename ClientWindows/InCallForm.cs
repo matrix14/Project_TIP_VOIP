@@ -136,16 +136,16 @@ namespace ClientWindows
                 switch (i)
                 {
                     case 0:
-                        b = (byte)'A';
+                        b = (byte)'a';
                         break;
                     case 1:
-                        b = (byte)'B';
+                        b = (byte)'b';
                         break;
                     case 2:
-                        b = (byte)'C';
+                        b = (byte)'c';
                         break;
                     case 3:
-                        b = (byte)'D';
+                        b = (byte)'d';
                         break;
                 }
 
