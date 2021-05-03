@@ -105,6 +105,7 @@ namespace Server
                         {
                             udpTokenSource.Cancel();
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+                            userNewVoiceHandler[clientIp].Set();
                         }
         
                     }                 
@@ -196,8 +197,9 @@ namespace Server
             while (true)
             {
                 byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
-                if (receiveBytes == null || receiveBytes.Length == 0)
-                {
+
+                if (receiveBytes.Length == 4 && BitConverter.ToInt32(receiveBytes, 0) == conversationId)
+                {                 
                     lock (voiceToSend[conversationId]) voiceToSend[conversationId].Remove(clientIp);
                     return;
                 }
