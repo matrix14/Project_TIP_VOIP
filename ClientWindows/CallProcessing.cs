@@ -12,7 +12,6 @@ namespace ClientWindows
     {
         private static int connectionPortRecv = 11000;
         private static int connectionPortSend = 11001;
-        private static String connectionIp = "10.1.1.1"; //TODO: server IP address
 
         private static ByteCallback receiveMsgCallback;
 
@@ -31,7 +30,7 @@ namespace ClientWindows
         public static void Start()
         {
             IPAddress ip;
-            IPAddress.TryParse(connectionIp, out ip);
+            IPAddress.TryParse(Shared.IP.serverIp, out ip);
 
             IPEndPoint eRecv = new IPEndPoint(IPAddress.Any, connectionPortRecv);
             IPEndPoint eSend = new IPEndPoint(ip, connectionPortSend);

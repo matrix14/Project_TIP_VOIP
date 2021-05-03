@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace Server
 {
     class ServerConnection
@@ -18,8 +19,6 @@ namespace Server
         /// <para> Value: <c>List of messages</c> </para>
         /// </summary>
         private Dictionary<int,Dictionary<IPAddress, Queue<byte[]>>> voiceToSend;
-        private int serverPort;
-        private int clientPort;
         /// <summary>
         /// <para> Key: <c>clientIp</c> </para>
         /// <para> Value: <c>handler</c> </para>
@@ -29,7 +28,7 @@ namespace Server
         public void RunServer()
         {
             // Create a TCP/IP (IPv4) socket and listen for incoming connections.
-            TcpListener listener = new TcpListener(IPAddress.Parse("10.8.0.2"), 13579);
+            TcpListener listener = new TcpListener(IPAddress.Parse(IP.serverIp), 13579);
             listener.Start();
             while (true)
             {
@@ -92,8 +91,8 @@ namespace Server
 
                         if (option == Options.JOIN_CONVERSATION)
                         {
-                            Task.Run(() => UdpRead(clientIp, serverPort,conversationId.id));
-                            Task.Run(() => UdpWrite(clientIp,clientPort, conversationId.id, token), token);
+                            Task.Run(() => UdpRead(clientIp, IP.serverPort,conversationId.id));
+                            Task.Run(() => UdpWrite(clientIp,IP.clientPort, conversationId.id, token), token);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
                         }
                         else if(option == Options.LEAVE_CONVERSATION)
@@ -211,8 +210,6 @@ namespace Server
             menager = new ClientProcessing();
             userNewVoiceHandler = new Dictionary<IPAddress, EventWaitHandle>();
             voiceToSend = new Dictionary<int, Dictionary<IPAddress, Queue<byte[]>>>();
-            serverPort = 11001;
-            clientPort = 11000;
             RunServer();
         }
     }
