@@ -14,14 +14,16 @@ namespace ClientWindows
     public partial class IncomingCallForm : Form
     {
         private Call call = null;
+        private CallCallback openC = null;
         public IncomingCallForm()
         {
             InitializeComponent();
         }
 
-        public IncomingCallForm(Call call)
+        public IncomingCallForm(Call call, CallCallback ccb)
         {
             InitializeComponent();
+            this.openC = ccb;
             this.call = call;
             this.callId.Text = call.callId.ToString(); //TODO: temporary
             String usersListStr = "";
@@ -49,9 +51,11 @@ namespace ClientWindows
             LoggedInService.acceptCall(new Id(this.call.callId));
 
             //TODO open call window
-            this.Hide();
+            /*this.Hide();
             InCallForm icf = new InCallForm(this.call);
-            icf.ShowDialog();
+            icf.Show();
+            icf.Refresh();*/
+            openC(this.call);
             this.Close();
         }
 
