@@ -14,6 +14,8 @@ namespace ClientWindows
         private static Boolean logoutNotFinished = false;
         private static StringCallback getFriendsCallback;
         private static StringCallback newInvitationCallback;
+        private static StringCallback addUserToCall;
+        private static StringCallback removeUserFromCall;
         private static InvitationCallback invitationProcessedCallback;
         private static BooleanCallback checkUsernameCallback;
         private static UsernameCallback newActiveFriend;
@@ -41,6 +43,8 @@ namespace ClientWindows
         public static UsernameCallback NewInactiveFriend { get => newInactiveFriend; set => newInactiveFriend = value; }
         public static IdCallback InviteToConversationReplyOk { get => inviteToConversationReplyOk; set => inviteToConversationReplyOk = value; }
         public static BooleanCallback InviteToConversationReplyFromUser { get => inviteToConversationReplyFromUser; set => inviteToConversationReplyFromUser = value; }
+        public static StringCallback AddUserToCall { get => addUserToCall; set => addUserToCall = value; }
+        public static StringCallback RemoveUserFromCall { get => removeUserFromCall; set => removeUserFromCall = value; }
 
         public static void logout()
         {
@@ -299,7 +303,13 @@ namespace ClientWindows
             {
                 return;
             }
-            inviteToConversationReplyFromUser(ack);
+            if (Program.isInCall)
+                if (ack)
+                    addUserToCall(us.username);
+                else
+                    removeUserFromCall(us.username);
+            else
+                inviteToConversationReplyFromUser(ack);
         }
 
         public static void incomingCall(String message)

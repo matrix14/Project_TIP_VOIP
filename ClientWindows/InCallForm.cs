@@ -27,12 +27,8 @@ namespace ClientWindows
             InitializeComponent();
         }
 
-        public InCallForm(Call c)
+        private void updateUsersInCall()
         {
-            
-            this.call = c;
-            this.callId = new Id(c.callId);
-            InitializeComponent();
             String usersListStr = "";
             foreach (String u in call.usernames)
             {
@@ -43,8 +39,24 @@ namespace ClientWindows
                 usersListStr += u;
             }
             this.callUsersList_label.Text = usersListStr;
-            //Task.Run(progBarIncrease);
+        }
 
+        public InCallForm(Call c)
+        {
+            
+            this.call = c;
+            this.callId = new Id(c.callId);
+            InitializeComponent();
+            //LoggedInForm.updateCallStatus();
+            this.Text = "(" + Program.username + ") Aktywne połączenie";
+            StringCallback callback2 = addUser;
+            StringCallback callback3 = removeUser;
+            LoggedInService.AddUserToCall = callback2;
+            LoggedInService.RemoveUserFromCall = callback3;
+
+
+            //Task.Run(progBarIncrease);
+            updateUsersInCall();
             ByteCallback callback = incomingTraffic;
             CallProcessing.ReceiveMsgCallback = callback;
             CallProcessing.Start();
@@ -52,10 +64,12 @@ namespace ClientWindows
             Program.isInCall = true;
         }
 
+        /*
         public InCallForm(Id id, Username user)
         {
             this.callId = id;
             InitializeComponent();
+            this.Text = "("+ Program.username + ") Aktywne połączenie";
             this.callUsersList_label.Text = user.username;
             //Task.Run(progBarIncrease);
 
@@ -64,6 +78,23 @@ namespace ClientWindows
             CallProcessing.Start();
             Task.Run(sentBytes);
             Program.isInCall = true;
+        }
+        */
+
+        public void removeUser(string username)
+        {
+            this.call.removeUser(username);
+            updateUsersInCall();
+            if (this.call.usernames.Count == 0)
+            {
+                this.Close();
+            }
+        }
+
+        public void addUser(string username)
+        {
+            this.call.addUser(username);
+            updateUsersInCall();
         }
 
         private void InCallForm_Load(object sender, EventArgs e)
@@ -125,7 +156,8 @@ namespace ClientWindows
             }
             else
             {
-                incomingMsg_label.Text = b[0].ToString();
+                
+                incomingMsg_label.Text = Encoding.ASCII.GetString(b);
             }
         }
 
@@ -133,31 +165,36 @@ namespace ClientWindows
         {
             do
             {
-                byte b = (byte)'Z';
+                char b = 'Z';
                 switch (i)
                 {
                     case 0:
-                        b = (byte)'a';
+                        b = 'A';
                         break;
                     case 1:
-                        b = (byte)'b';
+                        b = 'B';
                         break;
                     case 2:
-                        b = (byte)'c';
+                        b = 'C';
                         break;
                     case 3:
-                        b = (byte)'d';
+                        b = 'D';
                         break;
                 }
 
-                CallProcessing.SendMessages(new byte[] { b });
+                CallProcessing.SendMessages(Encoding.ASCII.GetBytes(Program.username + ": " + b));
                 i++;
                 if (i == 4)
                 {
                     i = 0;
                 }
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(250);
             } while (callStopped==false);
+        }
+
+        private void callUsersList_label_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

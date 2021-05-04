@@ -63,6 +63,7 @@ namespace ClientWindows
             this.callUsersList_label.Text = "username1, username2, username3, username4, username1, username2, username3, user" +
     "name4, username1, username2, username3, username4, username1, username2, usernam" +
     "e3, username4, ";
+            this.callUsersList_label.Click += new System.EventHandler(this.callUsersList_label_Click);
             // 
             // leaveCall_button
             // 

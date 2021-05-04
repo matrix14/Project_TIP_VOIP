@@ -338,6 +338,19 @@ namespace ClientWindows
             callUser.Visible = true;
         }
 
+        public void updateCallStatus()
+        {
+            if(this.callUser.InvokeRequired)
+            {
+                this.callUser.Invoke(new MethodInvoker(() => { updateCallStatus(); }));
+                return;
+            }
+            if (Program.isInCall)
+                this.callUser.Text = "Dodaj do rozmowy";
+            else
+                this.callUser.Text = "Zadzwoń";
+        }
+
         private void friendsList_SelectedIndexChanged(object sender, EventArgs e)
         {
             ListBox lb = (ListBox)sender;
@@ -357,6 +370,10 @@ namespace ClientWindows
             activeUserWindow.Text = fr.username;
             callUser.Enabled = (fr.active==1);
             this.callingStatusLabel.Visible = false;
+            if (Program.isInCall)
+                this.callUser.Text = "Dodaj do rozmowy";
+            else
+                this.callUser.Text = "Zadzwoń";
             if (callUser.Enabled)
             {
                 activeFriendStatus_Label.Text = "Aktywny";
@@ -444,7 +461,8 @@ namespace ClientWindows
                     callUser.Enabled = false;
                     callingStatusLabel.Text = "Zaakceptowano!";
                     callingStatusLabel.ForeColor = Color.Green;
-                    InCallForm icf = new InCallForm(lastCallId, lastCallUsername);
+                    Call c = new Call(lastCallId.id, new List<string> { lastCallUsername.username });
+                    InCallForm icf = new InCallForm(c);
                     icf.Show();
                 } else
                 {
@@ -452,7 +470,6 @@ namespace ClientWindows
                     callingStatusLabel.Text = "Odrzucono połączenie!";
                     callingStatusLabel.ForeColor = Color.Red;
                 }
-                
             }
         }
 
