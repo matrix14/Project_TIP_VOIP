@@ -22,6 +22,7 @@ namespace ClientWindows
         private static UsernameCallback newInactiveFriend;
         private static IdCallback inviteToConversationReplyOk;
         private static BooleanCallback inviteToConversationReplyFromUser;
+        private static CallCallback openInCallForm;
 
 
         private static Invitation lastProcessedInvitation = new Invitation();
@@ -45,6 +46,7 @@ namespace ClientWindows
         public static BooleanCallback InviteToConversationReplyFromUser { get => inviteToConversationReplyFromUser; set => inviteToConversationReplyFromUser = value; }
         public static StringCallback AddUserToCall { get => addUserToCall; set => addUserToCall = value; }
         public static StringCallback RemoveUserFromCall { get => removeUserFromCall; set => removeUserFromCall = value; }
+        public static CallCallback OpenInCallForm { get => openInCallForm; set => openInCallForm = value; }
 
         public static void logout()
         {
@@ -319,8 +321,12 @@ namespace ClientWindows
             Call c = MessageProccesing.DeserializeObject(Options.INCOMMING_CALL, userString) as Call;
 
             //MessageBox.Show("INCOMING CALL\n\r"+message);
-            IncomingCallForm icf = new IncomingCallForm(c);
-            icf.ShowDialog();
+            Task.Run(() =>
+            {
+                IncomingCallForm icf = new IncomingCallForm(c, OpenInCallForm);
+                icf.ShowDialog();
+            });
+            
 
             //if (inviteToConversationReplyOk == null || inviteToConversationReplyFromUser == null)
             //{

@@ -17,10 +17,9 @@ namespace ClientWindows
     public delegate void InvitationCallback(Invitation inv);
     public delegate void UsernameCallback(Username u);
     public delegate void IdCallback(Id id);
+    public delegate void CallCallback(Call c);
     public partial class LoggedInForm : Form
     {
-        //public static List<Friend> callbackFriendsContainer;
-
         private static List<Friend> friendsContainer = new List<Friend>();
         private static List<Invitation> invitationContainer = new List<Invitation>();
         private static Id lastCallId = null;
@@ -34,15 +33,19 @@ namespace ClientWindows
         public LoggedInForm()
         {
             InitializeComponent();
+            invitationContainer.Clear();
+            friendsContainer.Clear();
 
             UsernameCallback callback4 = newInactiveFriendFunc;
             UsernameCallback callback5 = newActiveFriendFunc;
             IdCallback callback6 = callUserReply;
             BooleanCallback callback7 = callUserReplyFromUser;
+            CallCallback callback8 = openInCallWindow;
             LoggedInService.NewInactiveFriend = callback4;
             LoggedInService.NewActiveFriend = callback5;
             LoggedInService.InviteToConversationReplyOk = callback6;
             LoggedInService.InviteToConversationReplyFromUser = callback7;
+            LoggedInService.OpenInCallForm = callback8;
 
             StringCallback callback2 = writeToInvitingList;
             LoggedInService.NewInvitationCallback = callback2;
@@ -470,6 +473,19 @@ namespace ClientWindows
                     callingStatusLabel.Text = "Odrzucono połączenie!";
                     callingStatusLabel.ForeColor = Color.Red;
                 }
+            }
+        }
+
+        public void openInCallWindow(Call c)
+        {
+            if (callingStatusLabel.InvokeRequired)
+            {
+                callingStatusLabel.Invoke(new MethodInvoker(() => { openInCallWindow(c); }));
+            }
+            else
+            {
+                InCallForm icf = new InCallForm(c);
+                icf.Show();
             }
         }
 
