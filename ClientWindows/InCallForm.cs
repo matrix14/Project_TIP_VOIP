@@ -29,6 +29,11 @@ namespace ClientWindows
 
         private void updateUsersInCall()
         {
+            if(callUsersList_label.InvokeRequired)
+            {
+                this.callUsersList_label.Invoke(new MethodInvoker(() => { updateUsersInCall(); }));
+                return;
+            }
             String usersListStr = "";
             foreach (String u in call.usernames)
             {
@@ -47,6 +52,7 @@ namespace ClientWindows
             this.call = c;
             this.callId = new Id(c.callId);
             InitializeComponent();
+            //Task.Run(refreshFormLoop);
             //LoggedInForm.updateCallStatus();
             this.Text = "(" + Program.username + ") Aktywne połączenie";
             StringCallback callback2 = addUser;
@@ -80,6 +86,27 @@ namespace ClientWindows
             Program.isInCall = true;
         }
         */
+
+        private void refreshFormLoop()
+        {
+            while (true)
+            {
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new MethodInvoker(() => { refreshForm(); }));
+                    return;
+                } else
+                {
+                    refreshForm();
+                }
+                System.Threading.Thread.Sleep(100);
+            }
+        }
+
+        public void refreshForm()
+        {
+            this.Refresh();
+        }
 
         public void removeUser(string username)
         {
