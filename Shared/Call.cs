@@ -13,7 +13,17 @@ namespace Shared
         public Call(int callId,List<string> usernames)
         {
             this.callId = callId;
-            usernames = new List<string>(usernames); 
+            this.usernames = usernames; 
+        }
+
+        public void addUser(string username)
+        {
+            this.usernames.Add(username);
+        }
+
+        public void removeUser(string username)
+        {
+            this.usernames.Remove(username);
         }
 
         public Call()

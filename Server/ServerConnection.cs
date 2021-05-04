@@ -64,7 +64,7 @@ namespace Server
             Task udpTask = null;
             while (true)
             {
-                //try
+                try
                 {
                     string sendMessage = "";
                     byte[] buffer = new byte[2048];
@@ -125,7 +125,7 @@ namespace Server
                     //Send response
                     stream.Write(message);
                 }
-                /*
+                
                 catch (Exception e)
                 {
                     udpTokenSource.Cancel();
@@ -134,7 +134,7 @@ namespace Server
                     Console.WriteLine(e.Message);
                     break;
                 }
-                */
+                
                 
 
             }
