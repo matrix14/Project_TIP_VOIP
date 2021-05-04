@@ -108,24 +108,29 @@ namespace Server
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
                         }
                         else if(option == Options.LEAVE_CONVERSATION)
-                        {
-                            udpTokenSource.Cancel();
+                        {                           
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
-                            userNewVoiceHandler[clientIp].Set();
-                            if (udpTask != null) await udpTask;
-                            udpTokenSource.Dispose();
-                            udpTask.Dispose();
-                            udpTokenSource = new CancellationTokenSource();
-                            udpToken = udpTokenSource.Token;
 
+                            // Leave conversation
+                            if (userNewVoiceHandler.ContainsKey(clientIp))
+                            {
+                                userNewVoiceHandler[clientIp].Set();
+                                udpTokenSource.Cancel();
+                                if (udpTask != null) await udpTask;
+                                udpTokenSource.Dispose();
+                                udpTask.Dispose();
+                                udpTask = null;
+                                udpTokenSource = new CancellationTokenSource();
+                                udpToken = udpTokenSource.Token;
+                            }
                         }
         
                     }                 
                     message = Encoding.ASCII.GetBytes(sendMessage);
                     //Send response
+                    Console.WriteLine("sync message: " + sendMessage + " reciverId: " + clientId.ToString() + "\n");
                     stream.Write(message);
-                }
-                
+                }               
                 catch (Exception e)
                 {
                     udpTokenSource.Cancel();
@@ -141,7 +146,7 @@ namespace Server
         }
 
 
-        public void ServerMessages(int clientID,NetworkStream stream, CancellationToken ct)
+        public void ServerMessages(int clientId, NetworkStream stream, CancellationToken ct)
         {
             List<string> messagesToSend = new List<string>();
             
@@ -155,7 +160,7 @@ namespace Server
 
                     try
                     {
-                        messagesToSend = menager.CheckServerMessages(clientID);
+                        messagesToSend = menager.CheckServerMessages(clientId);
                     }
                     catch(CustomException e)
                     {
@@ -166,6 +171,7 @@ namespace Server
                     foreach (string message in messagesToSend)
                     {
                         byte[] send = Encoding.ASCII.GetBytes(message);
+                        Console.WriteLine("async message: " + message + " reciverId: " + clientId.ToString() + "\n");
                         stream.Write(send);
                     }
                     messagesToSend.Clear();
@@ -195,6 +201,7 @@ namespace Server
                     {
                         if (ct.IsCancellationRequested)
                         {
+                            lock (usersConversations) usersConversations.Remove(clientIp);
                             lock (userNewVoiceHandler) userNewVoiceHandler.Remove(clientIp);
                             return;
                         }
@@ -254,6 +261,7 @@ namespace Server
             }
         }
         
+        // Function used by Task started after reading udp data
         public void PrepareData(IPAddress clientIp, byte[] receiveBytes)
         {
             int conversationId;
