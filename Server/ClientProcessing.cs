@@ -82,17 +82,20 @@ namespace Server
             if (!activeUsers[clientId].logged) userLoginHandler[clientId].WaitOne();
             // Wait unit event
             eventHandlers[activeUsers[clientId].username].WaitOne();
-            lock (eventHandlers[activeUsers[clientId].username])
+            if (eventHandlers.ContainsKey(activeUsers[clientId].username))
             {
-                lock (whichFunction[activeUsers[clientId].username])
+                lock (eventHandlers[activeUsers[clientId].username])
                 {
-                    foreach (var function in whichFunction[activeUsers[clientId].username])
+                    lock (whichFunction[activeUsers[clientId].username])
                     {
-                        item = asyncFunctions[function.Item1](clientId, function.Item2);
-                        if (item != "") res.Add(item);
+                        foreach (var function in whichFunction[activeUsers[clientId].username])
+                        {
+                            item = asyncFunctions[function.Item1](clientId, function.Item2);
+                            if (item != "") res.Add(item);
+                        }
+                        whichFunction[activeUsers[clientId].username].Clear();
+                        eventHandlers[activeUsers[clientId].username].Reset();
                     }
-                    whichFunction[activeUsers[clientId].username].Clear();
-                    eventHandlers[activeUsers[clientId].username].Reset();
                 }
             }
             return res;
