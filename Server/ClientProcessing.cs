@@ -82,22 +82,27 @@ namespace Server
             if (!activeUsers[clientId].logged) userLoginHandler[clientId].WaitOne();
             // Wait unit event
             eventHandlers[activeUsers[clientId].username].WaitOne();
+
             if (eventHandlers.ContainsKey(activeUsers[clientId].username))
             {
                 lock (eventHandlers[activeUsers[clientId].username])
                 {
-                    lock (whichFunction[activeUsers[clientId].username])
+                    if (whichFunction.ContainsKey(activeUsers[clientId].username))
                     {
-                        foreach (var function in whichFunction[activeUsers[clientId].username])
+                        lock (whichFunction[activeUsers[clientId].username])
                         {
-                            item = asyncFunctions[function.Item1](clientId, function.Item2);
-                            if (item != "") res.Add(item);
+                            foreach (var function in whichFunction[activeUsers[clientId].username])
+                            {
+                                item = asyncFunctions[function.Item1](clientId, function.Item2);
+                                if (item != "") res.Add(item);
+                            }
+                            whichFunction[activeUsers[clientId].username].Clear();
+                            eventHandlers[activeUsers[clientId].username].Reset();
                         }
-                        whichFunction[activeUsers[clientId].username].Clear();
-                        eventHandlers[activeUsers[clientId].username].Reset();
                     }
                 }
             }
+
             return res;
         }
 
@@ -113,7 +118,7 @@ namespace Server
                 {
                     invitations[userInvitationsIds[activeUsers[clientId].userId][i]].status = 0;
                     lock (activeUsers[clientId].dbConnection)
-                        lock (activeUsers[clientId].dbConnection) activeUsers[clientId].dbConnection.UpdateInvitations(i, 0);
+                        lock (activeUsers[clientId].dbConnection) activeUsers[clientId].dbConnection.UpdateInvitations(userInvitationsIds[activeUsers[clientId].userId][i], 0);
                 }
             }
             lock (eventHandlers) eventHandlers.Remove(activeUsers[clientId].username);
