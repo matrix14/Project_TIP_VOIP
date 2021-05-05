@@ -116,7 +116,8 @@ namespace Server
             {
                 for (int i = 0; i < userInvitationsIds[activeUsers[clientId].userId].Count; i++)
                 {
-                    invitations[userInvitationsIds[activeUsers[clientId].userId][i]].status = 0;
+                    if(invitations[userInvitationsIds[activeUsers[clientId].userId][i]].inviteeUsername == activeUsers[clientId].username)
+                        invitations[userInvitationsIds[activeUsers[clientId].userId][i]].status = 0;
                     lock (activeUsers[clientId].dbConnection)
                         lock (activeUsers[clientId].dbConnection) activeUsers[clientId].dbConnection.UpdateInvitations(userInvitationsIds[activeUsers[clientId].userId][i], 0);
                 }
