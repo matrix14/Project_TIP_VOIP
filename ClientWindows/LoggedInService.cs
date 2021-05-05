@@ -11,7 +11,6 @@ namespace ClientWindows
 {
     static class LoggedInService
     {
-        private static Boolean logoutNotFinished = false;
         private static StringCallback getFriendsCallback;
         private static StringCallback newInvitationCallback;
         private static StringCallback addUserToCall;
@@ -51,7 +50,6 @@ namespace ClientWindows
         public static void logout()
         {
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LOGOUT));
-            logoutNotFinished = true;
         }
 
         public static void logoutReply(String message)
@@ -64,7 +62,6 @@ namespace ClientWindows
             switch (error)
             {
                 case ErrorCodes.NO_ERROR:
-                    logoutNotFinished = false;
                     Program.isLoggedIn = false;
                     msg = "Pomyślnie wylogowano!";
                     MessageBox.Show(msg, title, buttons);
@@ -81,15 +78,9 @@ namespace ClientWindows
         {
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
-            MessageBoxButtons buttons = MessageBoxButtons.OK;
-            string title = "Lista znajomych";
-            String msg = "";
             switch (error)
             {
                 case ErrorCodes.NO_ERROR:
-                    logoutNotFinished = false;
-                    msg = "Pomyślnie uzyskano liste znajomych! "+message;
-                    //MessageBox.Show(msg, title, buttons);
                     getFriendsCallback(message);
                     break;
             }
@@ -320,20 +311,11 @@ namespace ClientWindows
             String userString = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
             Call c = MessageProccesing.DeserializeObject(Options.INCOMMING_CALL, userString) as Call;
 
-            //MessageBox.Show("INCOMING CALL\n\r"+message);
             Task.Run(() =>
             {
                 IncomingCallForm icf = new IncomingCallForm(c, OpenInCallForm);
                 icf.ShowDialog();
             });
-            
-
-            //if (inviteToConversationReplyOk == null || inviteToConversationReplyFromUser == null)
-            //{
-            //    return;
-            //}
-
-            //inviteToConversationReplyFromUser(ack);
         }
 
         public static void acceptCall(Id cId)
@@ -345,10 +327,5 @@ namespace ClientWindows
         {
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, cId));
         }
-
-        public static void joinConversationAccepted(String message)
-        {
-            //MessageBox.Show("ACK CONV \n" + message);
-        } 
     }
 }

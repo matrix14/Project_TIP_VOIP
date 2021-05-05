@@ -92,10 +92,8 @@ namespace ClientWindows
                         LoggedInService.inviteToConversationReply(message);
                         break;
                     case Options.LEAVE_CONVERSATION:
-                        //TODO: do nothing
                         break;
                     case Options.JOIN_CONVERSATION:
-                        LoggedInService.joinConversationAccepted(message); //TODO ???
                         break;
                 }
                 syncProcessNotCompleted.Set();

@@ -93,12 +93,6 @@
     <Compile Include="InvitationListForm.Designer.cs">
       <DependentUpon>InvitationListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SelectInvitationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SelectInvitationForm.Designer.cs">
-      <DependentUpon>SelectInvitationForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="AddFriendForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -131,9 +125,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="InvitationListForm.resx">
       <DependentUpon>InvitationListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SelectInvitationForm.resx">
-      <DependentUpon>SelectInvitationForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AddFriendForm.resx">
       <DependentUpon>AddFriendForm.cs</DependentUpon>

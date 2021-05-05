@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Forms;
 
 namespace ClientWindows
 {
@@ -45,6 +46,7 @@ namespace ClientWindows
                 connectionTimer.Start();
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return; //TODO Add message for client when problem
             }
         }
@@ -80,6 +82,7 @@ namespace ClientWindows
             }
             catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return; //TODO Add message for client when problem
             }
         }
@@ -99,6 +102,7 @@ namespace ClientWindows
             } 
             catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
             }
             //sendDone.WaitOne();
@@ -113,6 +117,7 @@ namespace ClientWindows
                 sendDone.Set();
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
                 //TODO implement fault
             }
@@ -137,6 +142,7 @@ namespace ClientWindows
 
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
                 //TODO Implement faults
             }
@@ -157,6 +163,7 @@ namespace ClientWindows
             }
             catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
                 //TODO Implement faults
             }
@@ -175,6 +182,7 @@ namespace ClientWindows
                 connectDone.Set();
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
                 //TODO Implement faults
             }

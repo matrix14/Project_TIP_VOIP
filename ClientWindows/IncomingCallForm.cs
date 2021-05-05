@@ -25,7 +25,6 @@ namespace ClientWindows
             InitializeComponent();
             this.openC = ccb;
             this.call = call;
-            this.callId.Text = call.callId.ToString(); //TODO: temporary
             String usersListStr = "";
             foreach(String u in call.usernames)
             {
@@ -50,11 +49,6 @@ namespace ClientWindows
             if (this.call == null) return;
             LoggedInService.acceptCall(new Id(this.call.callId));
 
-            //TODO open call window
-            /*this.Hide();
-            InCallForm icf = new InCallForm(this.call);
-            icf.Show();
-            icf.Refresh();*/
             openC(this.call);
             this.Close();
         }
