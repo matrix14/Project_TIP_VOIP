@@ -24,6 +24,7 @@ namespace ClientWindows
         private static List<Invitation> invitationContainer = new List<Invitation>();
         private static Id lastCallId = null;
         private static Username lastCallUsername = null;
+        private InvitationListForm ilf = null;
         private Hashtable friendListDetails = new Hashtable(){
             {"friendsStart", 0},
             {"friendsAmount", 0},
@@ -79,6 +80,8 @@ namespace ClientWindows
                 }
                 this.invitingList_button.Text = "Zaproszenia (" + amount.ToString() + ")";
             }
+            if (ilf != null)
+                ilf.updateInvitationList(invitationContainer);
         }
 
         public void updateFriendList()
@@ -207,10 +210,9 @@ namespace ClientWindows
             invitationContainer.Remove(inv);
             if(inv.status==2)
             {
-                friendsContainer.Add(new Friend(inv.username, 1));
+                addToFriendContainer(new Friend(inv.username, 1));
             }
             updateInvitationButton();
-
         }
 
         public void newActiveFriendFunc(Username u)
@@ -399,7 +401,9 @@ namespace ClientWindows
 
         private void invitingList_button_Click(object sender, EventArgs e)
         {
-
+            ilf = new InvitationListForm(invitationContainer);
+            ilf.ShowDialog();
+            ilf = null;
         }
 
         private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)

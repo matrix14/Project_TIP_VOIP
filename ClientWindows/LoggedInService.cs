@@ -187,7 +187,7 @@ namespace ClientWindows
                     msg = "Jesteś nie zalogowany!";
                     break;
                 case ErrorCodes.WRONG_INVATATION_ID:
-                    msg = "Zły idnetyfikator zaproszenia!";
+                    msg = "Zły identyfikator zaproszenia!";
                     break;
             }
             MessageBox.Show(msg, title, buttons);
