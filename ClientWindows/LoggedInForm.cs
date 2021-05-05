@@ -284,7 +284,7 @@ namespace ClientWindows
         {
             ListBox lb = (ListBox)sender;
 
-            Friend fr = (Friend)lb.Items[lb.SelectedIndex];
+            Friend fr = (Friend)lb.Items[lb.SelectedIndex]; //TODO: Exception ArgumentOutOfRangeException parametr:index = -1
             activeUserWindow.Text = fr.username;
             callUser.Enabled = (fr.active==1);
             this.callingStatusLabel.Visible = false;
@@ -330,7 +330,7 @@ namespace ClientWindows
                         activeFriendStatus_Label.ForeColor = Color.Green;
                     } else
                     {
-                        activeFriendStatus_Label.Text = "Nieaktywny";
+                        activeFriendStatus_Label.Text = "Nieaktywny"; //TODO: get acess from other thread
                         activeFriendStatus_Label.ForeColor = Color.Red;
                     }
                     return;

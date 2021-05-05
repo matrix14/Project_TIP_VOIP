@@ -163,10 +163,9 @@ namespace ClientWindows
             // 
             // incomingMsg_label
             // 
-            this.incomingMsg_label.AutoSize = true;
             this.incomingMsg_label.Location = new System.Drawing.Point(13, 149);
             this.incomingMsg_label.Name = "incomingMsg_label";
-            this.incomingMsg_label.Size = new System.Drawing.Size(35, 13);
+            this.incomingMsg_label.Size = new System.Drawing.Size(200, 13);
             this.incomingMsg_label.TabIndex = 10;
             this.incomingMsg_label.Text = "label1";
             // 
