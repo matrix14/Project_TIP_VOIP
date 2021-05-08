@@ -1,5 +1,6 @@
 ﻿using Shared;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -26,6 +27,12 @@ namespace Server
         private Dictionary<IPAddress, EventWaitHandle> userNewVoiceHandler;
         private UdpClient receivingUdpClient;
         private Dictionary<IPAddress, int> usersConversations;
+
+
+
+        private Dictionary<int, Dictionary<IPAddress, ConcurrentQueue<byte[]>>> toSend;
+        private Dictionary<int, ConcurrentBag<IPEndPoint>> conversationsParticipans;
+
 
         public void RunServer()
         {
@@ -96,14 +103,12 @@ namespace Server
                         if (option == Options.JOIN_CONVERSATION)
                         {
                             if (udpTask != null) await udpTask;
-                            //Task.Run(() => UdpRead(clientIp, IP.serverPort,conversationId.id));
                             udpTask = Task.Run(() => UdpWrite(clientIp,IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
                         }
                         else if(option == Options.CREATE_UDP)
                         {
                             if (udpTask != null) await udpTask;
-                            //Task.Run(() => UdpRead(clientIp, IP.serverPort, conversationId.id));
                             udpTask = Task.Run(() => UdpWrite(clientIp, IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
                         }
@@ -185,6 +190,7 @@ namespace Server
         public void UdpWrite(IPAddress clientIp,int port, int conversationId, CancellationToken ct)
         {
             lock (usersConversations) usersConversations[clientIp] = conversationId;
+
             lock (voiceToSend)
             {
                 if (!voiceToSend.ContainsKey(conversationId)) voiceToSend[conversationId] = new Dictionary<IPAddress, Queue<byte[]>>();
@@ -219,39 +225,8 @@ namespace Server
             }
         }
 
-        // One Task for one Client, make try catch
-        public void UdpRead(IPAddress clientIp,int port,int conversationId)
-        {
-            lock (voiceToSend)
-            {
-                if (!voiceToSend.ContainsKey(conversationId)) voiceToSend[conversationId] = new Dictionary<IPAddress, Queue<byte[]>>();
-            }
-            voiceToSend[conversationId][clientIp] = new Queue<byte[]>();
-            IPEndPoint RemoteIpEndPoint = new IPEndPoint(clientIp, IP.clientPort);
-            
-            while (true)
-            {
-                byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
-
-                if (receiveBytes.Length == 4 && BitConverter.ToInt32(receiveBytes, 0) == conversationId)
-                {                 
-                    lock (voiceToSend[conversationId]) voiceToSend[conversationId].Remove(clientIp);
-                    return;
-                }
-                foreach (var key in voiceToSend[conversationId].Keys)
-                {
-                    // Key is clientIp
-                    if(key != clientIp)
-                    {
-                        lock (voiceToSend[conversationId][key]) voiceToSend[conversationId][key].Enqueue(receiveBytes);
-                        lock (userNewVoiceHandler[key]) userNewVoiceHandler[key].Set();
-                    }
-                }
-            }
-
-        }
-        
-        public void UdpReadv2()
+    
+        public void UdpRead()
         {
             IPEndPoint RemoteIpEndPoint = null;
             while (true)
@@ -296,6 +271,98 @@ namespace Server
             }
         }
 
+
+
+
+
+
+
+
+
+        // One Task for one Client
+        public void UdpWritev2(IPAddress clientIp, int port, int conversationId, CancellationToken ct)
+        {
+            lock (usersConversations) usersConversations[clientIp] = conversationId;
+            // Create new conversation if doesnt exist
+            if (!conversationsParticipans.ContainsKey(conversationId)) conversationsParticipans[conversationId] = new ConcurrentBag<IPEndPoint>();
+            conversationsParticipans[conversationId].Add(new IPEndPoint(clientIp, port));
+
+            lock (toSend)
+            {
+                if (!toSend.ContainsKey(conversationId)) toSend[conversationId] = new Dictionary<IPAddress, ConcurrentQueue<byte[]>>();
+            }
+            toSend[conversationId][clientIp] = new ConcurrentQueue<byte[]>();
+            if (!userNewVoiceHandler.ContainsKey(clientIp)) userNewVoiceHandler[clientIp] = new EventWaitHandle(false, EventResetMode.ManualReset);
+
+            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            while (true)
+            {
+                try
+                {
+                    userNewVoiceHandler[clientIp].WaitOne();
+                    lock (userNewVoiceHandler[clientIp])
+                    {
+                        if (ct.IsCancellationRequested)
+                        {
+                            lock (usersConversations) usersConversations.Remove(clientIp);
+                            lock (userNewVoiceHandler) userNewVoiceHandler.Remove(clientIp);
+                            IPEndPoint user = new IPEndPoint(clientIp, port);
+                            while (!conversationsParticipans[conversationId].TryTake(out user))
+                            {
+                                ;
+                            }
+                            return;
+                        }
+                        toSend[conversationId][clientIp].TryDequeue(out byte[] data);
+                        foreach (var reciver in conversationsParticipans[conversationId])
+                        {
+                            s.SendTo(data, reciver);
+                        }
+                        userNewVoiceHandler[clientIp].Reset();
+                    }
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+        }
+
+
+        public void UdpReadv2()
+        {
+            IPEndPoint RemoteIpEndPoint = null;
+            while (true)
+            {
+                byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
+                PrepareData(RemoteIpEndPoint.Address, receiveBytes);
+
+            }
+        }
+
+        // Function used by Task started after reading udp data
+        public void PrepareDatav2(IPAddress clientIp, byte[] receiveBytes)
+        {
+            
+            if (!usersConversations.ContainsKey(clientIp)) return;
+            int conversationId = usersConversations[clientIp];
+
+            if (receiveBytes.Length == 4 && BitConverter.ToInt32(receiveBytes, 0) == conversationId)
+            {
+                lock (toSend[conversationId])
+                {
+                    if (toSend[conversationId].ContainsKey(clientIp))
+                    {
+                        toSend[conversationId].Remove(clientIp);
+                    }
+                }
+                return;
+            }
+
+            toSend[conversationId][clientIp].Enqueue(receiveBytes);
+            userNewVoiceHandler[clientIp].Set();
+        }
+
         public ServerConnection()
         {
             menager = new ClientProcessing();
@@ -303,7 +370,12 @@ namespace Server
             voiceToSend = new Dictionary<int, Dictionary<IPAddress, Queue<byte[]>>>();
             usersConversations = new Dictionary<IPAddress, int>();
             receivingUdpClient = new UdpClient(IP.serverPort);
-            Task.Run(() => { UdpReadv2(); });
+
+
+            toSend = new Dictionary<int, Dictionary<IPAddress, ConcurrentQueue<byte[]>>>();
+            conversationsParticipans = new Dictionary<int, ConcurrentBag<IPEndPoint>>();
+
+            Task.Run(() => { UdpRead(); });
             RunServer();
         }
     }
