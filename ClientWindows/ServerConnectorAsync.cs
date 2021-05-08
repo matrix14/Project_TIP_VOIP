@@ -50,13 +50,11 @@ namespace ClientWindows
                 return; //TODO Add message for client when problem
             }
         }
-
         public static void StopConnection()
         {
             sock.Shutdown(SocketShutdown.Both);
             sock.Close();
         }
-
         private static void connectionTimerOnTimerElapsed(object sender, ElapsedEventArgs e)
         {
             if (sock.Connected)
@@ -68,7 +66,6 @@ namespace ClientWindows
                 Reconnect();
             }
         }
-
         public static void Reconnect()
         {
             sock.Close();
@@ -86,7 +83,6 @@ namespace ClientWindows
                 return; //TODO Add message for client when problem
             }
         }
-
         public static void SendMessage(String message)
         {
             try

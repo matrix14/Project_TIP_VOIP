@@ -74,5 +74,10 @@ namespace ClientWindows
             checkUsernameTimer.Stop();
             checkUsernameTimerStopped = true;
         }
+
+        private void AddFriendForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

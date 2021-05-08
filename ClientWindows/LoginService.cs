@@ -57,8 +57,6 @@ namespace ClientWindows
             loginNotFinished = false;
         }
 
-
-
         public static void register(String username, String pass)
         {
             Login login = new Login(username, pass);
