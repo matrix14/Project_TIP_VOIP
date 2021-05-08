@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Forms;
 
 namespace ClientWindows
 {
@@ -45,6 +46,7 @@ namespace ClientWindows
                 connectionTimer.Start();
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return; //TODO Add message for client when problem
             }
         }
@@ -80,6 +82,7 @@ namespace ClientWindows
             }
             catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return; //TODO Add message for client when problem
             }
         }
@@ -99,6 +102,7 @@ namespace ClientWindows
             } 
             catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
             }
             //sendDone.WaitOne();
@@ -113,6 +117,7 @@ namespace ClientWindows
                 sendDone.Set();
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
                 //TODO implement fault
             }
@@ -133,10 +138,11 @@ namespace ClientWindows
             try
             {
                 ReceiveObject ro = new ReceiveObject();
-                sock.BeginReceive(ro.buffer, 0, ReceiveObject.MAX_BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), ro);
+                sock.BeginReceive(ro.buffer, 0, ReceiveObject.MAX_BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), ro); //TODO: sometimes SocketException: 0x80004005 zadanie wyslania lub odebrania danych zostalo zablokowane poniewaz gniazdo nie jest podłaczone i (podczas wywyslania przez gniazdo datagramu przy uzyciu wywolania "wyslij do") nie podano adresu
 
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
                 //TODO Implement faults
             }
@@ -155,8 +161,9 @@ namespace ClientWindows
                 }
                 receiveDone.Set();
             }
-            catch (Exception e)
+            catch (Exception e) //TODO: System.Net.Sockets.SocketException - when server crash or close
             {
+                MessageBox.Show(e.ToString());
                 return;
                 //TODO Implement faults
             }
@@ -175,6 +182,7 @@ namespace ClientWindows
                 connectDone.Set();
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
                 //TODO Implement faults
             }

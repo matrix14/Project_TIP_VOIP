@@ -34,7 +34,6 @@ namespace ClientWindows
             this.label1 = new System.Windows.Forms.Label();
             this.username_label = new System.Windows.Forms.Label();
             this.usersList_label = new System.Windows.Forms.Label();
-            this.callId = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // acceptCall_button
@@ -88,21 +87,11 @@ namespace ClientWindows
             this.usersList_label.Text = "username1, username2, username3, username4, username1, username2, username3, user" +
     "name4, username1, username2, username3, username4";
             // 
-            // callId
-            // 
-            this.callId.AutoSize = true;
-            this.callId.Location = new System.Drawing.Point(9, 0);
-            this.callId.Name = "callId";
-            this.callId.Size = new System.Drawing.Size(13, 13);
-            this.callId.TabIndex = 5;
-            this.callId.Text = "0";
-            // 
             // IncomingCallForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(308, 183);
-            this.Controls.Add(this.callId);
             this.Controls.Add(this.usersList_label);
             this.Controls.Add(this.username_label);
             this.Controls.Add(this.label1);
@@ -123,6 +112,5 @@ namespace ClientWindows
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label username_label;
         private System.Windows.Forms.Label usersList_label;
-        private System.Windows.Forms.Label callId;
     }
 }

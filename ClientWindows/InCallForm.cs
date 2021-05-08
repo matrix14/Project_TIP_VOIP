@@ -21,6 +21,8 @@ namespace ClientWindows
 
         private int i = 0;
 
+        private SoundProcessing sp = null;
+
 
         public InCallForm()
         {
@@ -66,8 +68,13 @@ namespace ClientWindows
             ByteCallback callback = incomingTraffic;
             CallProcessing.ReceiveMsgCallback = callback;
             CallProcessing.Start();
-            Task.Run(sentBytes);
+            //Task.Run(sentBytes);
             Program.isInCall = true;
+
+            ByteCallback sendCb = sendSound;
+            sp = new SoundProcessing(sendCb);
+            Task.Run(sp.startUp);
+            //sp.startUp();
         }
 
         /*
@@ -179,16 +186,17 @@ namespace ClientWindows
         {
             if (incomingMsg_label.InvokeRequired)
             {
-                incomingMsg_label.Invoke(new MethodInvoker(() => { incomingTraffic(b); }));
+                incomingMsg_label.Invoke(new MethodInvoker(() => { incomingTraffic(b); })); //TODO: ObjectDisposedException - not exist "Label"
             }
             else
             {
-                
-                incomingMsg_label.Text = Encoding.ASCII.GetString(b);
+                if (sp != null)
+                    sp.incomingEncodedSound(b);
+                incomingMsg_label.Text = b.ToString();
             }
         }
 
-        public void sentBytes()
+        /*public void sentBytes()
         {
             do
             {
@@ -216,7 +224,12 @@ namespace ClientWindows
                     i = 0;
                 }
                 System.Threading.Thread.Sleep(250);
-            } while (callStopped==false);
+            } while (callStopped == false);
+        }*/
+
+        public void sendSound(byte[] sound)
+        {
+            CallProcessing.SendMessages(sound);
         }
 
         private void callUsersList_label_Click(object sender, EventArgs e)

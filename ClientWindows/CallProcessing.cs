@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ClientWindows
 {
@@ -76,15 +77,16 @@ namespace ClientWindows
 
                 byte[] receiveBytes = u.EndReceive(ar, ref e);
                 ReceiveMsgCallback(receiveBytes);
+                //TODO: callback to inCallForm with sound or to sound processing method
+                //string receiveString = Encoding.ASCII.GetString(receiveBytes);
 
                 if (u == null || e == null || u.Client == null)
                     return;
 
                 ReceiveMessages();
-                //TODO: callback to inCallForm with sound or to sound processing method
-                //string receiveString = Encoding.ASCII.GetString(receiveBytes);
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
             }
         }

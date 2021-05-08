@@ -34,7 +34,7 @@ namespace ClientWindows
                 Options opt = (Options)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
                 switch(opt)
                 {
-                    case Options.FRIEND_INVITATIONS:
+                    case Options.FRIEND_INVITATIONS: //TODO: user which invite someone doesn't update friends after he accepted invitation
                         LoggedInService.incomingInvitation(message);
                         break;
                     case Options.ACTIVE_FRIENDS:
@@ -92,10 +92,8 @@ namespace ClientWindows
                         LoggedInService.inviteToConversationReply(message);
                         break;
                     case Options.LEAVE_CONVERSATION:
-                        //TODO: do nothing
                         break;
                     case Options.JOIN_CONVERSATION:
-                        LoggedInService.joinConversationAccepted(message); //TODO ???
                         break;
                 }
                 syncProcessNotCompleted.Set();

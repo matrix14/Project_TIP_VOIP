@@ -1,12 +1,7 @@
 ﻿using Shared;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
 
@@ -24,12 +19,7 @@ namespace ClientWindows
         private static List<Invitation> invitationContainer = new List<Invitation>();
         private static Id lastCallId = null;
         private static Username lastCallUsername = null;
-        private Hashtable friendListDetails = new Hashtable(){
-            {"friendsStart", 0},
-            {"friendsAmount", 0},
-            {"invitationsStart", 0},
-            {"invitationsAmount", 0}
-        };
+        private InvitationListForm ilf = null;
         public LoggedInForm()
         {
             InitializeComponent();
@@ -79,6 +69,8 @@ namespace ClientWindows
                 }
                 this.invitingList_button.Text = "Zaproszenia (" + amount.ToString() + ")";
             }
+            if (ilf != null)
+                ilf.updateInvitationList(invitationContainer);
         }
 
         public void updateFriendList()
@@ -90,42 +82,20 @@ namespace ClientWindows
             }
             else
             {
-                friendListDetails["friendsStart"] = 0;
-                friendListDetails["friendsAmount"] = 0;
-                friendListDetails["invitationsStart"] = 0;
-                friendListDetails["invitationsAmount"] = 0;
                 friendsList.Items.Clear();
-                //friendsList.Items.Add("ZNAJOMI:");
                 int i = 1;
                 if (friendsContainer == null || friendsContainer.Count == 0)
                 {
                     i++;
-                    //friendsList.Items.Add("- Nie masz znajomych");
                 }
                 else
                 {
                     foreach (Friend fr in friendsContainer)
                     {
                         i++;
-                        friendListDetails["friendsAmount"] = (int)friendListDetails["friendsAmount"] + 1;
                         friendsList.Items.Add(fr);
                     }
                 }
-                friendListDetails["invitationsStart"] = i;
-                //friendsList.Items.Add("ZAPROSZENIA:");
-                /*
-                if (invitationContainer == null || invitationContainer.Count == 0)
-                {
-                    friendsList.Items.Add("- Nie masz zaproszeń");
-                }
-                else {
-                    foreach (Invitation inv in invitationContainer)
-                    {
-                        friendListDetails["invitationsAmount"] = (int)friendListDetails["invitationsAmount"]+1;
-                        friendsList.Items.Add(inv);
-                    }
-                }
-                */
                 return;
             }
         }
@@ -140,40 +110,7 @@ namespace ClientWindows
             {
                 friendsContainer.Add(fr);
             }
-
             updateFriendList();
-            //MessageBox.Show("Friends updated v2");
-
-            //if (null == friendsContainer) return;
-
-            // also make this threadsafe:
-            /*if (callbackFriendsContainer.InvokeRequired)
-            {
-                callbackFriendsContainer.Invoke(new MethodInvoker(() => { writeToFriendList(message); }));
-            }
-            else
-            {
-                String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
-                String frListStr = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
-                List<Friend> friends = MessageProccesing.DeserializeObject(Options.GET_FRIENDS, frListStr) as List<Friend>;
-                callbackFriendsContainer.Items.Clear();
-                friendsContainer.Clear();
-                if (friends == null || friends.Count == 0)
-                {
-                    callbackFriendsContainer.Items.Add("Nie masz znajomych");
-                    return;
-                }
-
-                foreach (Friend fr in friends)
-                {
-                    friendsContainer.Add(fr);
-                    callbackFriendsList.Items.Add(fr.username);
-                }
-            */
-            updateFriendList();
-                //callbackFriendsList.Items.Add(s);
-                //callbackFriendsList.TopIndex = callbackFriendsList.Items.Count - (callbackFriendsList.Height / callbackFriendsList.ItemHeight);
-            //}
         }
 
         public void addToFriendContainer(Friend fr)
@@ -199,7 +136,6 @@ namespace ClientWindows
                 }
             }
             updateInvitationButton();
-            //MessageBox.Show("Invitations updated v2");
         }
 
         public void removeFromInvitingList(Invitation inv)
@@ -207,10 +143,9 @@ namespace ClientWindows
             invitationContainer.Remove(inv);
             if(inv.status==2)
             {
-                friendsContainer.Add(new Friend(inv.username, 1));
+                addToFriendContainer(new Friend(inv.username, 1));
             }
             updateInvitationButton();
-
         }
 
         public void newActiveFriendFunc(Username u)
@@ -272,7 +207,6 @@ namespace ClientWindows
         private void friendList_DrawItem(object sender, DrawItemEventArgs e)
         {
             if (e.Index == -1) return;
-            // Get the ListBox and the item.
             ListBox lst = sender as ListBox;
             if (lst.Items.Count < 1) return;
             Friend fr = lst.Items[e.Index] as Friend;
@@ -281,16 +215,10 @@ namespace ClientWindows
             SolidBrush redDot = new SolidBrush(Color.Red);
             SolidBrush greenDot = new SolidBrush(Color.Green);
 
-            // Draw the background.
             e.DrawBackground();
 
-
             e.DrawFocusRectangle();
-            //e.Graphics.DrawEllipse(Pens.Blue, new Rectangle(1, 1 + e.Index * 15, 100, 10));
-            //e.Graphics.DrawString(l.Items[e.Index].ToString(), new Font(FontFamily.GenericSansSerif, 9, FontStyle.Regular), Brushes.Red, e.Bounds);
 
-
-            // See if the item is selected.
             if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
             {
                 if(fr.active==1)
@@ -302,7 +230,6 @@ namespace ClientWindows
             }
             else
             {
-                // Not selected. Draw with ListBox's foreground color.
                 using (SolidBrush br = new SolidBrush(e.ForeColor))
                 {
                     if (fr.active == 1)
@@ -314,7 +241,6 @@ namespace ClientWindows
                 }
             }
 
-            // Draw the focus rectangle if appropriate.
             e.DrawFocusRectangle();
         }
 
@@ -358,18 +284,7 @@ namespace ClientWindows
         {
             ListBox lb = (ListBox)sender;
 
-            /*int startFriends = (int)friendListDetails["friendsStart"]+1;
-            int endFriends = (int)friendListDetails["friendsStart"] + (int)friendListDetails["friendsAmount"];
-            int startInvitations = (int)friendListDetails["invitationsStart"]+1;
-            int endInvitations = (int)friendListDetails["invitationsStart"] + (int)friendListDetails["invitationsAmount"];
-
-            if (lb.SelectedIndex==0||
-                lb.SelectedIndex==(int)friendListDetails["friendsStart"]||
-                lb.SelectedIndex == (int)friendListDetails["invitationsStart"]) { return; }
-            
-            if(lb.SelectedIndex>=startFriends&&lb.SelectedIndex<=endFriends)
-            {*/
-            Friend fr = (Friend)lb.Items[lb.SelectedIndex];
+            Friend fr = (Friend)lb.Items[lb.SelectedIndex]; //TODO: Exception ArgumentOutOfRangeException parametr:index = -1
             activeUserWindow.Text = fr.username;
             callUser.Enabled = (fr.active==1);
             this.callingStatusLabel.Visible = false;
@@ -388,18 +303,13 @@ namespace ClientWindows
                 activeFriendStatus_Label.ForeColor = Color.Red;
             }
             showFriendContext();
-            /*}
-            if (lb.SelectedIndex >= startInvitations && lb.SelectedIndex <= endInvitations)
-            {
-                Invitation inv = (Invitation)lb.Items[lb.SelectedIndex];
-                SelectInvitationForm sif = new SelectInvitationForm(inv);
-                sif.ShowDialog();
-            }*/
         }
 
         private void invitingList_button_Click(object sender, EventArgs e)
         {
-
+            ilf = new InvitationListForm(invitationContainer);
+            ilf.ShowDialog();
+            ilf = null;
         }
 
         private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
@@ -420,7 +330,7 @@ namespace ClientWindows
                         activeFriendStatus_Label.ForeColor = Color.Green;
                     } else
                     {
-                        activeFriendStatus_Label.Text = "Nieaktywny";
+                        activeFriendStatus_Label.Text = "Nieaktywny"; //TODO: get acess from other thread
                         activeFriendStatus_Label.ForeColor = Color.Red;
                     }
                     return;

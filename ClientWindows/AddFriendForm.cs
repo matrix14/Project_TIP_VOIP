@@ -16,15 +16,14 @@ namespace ClientWindows
         private Boolean checkUsernameTimerStopped = true;
         public AddFriendForm()
         {
-            InitializeComponent();
-            BooleanCallback callback = usernameCheckUpdateInfo;
-            LoggedInService.CheckUsernameCallback = callback;
-
-            this.addFriend_button.Enabled = false;
-
             checkUsernameTimer.Interval = 150;
             checkUsernameTimer.Elapsed += usernameCheckOnTimerElapsed;
             checkUsernameTimer.AutoReset = false;
+            BooleanCallback callback = usernameCheckUpdateInfo;
+            LoggedInService.CheckUsernameCallback = callback;
+            InitializeComponent();
+
+            this.addFriend_button.Enabled = false;
         }
 
         private void addFriend_button_Click(object sender, EventArgs e)
@@ -54,7 +53,7 @@ namespace ClientWindows
             }
         }
 
-        public void usernameCheckUpdateInfo(Boolean exist)
+        public void usernameCheckUpdateInfo(Boolean exist) //TODO: sometimes it get stuck, and not showing if user exist
         {
             if (exist)
             { 
