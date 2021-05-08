@@ -1,2 +1,120 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram /> 
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="ClientWindows.AddFriendForm">
+    <Position X="11" Y="0.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQCAABEAAAACAIAAGAgCAAAAAAAQAAAAAAEI=</HashCode>
+      <FileName>AddFriendForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.CallProcessing">
+    <Position X="19" Y="0.75" Width="3.25" />
+    <NestedTypes>
+      <Struct Name="ClientWindows.CallProcessing.UdpState" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CallProcessing.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AgAAAIAAACAAAAAAACAAICAAACAgBAAAIAAAAAAgAAA=</HashCode>
+      <FileName>CallProcessing.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.InCallForm">
+    <Position X="19" Y="4.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AEgEBBAABGQQBAAABgCEAAQCCAgAiaAAIAEAoBQAAEA=</HashCode>
+      <FileName>InCallForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.IncomingCallForm">
+    <Position X="7.75" Y="6" Width="3" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAGAAQBAAAACGAAAGAAAAAAAAAAABAAAAACA=</HashCode>
+      <FileName>IncomingCallForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.InvitationListForm">
+    <Position X="11" Y="5.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAACAEAAADAAAFCAAAAAAAAAgAAAAAAEAA=</HashCode>
+      <FileName>InvitationListForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.LoggedInForm">
+    <Position X="7.75" Y="0.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAQAACAACAMAQACAEiAAAACAAGAQRAAAAAAAAABAAk=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.LoggedInService">
+    <Position X="14.5" Y="0.75" Width="4.25" />
+    <Members>
+      <Property Name="AddUserToCall" Hidden="true" />
+      <Property Name="CheckUsernameCallback" Hidden="true" />
+      <Property Name="GetFriendsCallback" Hidden="true" />
+      <Property Name="InvitationProcessedCallback" Hidden="true" />
+      <Property Name="InviteToConversationReplyFromUser" Hidden="true" />
+      <Property Name="InviteToConversationReplyOk" Hidden="true" />
+      <Property Name="NewActiveFriend" Hidden="true" />
+      <Property Name="NewInactiveFriend" Hidden="true" />
+      <Property Name="NewInvitationCallback" Hidden="true" />
+      <Property Name="OpenInCallForm" Hidden="true" />
+      <Property Name="RemoveUserFromCall" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AgACCKAkUGIAgoBADKAAACQgQAAiEEAqMVAYAggBAoA=</HashCode>
+      <FileName>LoggedInService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.LoginForm">
+    <Position X="4.5" Y="3.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAFQCAAAAAY0ACAIEAiAgABACBGAAUEAAAACYE=</HashCode>
+      <FileName>LoginForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.LoginService">
+    <Position X="1.25" Y="3.25" Width="3" />
+    <Members>
+      <Property Name="CheckUsernameCallback" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIIAAAAAGAAAAAAAQAABAEAAAQAAAAAAEAA=</HashCode>
+      <FileName>LoginService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.Program">
+    <Position X="4.5" Y="0.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAABAAIAgA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.ServerConnectorAsync">
+    <Position X="1.25" Y="6.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>BAAASAEBAAAAAECAACEAAABAAAICgAgQAAAAAAAgAAE=</HashCode>
+      <FileName>ServerConnectorAsync.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.ServerProcessing">
+    <Position X="1.25" Y="0.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>IAAAEAAAAIAAAAAAAAAAAAAQAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ServerProcessing.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientWindows.SoundProcessing">
+    <Position X="14.5" Y="8.75" Width="4.25" />
+    <Members>
+      <Property Name="VoiceSendCallback" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>QAAAAEAAAAAAAAAAAAAwAAAgAgAAAAABCAAAAAAGAAA=</HashCode>
+      <FileName>SoundProcessing.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

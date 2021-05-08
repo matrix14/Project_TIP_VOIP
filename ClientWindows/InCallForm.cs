@@ -16,10 +16,7 @@ namespace ClientWindows
     {
 
         private Id callId = null;
-        private Boolean callStopped = false;
         private Call call = null;
-
-        private int i = 0;
 
         private SoundProcessing sp = null;
 
@@ -94,27 +91,6 @@ namespace ClientWindows
         }
         */
 
-        private void refreshFormLoop()
-        {
-            while (true)
-            {
-                if (this.InvokeRequired)
-                {
-                    this.Invoke(new MethodInvoker(() => { refreshForm(); }));
-                    return;
-                } else
-                {
-                    refreshForm();
-                }
-                System.Threading.Thread.Sleep(100);
-            }
-        }
-
-        public void refreshForm()
-        {
-            this.Refresh();
-        }
-
         public void removeUser(string username)
         {
             this.call.removeUser(username);
@@ -144,7 +120,6 @@ namespace ClientWindows
         private void InCallForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (this.callId == null) return;
-            callStopped = true;
             
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
