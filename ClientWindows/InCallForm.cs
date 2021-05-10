@@ -91,7 +91,7 @@ namespace ClientWindows
         }
         */
 
-        public void removeUser(string username)
+        public void removeUser(string username) //TODO: Invoke
         {
             this.call.removeUser(username);
             updateUsersInCall();
@@ -165,9 +165,9 @@ namespace ClientWindows
             }
             else
             {
+                incomingMsg_label.Text = Encoding.ASCII.GetString(b);
                 if (sp != null)
                     sp.incomingEncodedSound(b);
-                incomingMsg_label.Text = b.ToString();
             }
         }
 

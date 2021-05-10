@@ -84,7 +84,7 @@ namespace ClientWindows
                     return;
 
                 ReceiveMessages();
-            } catch (Exception e)
+            } catch (Exception e) //TODO: System.ObjectDisposedException (when connection close)
             {
                 MessageBox.Show(e.ToString());
                 return;

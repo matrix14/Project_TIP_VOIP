@@ -121,6 +121,7 @@ namespace ClientWindows
 
         public static void ReceiveWhile()
         {
+            connectDone.WaitOne();
             do
             {
                 Receive();
@@ -186,6 +187,8 @@ namespace ClientWindows
 
         public static Boolean getConnectionState()
         {
+            if (sock == null)
+                return false;
             return sock.Connected;
         }
     }
