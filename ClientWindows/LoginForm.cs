@@ -37,6 +37,9 @@ namespace ClientWindows
             BooleanCallback callback = usernameCheckUpdateInfo;
             LoginService.CheckUsernameCallback = callback;
 
+            BooleanCallback callback2 = onLogin;
+            LoginService.OnLoginCallback = callback2;
+
             checkConnectionTimer.Start();
         }
 
@@ -139,7 +142,8 @@ namespace ClientWindows
             {
                 Program.username = this.login_textbox.Text;
                 LoginService.login(this.login_textbox.Text, this.password_textbox.Text);
-                if (Program.isLoggedIn == true)
+                
+                /*if (Program.isLoggedIn == true)
                 {
                     LoggedInForm lif = new LoggedInForm();
                     lif.Location = this.Location;
@@ -147,7 +151,25 @@ namespace ClientWindows
                     lif.FormClosing += delegate { this.Show(); };
                     lif.Show();
                     this.Hide();
-                }
+                }*/
+            }
+        }
+
+        public void onLogin(Boolean loggedIn)
+        {
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(() => { onLogin(loggedIn); }));
+                return;
+            }
+            if (loggedIn == true)
+            {
+                LoggedInForm lif = new LoggedInForm();
+                lif.Location = this.Location;
+                lif.StartPosition = FormStartPosition.Manual;
+                lif.FormClosing += delegate { this.Show(); };
+                lif.Show();
+                this.Hide();
             }
         }
 

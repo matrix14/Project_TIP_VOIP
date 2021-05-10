@@ -283,8 +283,8 @@ namespace ClientWindows
         private void friendsList_SelectedIndexChanged(object sender, EventArgs e)
         {
             ListBox lb = (ListBox)sender;
-
-            Friend fr = (Friend)lb.Items[lb.SelectedIndex]; //TODO: Exception ArgumentOutOfRangeException parametr:index = -1
+            if (lb.SelectedIndex == -1) return;
+            Friend fr = (Friend)lb.Items[lb.SelectedIndex];
             activeUserWindow.Text = fr.username;
             callUser.Enabled = (fr.active==1);
             this.callingStatusLabel.Visible = false;
@@ -319,7 +319,12 @@ namespace ClientWindows
 
         private void updateFriendWindowStatus()
         {
-            foreach(Friend fr in friendsContainer)
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(() => { updateFriendWindowStatus(); }));
+                return;
+            }
+            foreach (Friend fr in friendsContainer)
             {
                 if(fr.username==activeUserWindow.Text)
                 {
@@ -330,7 +335,7 @@ namespace ClientWindows
                         activeFriendStatus_Label.ForeColor = Color.Green;
                     } else
                     {
-                        activeFriendStatus_Label.Text = "Nieaktywny"; //TODO: get acess from other thread
+                        activeFriendStatus_Label.Text = "Nieaktywny";
                         activeFriendStatus_Label.ForeColor = Color.Red;
                     }
                     return;

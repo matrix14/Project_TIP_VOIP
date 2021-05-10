@@ -91,8 +91,13 @@ namespace ClientWindows
         }
         */
 
-        public void removeUser(string username) //TODO: Invoke
+        public void removeUser(string username)
         {
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(() => { removeUser(username); }));
+                return;
+            }
             this.call.removeUser(username);
             updateUsersInCall();
             if (this.call.usernames.Count == 0)

@@ -15,6 +15,8 @@ namespace ClientWindows
         private static int connectionPortSend = 11001;
         private static String connectionIp = Shared.IP.serverIp;
 
+        private static Boolean connectionExist = false;
+
         private static ByteCallback receiveMsgCallback;
 
         private struct UdpState
@@ -50,11 +52,14 @@ namespace ClientWindows
             udpState.socketSend = sSend;
             //udpState.uClientSend = uSend;
 
+            connectionExist = true;
+
             ReceiveMessages();
         }
 
         public static void Stop()
         {
+            connectionExist = false;
             udpState.uClientRecv.Close();
             //udpState.uClientSend.Close();
             udpState.socketSend.Close();
@@ -76,15 +81,18 @@ namespace ClientWindows
                     return;
 
                 byte[] receiveBytes = u.EndReceive(ar, ref e);
-                ReceiveMsgCallback(receiveBytes);
-                //TODO: callback to inCallForm with sound or to sound processing method
-                //string receiveString = Encoding.ASCII.GetString(receiveBytes);
+                if(connectionExist)
+                    ReceiveMsgCallback(receiveBytes);
 
                 if (u == null || e == null || u.Client == null)
                     return;
 
                 ReceiveMessages();
-            } catch (Exception e) //TODO: System.ObjectDisposedException (when connection close)
+            }catch(ObjectDisposedException)
+            {
+                return; //TODO: System.ObjectDisposedException (when connection close)
+            }
+            catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
                 return;
