@@ -169,6 +169,10 @@ namespace Server
                         Console.WriteLine("Async Error \n" + e.Message);
                         continue;
                     }
+                    catch (Exception e)
+                    {
+                        continue;
+                    }
 
                     foreach (string message in messagesToSend)
                     {
