@@ -28,7 +28,7 @@ namespace ClientWindows
             WaveFormat format = new WaveFormat(16000, 16, 1);
             recorder = new WaveInEvent()
             {
-                BufferMilliseconds = 200,
+                BufferMilliseconds = 50,
                 DeviceNumber = 1,
                 WaveFormat = format
             };
