@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Shared;
@@ -18,9 +19,14 @@ namespace ClientWindows
         private Id callId = null;
         private Call call = null;
 
+        private System.Timers.Timer packetsCounterTimer = new System.Timers.Timer();
+        private int packetsCounter = 0;
+        private int packetsCounter2 = 0;
+
+        CancellationTokenSource tokenSource = null;
+        CancellationToken token;
+
         private SoundProcessing sp = null;
-
-
         public InCallForm()
         {
             InitializeComponent();
@@ -43,6 +49,7 @@ namespace ClientWindows
                 usersListStr += u;
             }
             this.callUsersList_label.Text = usersListStr;
+            sp.updateUsersCount(this.call.usernames.Count);
         }
 
         public InCallForm(Call c)
@@ -68,9 +75,18 @@ namespace ClientWindows
             //Task.Run(sentBytes);
             Program.isInCall = true;
 
+            packetsCounterTimer.Interval = 1000;
+            packetsCounterTimer.Elapsed += packetsCounterTimer_OnTimerElapsed;
+            packetsCounterTimer.AutoReset = true;
+            packetsCounterTimer.Start();
+
             ByteCallback sendCb = sendSound;
             sp = new SoundProcessing(sendCb);
-            Task.Run(sp.startUp);
+
+            tokenSource = new System.Threading.CancellationTokenSource();
+            token = tokenSource.Token;
+
+            Task.Run(() => sp.startUp(this.call.usernames.Count, token), token); //TODO: missing canceletaion token
             //sp.startUp();
         }
 
@@ -106,6 +122,25 @@ namespace ClientWindows
             }
         }
 
+        private void packetsCounterTimer_OnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (this.incomingPackets_label.InvokeRequired)
+            {
+                this.incomingPackets_label.Invoke(new MethodInvoker(() => { packetsCounterTimer_OnTimerElapsed(sender,e); }));
+                return;
+            }
+            String message = packetsCounter.ToString();
+            for(int i=0;i<(packetsCounter2+1);i++)
+            {
+                message += ".";
+            }
+            packetsCounter2++;
+            if (packetsCounter2 == 4)
+                packetsCounter2 = 0;
+            packetsCounter = 0;
+            incomingPackets_label.Text = message;
+        }
+
         public void addUser(string username)
         {
             this.call.addUser(username);
@@ -125,7 +160,9 @@ namespace ClientWindows
         private void InCallForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (this.callId == null) return;
-            
+            packetsCounterTimer.Stop();
+            tokenSource.Cancel();
+            sp.stop();
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
@@ -170,6 +207,7 @@ namespace ClientWindows
             }
             else
             {
+                packetsCounter++;
                 incomingMsg_label.Text = Encoding.ASCII.GetString(b);
                 if (sp != null)
                     sp.incomingEncodedSound(b);

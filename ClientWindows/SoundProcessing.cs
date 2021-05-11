@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ClientWindows
@@ -14,6 +15,8 @@ namespace ClientWindows
         private BufferedWaveProvider bufferedWaveProvider;
         private WaveOut player;
 
+        private int activeUsersInCall = 0;
+
         private ByteCallback voiceSendCallback;
 
         public SoundProcessing(ByteCallback voiceSendCallback)
@@ -23,8 +26,9 @@ namespace ClientWindows
 
         public ByteCallback VoiceSendCallback { get => voiceSendCallback; set => voiceSendCallback = value; }
 
-        public void startUp()
+        public void startUp(int activeUsers, CancellationToken token)
         {
+            activeUsersInCall = activeUsers;
             WaveFormat format = new WaveFormat(16000, 16, 1);
             recorder = new WaveInEvent()
             {
@@ -42,7 +46,7 @@ namespace ClientWindows
 
             // set up playback
             player = new WaveOut();
-            player.Init(bufferedWaveProvider);
+            player.Init(bufferedWaveProvider); //TODO: clear buffer
 
             int waveInDevices = WaveIn.DeviceCount;
             WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(0);
@@ -51,11 +55,39 @@ namespace ClientWindows
             recorder.StartRecording();
             while (true)
             {
+                if (token.IsCancellationRequested)
+                    break;
                 player.Play();
             }
 
         }
 
+        public void abd()
+        {
+            var mixer = new WaveMixerStream32 { AutoStop = true };
+
+            var wav1 = new WaveFileReader(@"c:\...\1.wav");
+            var wav2 = new WaveFileReader(@"c:\...\2.wav");
+
+            mixer.AddInputStream(new WaveChannel32(wav1));
+            mixer.AddInputStream(new WaveChannel32(wav2));
+            WaveFileWriter.CreateWaveFile("mixed.wav", new Wave32To16Stream(mixer));
+            IWaveProvider iwp = new Wave32To16Stream(mixer);
+            //bufferedWaveProvider.AddSamples(iwp);
+        }
+
+        public void updateUsersCount(int activeUsers)
+        {
+            this.activeUsersInCall = activeUsers;
+        }
+
+        public void stop()
+        {
+            player.Stop();
+            recorder.StopRecording();
+            bufferedWaveProvider.ClearBuffer();
+        }
+ 
         public void incomingEncodedSound(byte[] inMsg)
         {
             int position = 0;

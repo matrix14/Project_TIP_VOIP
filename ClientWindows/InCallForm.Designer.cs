@@ -41,6 +41,7 @@ namespace ClientWindows
             this.incomingTraffic_label = new System.Windows.Forms.Label();
             this.incomingTraffic_bar = new System.Windows.Forms.ProgressBar();
             this.incomingMsg_label = new System.Windows.Forms.Label();
+            this.incomingPackets_label = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // activeCallWith_label
@@ -169,11 +170,20 @@ namespace ClientWindows
             this.incomingMsg_label.TabIndex = 10;
             this.incomingMsg_label.Text = "label1";
             // 
+            // incomingPackets_label
+            // 
+            this.incomingPackets_label.Location = new System.Drawing.Point(15, 130);
+            this.incomingPackets_label.Name = "incomingPackets_label";
+            this.incomingPackets_label.Size = new System.Drawing.Size(200, 13);
+            this.incomingPackets_label.TabIndex = 11;
+            this.incomingPackets_label.Text = "label1";
+            // 
             // InCallForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(450, 212);
+            this.Controls.Add(this.incomingPackets_label);
             this.Controls.Add(this.incomingMsg_label);
             this.Controls.Add(this.incomingTraffic_bar);
             this.Controls.Add(this.incomingTraffic_label);
@@ -209,5 +219,6 @@ namespace ClientWindows
         private System.Windows.Forms.Label incomingTraffic_label;
         private System.Windows.Forms.ProgressBar incomingTraffic_bar;
         private System.Windows.Forms.Label incomingMsg_label;
+        private System.Windows.Forms.Label incomingPackets_label;
     }
 }
