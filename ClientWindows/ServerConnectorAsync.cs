@@ -89,7 +89,7 @@ namespace ClientWindows
             {
                 byte[] byteData = Encoding.ASCII.GetBytes(message);
                 sock.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), sock);
-            } catch(System.Net.Sockets.SocketException e)
+            } catch(System.Net.Sockets.SocketException)
             {
                 if(!sock.Connected)
                 {
@@ -121,6 +121,7 @@ namespace ClientWindows
 
         public static void ReceiveWhile()
         {
+            connectDone.WaitOne();
             do
             {
                 Receive();
@@ -186,6 +187,8 @@ namespace ClientWindows
 
         public static Boolean getConnectionState()
         {
+            if (sock == null)
+                return false;
             return sock.Connected;
         }
     }

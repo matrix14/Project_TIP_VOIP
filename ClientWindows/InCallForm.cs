@@ -93,6 +93,11 @@ namespace ClientWindows
 
         public void removeUser(string username)
         {
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(() => { removeUser(username); }));
+                return;
+            }
             this.call.removeUser(username);
             updateUsersInCall();
             if (this.call.usernames.Count == 0)
@@ -165,9 +170,9 @@ namespace ClientWindows
             }
             else
             {
+                incomingMsg_label.Text = Encoding.ASCII.GetString(b);
                 if (sp != null)
                     sp.incomingEncodedSound(b);
-                incomingMsg_label.Text = b.ToString();
             }
         }
 

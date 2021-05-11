@@ -10,21 +10,16 @@ namespace ClientWindows
 {
     static class LoginService
     {
-        private static Boolean loginNotFinished = false;
         private static BooleanCallback checkUsernameCallback;
+        private static BooleanCallback onLoginCallback;
 
         public static BooleanCallback CheckUsernameCallback { get => checkUsernameCallback; set => checkUsernameCallback = value; }
+        public static BooleanCallback OnLoginCallback { get => onLoginCallback; set => onLoginCallback = value; }
 
         public static void login(String username, String pass)
         {
             Login login = new Login(username, pass);
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.LOGIN, login));
-            loginNotFinished = true;
-            do
-            {
-
-            } while (loginNotFinished);
-            //TODO: handle it in other way
 
         }
 
@@ -39,7 +34,8 @@ namespace ClientWindows
             {
                 case ErrorCodes.NO_ERROR:
                     Program.isLoggedIn = true;
-                    break;
+                    Task.Run(() => onLoginCallback(true));
+                    return;
                 case ErrorCodes.USER_NOT_FOUND:
                     msg = "Nie odnaleziono użytkownika!";
                     MessageBox.Show(msg, title, buttons);
@@ -54,7 +50,7 @@ namespace ClientWindows
                     break;
 
             }
-            loginNotFinished = false;
+            Task.Run(() => onLoginCallback(false));
         }
 
         public static void register(String username, String pass)

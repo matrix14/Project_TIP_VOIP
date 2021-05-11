@@ -28,7 +28,7 @@ namespace ClientWindows
             WaveFormat format = new WaveFormat(16000, 16, 1);
             recorder = new WaveInEvent()
             {
-                BufferMilliseconds = 50,
+                BufferMilliseconds = 200,
                 DeviceNumber = 1,
                 WaveFormat = format
             };
@@ -56,8 +56,20 @@ namespace ClientWindows
 
         }
 
-        public void incomingEncodedSound(byte[] sound)
+        public void incomingEncodedSound(byte[] inMsg)
         {
+            int position = 0;
+            foreach (byte b in inMsg)
+            {
+                if (b == ':')
+                    break;
+                else
+                    position++;
+            }
+
+            byte[] sound = new byte[inMsg.Length - (position + 1)];
+
+            Array.Copy(inMsg, (position + 1), sound, 0, sound.Length);
             byte[] soundRaw = DecodeSamples(sound);
             //if(bufferedWaveProvider.)
             bufferedWaveProvider.AddSamples(soundRaw, 0, soundRaw.Length);
@@ -66,7 +78,19 @@ namespace ClientWindows
         private void RecorderOnDataAvailable(object sender, WaveInEventArgs waveInEventArgs)
         {
             var sound = EncodeSamples(waveInEventArgs.Buffer);
-            voiceSendCallback(sound);
+
+            int length = Program.username.Length;
+
+            byte[] outMsg = new byte[sound.Length + (length + 1)];
+            for(int i=0; i<length; i++)
+            {
+                outMsg[i] = Encoding.ASCII.GetBytes(Program.username)[i];
+            }
+            outMsg[length] = (byte)':';
+
+            Array.Copy(sound, 0, outMsg, (length + 1), sound.Length);
+
+            voiceSendCallback(outMsg);
 
             //bufferedWaveProvider.AddSamples(DecodeSamples(x), 0, DecodeSamples(x).Length);
             //bufferedWaveProvider.AddSamples(waveInEventArgs.Buffer, 0, waveInEventArgs.BytesRecorded);
