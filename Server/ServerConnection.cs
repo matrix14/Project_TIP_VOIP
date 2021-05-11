@@ -233,8 +233,8 @@ namespace Server
             while (true)
             {
                 byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
-                Task.Run(() => { PrepareData(RemoteIpEndPoint.Address, receiveBytes); });
-              
+                PrepareData(RemoteIpEndPoint.Address, receiveBytes);
+                //Task.Run(() => { PrepareData(RemoteIpEndPoint.Address, receiveBytes); });            
             }
         }
         
