@@ -71,7 +71,7 @@ namespace Server
             Task udpTask = null;
             while (true)
             {
-                //try
+                try
                 {
                     string sendMessage = "";
                     byte[] buffer = new byte[2048];
@@ -133,10 +133,9 @@ namespace Server
                     }                 
                     message = Encoding.ASCII.GetBytes(sendMessage);
                     //Send response
-                    //Console.WriteLine("sync message: " + sendMessage + " reciverId: " + clientId.ToString() + "\n");
+                    Console.WriteLine("sync message: " + sendMessage + " reciverId: " + clientId.ToString() + "\n");
                     stream.Write(message);
-                }   
-                /*
+                }                   
                 catch (Exception e)
                 {
                     udpTokenSource.Cancel();
@@ -144,10 +143,7 @@ namespace Server
                     menager.Disconnect(clientId);
                     Console.WriteLine(e.Message);
                     break;
-                }
-                */
-                
-
+                }                
             }
         }
 
