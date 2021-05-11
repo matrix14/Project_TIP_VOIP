@@ -379,7 +379,7 @@ namespace ClientWindows
                     callUser.Enabled = false;
                     callingStatusLabel.Text = "Zaakceptowano!";
                     callingStatusLabel.ForeColor = Color.Green;
-                    Call c = new Call(lastCallId.id, new List<string> { lastCallUsername.username });
+                    Call c = new Call(lastCallId.id, new List<string> { lastCallUsername.username }); //TODO: lastCallId = null NullReferenceException
                     InCallForm icf = new InCallForm(c);
                     icf.Show();
                 } else

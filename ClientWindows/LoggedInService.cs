@@ -315,6 +315,7 @@ namespace ClientWindows
             {
                 IncomingCallForm icf = new IncomingCallForm(c, OpenInCallForm);
                 icf.ShowDialog();
+                icf.Activate();
             });
         }
 

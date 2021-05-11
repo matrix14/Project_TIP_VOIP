@@ -19,6 +19,9 @@ namespace ClientWindows
 
         private ByteCallback voiceSendCallback;
 
+        private Boolean microphoneStatus = true;
+        private Boolean speakerStatus = true;
+
         public SoundProcessing(ByteCallback voiceSendCallback)
         {
             this.voiceSendCallback = voiceSendCallback;
@@ -42,7 +45,7 @@ namespace ClientWindows
             //Up to here its ok
             
             bufferedWaveProvider = new BufferedWaveProvider(recorder.WaveFormat);
-            bufferedWaveProvider.DiscardOnBufferOverflow = true; //TODO: temporary
+            //bufferedWaveProvider.DiscardOnBufferOverflow = true; //TODO: temporary
 
             // set up playback
             player = new WaveOut();
@@ -57,6 +60,8 @@ namespace ClientWindows
             {
                 if (token.IsCancellationRequested)
                     break;
+                if (!speakerStatus)
+                    continue;
                 player.Play();
             }
 
@@ -87,9 +92,45 @@ namespace ClientWindows
             recorder.StopRecording();
             bufferedWaveProvider.ClearBuffer();
         }
- 
+
+        public Boolean switchMicrophone()
+        {
+            if (microphoneStatus)
+            {
+                recorder.StopRecording();
+                microphoneStatus = false;
+            }
+            else
+            {
+                recorder.StartRecording();
+                microphoneStatus = true;
+            }
+            return microphoneStatus;
+        }
+
+        public Boolean switchSpeaker()
+        {
+            if (speakerStatus)
+            {
+                bufferedWaveProvider.ClearBuffer();
+                player.Pause();
+                speakerStatus = false;
+            }
+            else
+            {
+                bufferedWaveProvider.ClearBuffer();
+                player.Resume();
+                speakerStatus = true;
+            }
+            return speakerStatus;
+        }
+
         public void incomingEncodedSound(byte[] inMsg)
         {
+            if(speakerStatus==false)
+            {
+                return;
+            }
             int position = 0;
             foreach (byte b in inMsg)
             {
@@ -103,7 +144,8 @@ namespace ClientWindows
 
             Array.Copy(inMsg, (position + 1), sound, 0, sound.Length);
             byte[] soundRaw = DecodeSamples(sound);
-            //if(bufferedWaveProvider.)
+            if (bufferedWaveProvider == null)
+                return;
             bufferedWaveProvider.AddSamples(soundRaw, 0, soundRaw.Length);
         }
 

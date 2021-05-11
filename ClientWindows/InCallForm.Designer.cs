@@ -86,6 +86,7 @@ namespace ClientWindows
             this.muteMicrophone_button.TabIndex = 3;
             this.muteMicrophone_button.Text = "Mikrofon";
             this.muteMicrophone_button.UseVisualStyleBackColor = true;
+            this.muteMicrophone_button.Click += new System.EventHandler(this.muteMicrophone_button_Click);
             // 
             // microState_label
             // 
@@ -118,6 +119,7 @@ namespace ClientWindows
             this.muteSound_button.TabIndex = 5;
             this.muteSound_button.Text = "Dźwięk";
             this.muteSound_button.UseVisualStyleBackColor = true;
+            this.muteSound_button.Click += new System.EventHandler(this.muteSound_button_Click);
             // 
             // soundSettings_button
             // 

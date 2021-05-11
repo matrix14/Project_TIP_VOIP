@@ -26,6 +26,8 @@ namespace ClientWindows
         {
             InitializeComponent();
 
+            this.ActiveControl = this.login_textbox;
+
             checkUsernameTimer.Interval = 150;
             checkUsernameTimer.Elapsed += usernameCheckOnTimerElapsed;
             checkUsernameTimer.AutoReset = false;

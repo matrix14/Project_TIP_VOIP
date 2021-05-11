@@ -15,6 +15,7 @@ namespace ClientWindows
     {
         private Call call = null;
         private CallCallback openC = null;
+        private Boolean acceptedCall = false;
         public IncomingCallForm()
         {
             InitializeComponent();
@@ -47,6 +48,7 @@ namespace ClientWindows
         private void acceptCall_button_Click(object sender, EventArgs e)
         {
             if (this.call == null) return;
+            acceptedCall = true;
             LoggedInService.acceptCall(new Id(this.call.callId));
 
             openC(this.call);
@@ -57,12 +59,21 @@ namespace ClientWindows
         {
             if (this.call == null) return;
             LoggedInService.declineCall(new Id(this.call.callId));
+            this.call = null;
             this.Close();
         }
 
         private void IncomingCallForm_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void IncomingCallForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (this.call == null) return;
+            if(!acceptedCall)
+                LoggedInService.declineCall(new Id(this.call.callId));
+            this.call = null;
         }
     }
 }

@@ -23,6 +23,8 @@ namespace ClientWindows
             LoggedInService.CheckUsernameCallback = callback;
             InitializeComponent();
 
+            this.ActiveControl = this.username_input;
+
             this.addFriend_button.Enabled = false;
         }
 

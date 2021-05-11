@@ -49,6 +49,7 @@ namespace ClientWindows
             // 
             // declineCall_button
             // 
+            this.declineCall_button.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.declineCall_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold);
             this.declineCall_button.Location = new System.Drawing.Point(157, 122);
             this.declineCall_button.Name = "declineCall_button";
@@ -89,8 +90,10 @@ namespace ClientWindows
             // 
             // IncomingCallForm
             // 
+            this.AcceptButton = this.acceptCall_button;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.declineCall_button;
             this.ClientSize = new System.Drawing.Size(308, 183);
             this.Controls.Add(this.usersList_label);
             this.Controls.Add(this.username_label);
@@ -99,6 +102,7 @@ namespace ClientWindows
             this.Controls.Add(this.acceptCall_button);
             this.Name = "IncomingCallForm";
             this.Text = "Przychodzące połączenie";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.IncomingCallForm_FormClosing);
             this.Load += new System.EventHandler(this.IncomingCallForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

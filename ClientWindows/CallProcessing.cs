@@ -112,6 +112,13 @@ namespace ClientWindows
 
                 byte[] receiveBytes = u.EndReceive(ar, ref e);
                 logToFile(receiveBytes);
+
+                if (connectionExist == false || receiveBytes == null || receiveMsgCallback == null)
+                {
+                    ReceiveMessages();
+                    return;
+                }
+
                 if (connectionExist&&receiveBytes!=null&&receiveMsgCallback!=null)
                     receiveMsgCallback(receiveBytes); //TODO: NullReferenceException 
 

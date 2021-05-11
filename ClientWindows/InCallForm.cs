@@ -26,6 +26,9 @@ namespace ClientWindows
         CancellationTokenSource tokenSource = null;
         CancellationToken token;
 
+        private Boolean micStatus = true;
+        private Boolean micStatusBeforeSpkMute = false;
+
         private SoundProcessing sp = null;
         public InCallForm()
         {
@@ -49,7 +52,8 @@ namespace ClientWindows
                 usersListStr += u;
             }
             this.callUsersList_label.Text = usersListStr;
-            sp.updateUsersCount(this.call.usernames.Count);
+            if(sp!=null)
+                sp.updateUsersCount(this.call.usernames.Count);
         }
 
         public InCallForm(Call c)
@@ -86,7 +90,7 @@ namespace ClientWindows
             tokenSource = new System.Threading.CancellationTokenSource();
             token = tokenSource.Token;
 
-            Task.Run(() => sp.startUp(this.call.usernames.Count, token), token); //TODO: missing canceletaion token
+            Task.Run(() => sp.startUp(this.call.usernames.Count, token), token);
             //sp.startUp();
         }
 
@@ -129,6 +133,8 @@ namespace ClientWindows
                 this.incomingPackets_label.Invoke(new MethodInvoker(() => { packetsCounterTimer_OnTimerElapsed(sender,e); }));
                 return;
             }
+            if (packetsCounterTimer.Enabled == false)
+                return;
             String message = packetsCounter.ToString();
             for(int i=0;i<(packetsCounter2+1);i++)
             {
@@ -253,6 +259,54 @@ namespace ClientWindows
         private void callUsersList_label_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void muteMicrophone_button_Click(object sender, EventArgs e)
+        {
+            if (sp == null)
+                return;
+            micStatus = sp.switchMicrophone();
+            if (micStatus)
+            {
+                this.microState_label.Text = "ON";
+                this.microState_label.ForeColor = Color.Red;
+            }
+            else
+            {
+                this.microState_label.Text = "OFF";
+                this.microState_label.ForeColor = Color.Green;
+            }
+        }
+
+        private void muteSound_button_Click(object sender, EventArgs e)
+        {
+            if (sp == null)
+                return;
+            Boolean speStat = sp.switchSpeaker();
+            if (speStat)
+            {
+                if (micStatusBeforeSpkMute&&!micStatus)
+                {
+                    this.muteMicrophone_button.PerformClick();
+                }
+
+                this.soundState_label.Text = "ON";
+                this.soundState_label.ForeColor = Color.Red;
+            }
+            else
+            {
+                if (micStatus)
+                {
+                    this.muteMicrophone_button.PerformClick();
+                    micStatusBeforeSpkMute = true;
+                }
+                else
+                {
+                    micStatusBeforeSpkMute = false;
+                }
+                this.soundState_label.Text = "OFF";
+                this.soundState_label.ForeColor = Color.Green;
+            }
         }
     }
 }
