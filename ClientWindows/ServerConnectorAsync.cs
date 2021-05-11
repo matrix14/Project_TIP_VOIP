@@ -171,7 +171,7 @@ namespace ClientWindows
             try
             {
                 Socket sockInt = (Socket)res.AsyncState;
-                sockInt.EndConnect(res);
+                sockInt.EndConnect(res); //TODO: ObjectDisposedException - when no connection
                 if(sockInt.Connected)
                 {
                     connectionTimer.Stop();

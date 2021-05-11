@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -17,7 +18,9 @@ namespace ClientWindows
 
         private static Boolean connectionExist = false;
 
-        private static ByteCallback receiveMsgCallback;
+        private static ByteCallback receiveMsgCallback = null;
+
+        private static FileStream logFile;
 
         private struct UdpState
         {
@@ -54,6 +57,8 @@ namespace ClientWindows
 
             connectionExist = true;
 
+            openLog();
+
             ReceiveMessages();
         }
 
@@ -67,6 +72,31 @@ namespace ClientWindows
             udpState.ePointSend = null;
             udpState.socketSend = null;
             udpState.uClientRecv = null;
+            if(logFile!=null)
+                logFile.Close();
+        }
+
+        private static void openLog()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            logFile = File.Open(path+"\\logFile.txt", FileMode.Append, FileAccess.Write, FileShare.None);
+            if (logFile == null)
+                return;
+            byte[] splitter = Encoding.ASCII.GetBytes("---------------------\n");
+            logFile.Write(splitter, 0, splitter.Length);
+        }
+
+        private static void logToFile(byte[] b)
+        {
+            //if (false)
+            //    return;
+            if (logFile == null)
+                return;
+            if (b == null)
+                b = Encoding.ASCII.GetBytes("NULL");
+            logFile.Write(b, 0, b.Length);
+            byte[] endLine = Encoding.ASCII.GetBytes("\n");
+            logFile.Write(endLine, 0, endLine.Length);
         }
 
         
@@ -81,8 +111,9 @@ namespace ClientWindows
                     return;
 
                 byte[] receiveBytes = u.EndReceive(ar, ref e);
-                if(connectionExist)
-                    ReceiveMsgCallback(receiveBytes);
+                logToFile(receiveBytes);
+                if (connectionExist&&receiveBytes!=null&&receiveMsgCallback!=null)
+                    receiveMsgCallback(receiveBytes); //TODO: NullReferenceException 
 
                 if (u == null || e == null || u.Client == null)
                     return;
