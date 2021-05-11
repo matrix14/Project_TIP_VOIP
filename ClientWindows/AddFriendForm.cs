@@ -55,6 +55,11 @@ namespace ClientWindows
 
         public void usernameCheckUpdateInfo(Boolean exist) //TODO: sometimes it get stuck, and not showing if user exist
         {
+            if(this.isUserExists_label.InvokeRequired)
+            {
+                this.isUserExists_label.Invoke(new MethodInvoker(() => { usernameCheckUpdateInfo(exist); }));
+                return;
+            }
             if (exist)
             { 
                 this.isUserExists_label.Text = "Znaleziono użytkownika!";
