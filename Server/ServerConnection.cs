@@ -171,6 +171,7 @@ namespace Server
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine("Async Error \n" + e.Message);
                         continue;
                     }
 
@@ -212,7 +213,7 @@ namespace Server
                             lock (userNewVoiceHandler) userNewVoiceHandler.Remove(clientIp);
                             return;
                         }
-
+                        Console.WriteLine("From: " + clientIp.ToString() +  " To: " +  Encoding.ASCII.GetString(voiceToSend[conversationId][clientIp].Peek()) + "\n");
                         s.SendTo(voiceToSend[conversationId][clientIp].Dequeue(), ep);
 
                         userNewVoiceHandler[clientIp].Reset();
