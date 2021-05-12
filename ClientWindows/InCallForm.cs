@@ -62,21 +62,16 @@ namespace ClientWindows
             this.call = c;
             this.callId = new Id(c.callId);
             InitializeComponent();
-            //Task.Run(refreshFormLoop);
-            //LoggedInForm.updateCallStatus();
             this.Text = "(" + Program.username + ") Aktywne połączenie";
             StringCallback callback2 = addUser;
             StringCallback callback3 = removeUser;
             LoggedInService.AddUserToCall = callback2;
             LoggedInService.RemoveUserFromCall = callback3;
 
-
-            //Task.Run(progBarIncrease);
             updateUsersInCall();
             ByteCallback callback = incomingTraffic;
             CallProcessing.ReceiveMsgCallback = callback;
             CallProcessing.Start();
-            //Task.Run(sentBytes);
             Program.isInCall = true;
 
             packetsCounterTimer.Interval = 1000;
@@ -91,25 +86,7 @@ namespace ClientWindows
             token = tokenSource.Token;
 
             Task.Run(() => sp.startUp(this.call.usernames, token), token);
-            //sp.startUp();
         }
-
-        /*
-        public InCallForm(Id id, Username user)
-        {
-            this.callId = id;
-            InitializeComponent();
-            this.Text = "("+ Program.username + ") Aktywne połączenie";
-            this.callUsersList_label.Text = user.username;
-            //Task.Run(progBarIncrease);
-
-            ByteCallback callback = incomingTraffic;
-            CallProcessing.ReceiveMsgCallback = callback;
-            CallProcessing.Start();
-            Task.Run(sentBytes);
-            Program.isInCall = true;
-        }
-        */
 
         public void removeUser(string username)
         {
@@ -187,29 +164,6 @@ namespace ClientWindows
         {
             
         }
-
-        /*private void progBarIncrease()
-        {
-            if(incomingTraffic_bar.InvokeRequired)
-            {
-                incomingTraffic_bar.Invoke(new MethodInvoker(() => { progBarIncrease(); }));
-                return;
-            }
-            incomingTraffic_bar.Visible = true;
-            incomingTraffic_bar.Minimum = 0;
-            incomingTraffic_bar.Maximum = 1;
-            incomingTraffic_bar.Value = 1;
-            incomingTraffic_bar.Step = 1;
-            while(true)
-            {
-                if(incomingTraffic_bar.Value==1)
-                    incomingTraffic_bar.Value = 0;
-                else
-                    incomingTraffic_bar.PerformStep();
-                System.Threading.Thread.Sleep(500);
-            }
-            
-        }*/
 
         public void incomingTraffic(byte[] b)
         {
