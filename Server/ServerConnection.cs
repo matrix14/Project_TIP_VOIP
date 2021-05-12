@@ -213,7 +213,7 @@ namespace Server
                             lock (userNewVoiceHandler) userNewVoiceHandler.Remove(clientIp);
                             return;
                         }
-                        Console.WriteLine("From: " + clientIp.ToString() +  " To: " +  Encoding.ASCII.GetString(voiceToSend[conversationId][clientIp].Peek()) + "\n");
+                      
                         s.SendTo(voiceToSend[conversationId][clientIp].Dequeue(), ep);
 
                         userNewVoiceHandler[clientIp].Reset();
@@ -266,6 +266,10 @@ namespace Server
                 // Key is clientIp
                 if (key.ToString() != clientIp.ToString())
                 {
+                    if (clientIp.ToString() == "7.60.42.67" && Encoding.ASCII.GetString(receiveBytes).Split(':',2)[0] == "111")
+                    {
+                        Console.WriteLine("Self message");
+                    }
                     lock (voiceToSend[conversationId][key]) voiceToSend[conversationId][key].Enqueue(receiveBytes);
                     lock (userNewVoiceHandler[key]) userNewVoiceHandler[key].Set();
                 }
