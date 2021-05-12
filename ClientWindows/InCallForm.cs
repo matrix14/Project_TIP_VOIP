@@ -53,7 +53,7 @@ namespace ClientWindows
             }
             this.callUsersList_label.Text = usersListStr;
             if(sp!=null)
-                sp.updateUsersCount(this.call.usernames.Count);
+                sp.updateUsersCount(this.call.usernames);
         }
 
         public InCallForm(Call c)
@@ -90,7 +90,7 @@ namespace ClientWindows
             tokenSource = new System.Threading.CancellationTokenSource();
             token = tokenSource.Token;
 
-            Task.Run(() => sp.startUp(this.call.usernames.Count, token), token);
+            Task.Run(() => sp.startUp(this.call.usernames, token), token);
             //sp.startUp();
         }
 
@@ -128,23 +128,29 @@ namespace ClientWindows
 
         private void packetsCounterTimer_OnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (this.incomingPackets_label.InvokeRequired)
+            try
             {
-                this.incomingPackets_label.Invoke(new MethodInvoker(() => { packetsCounterTimer_OnTimerElapsed(sender,e); }));
+                if (this.incomingPackets_label.InvokeRequired)
+                {
+                    this.incomingPackets_label.Invoke(new MethodInvoker(() => { packetsCounterTimer_OnTimerElapsed(sender, e); }));
+                    return;
+                }
+                if (packetsCounterTimer.Enabled == false)
+                    return;
+                String message = packetsCounter.ToString();
+                for (int i = 0; i < (packetsCounter2 + 1); i++)
+                {
+                    message += ".";
+                }
+                packetsCounter2++;
+                if (packetsCounter2 == 4)
+                    packetsCounter2 = 0;
+                packetsCounter = 0;
+                incomingPackets_label.Text = message;
+            } catch (ObjectDisposedException)
+            {
                 return;
             }
-            if (packetsCounterTimer.Enabled == false)
-                return;
-            String message = packetsCounter.ToString();
-            for(int i=0;i<(packetsCounter2+1);i++)
-            {
-                message += ".";
-            }
-            packetsCounter2++;
-            if (packetsCounter2 == 4)
-                packetsCounter2 = 0;
-            packetsCounter = 0;
-            incomingPackets_label.Text = message;
         }
 
         public void addUser(string username)

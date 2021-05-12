@@ -135,7 +135,7 @@ namespace ClientWindows
             try
             {
                 ReceiveObject ro = new ReceiveObject();
-                sock.BeginReceive(ro.buffer, 0, ReceiveObject.MAX_BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), ro); //TODO: sometimes SocketException: 0x80004005 zadanie wyslania lub odebrania danych zostalo zablokowane poniewaz gniazdo nie jest podłaczone i (podczas wywyslania przez gniazdo datagramu przy uzyciu wywolania "wyslij do") nie podano adresu
+                sock.BeginReceive(ro.buffer, 0, ReceiveObject.MAX_BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), ro);
 
             } catch (Exception e)
             {

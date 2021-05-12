@@ -1,5 +1,6 @@
 ﻿using NAudio.Codecs;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,11 @@ namespace ClientWindows
     class SoundProcessing
     {
         private WaveInEvent recorder;
-        private BufferedWaveProvider bufferedWaveProvider;
+        private Dictionary<String, BufferedWaveProvider> multipleBufWaveProv = new Dictionary<string, BufferedWaveProvider>();
         private WaveOut player;
+        private MixingSampleProvider mixingSampleProvider;
 
-        private int activeUsersInCall = 0;
+        private List<String> activeUsersInCall;
 
         private ByteCallback voiceSendCallback;
 
@@ -29,10 +31,10 @@ namespace ClientWindows
 
         public ByteCallback VoiceSendCallback { get => voiceSendCallback; set => voiceSendCallback = value; }
 
-        public void startUp(int activeUsers, CancellationToken token)
+        public void startUp(List<string> activeUsers, CancellationToken token)
         {
-            activeUsersInCall = activeUsers;
-            WaveFormat format = new WaveFormat(16000, 16, 1);
+            
+            WaveFormat format = new WaveFormat(16000, 1); //TODO: verify difference beetween (16000, 16, 1)
             recorder = new WaveInEvent()
             {
                 BufferMilliseconds = 50,
@@ -42,18 +44,17 @@ namespace ClientWindows
             recorder.DeviceNumber = 0;
             recorder.DataAvailable += RecorderOnDataAvailable;
 
-            //Up to here its ok
-            
-            bufferedWaveProvider = new BufferedWaveProvider(recorder.WaveFormat);
-            //bufferedWaveProvider.DiscardOnBufferOverflow = true; //TODO: temporary
+            mixingSampleProvider = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(16000, 1));
 
-            // set up playback
+            activeUsersInCall = activeUsers;
+            updateInputBuffers();
+
             player = new WaveOut();
-            player.Init(bufferedWaveProvider); //TODO: clear buffer
+            clearAllBuffers();
+            player.Init(mixingSampleProvider);
 
             int waveInDevices = WaveIn.DeviceCount;
             WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(0);
-
 
             recorder.StartRecording();
             while (true)
@@ -67,30 +68,68 @@ namespace ClientWindows
 
         }
 
-        public void abd()
+        private void updateInputBuffers()
         {
-            var mixer = new WaveMixerStream32 { AutoStop = true };
-
-            var wav1 = new WaveFileReader(@"c:\...\1.wav");
-            var wav2 = new WaveFileReader(@"c:\...\2.wav");
-
-            mixer.AddInputStream(new WaveChannel32(wav1));
-            mixer.AddInputStream(new WaveChannel32(wav2));
-            WaveFileWriter.CreateWaveFile("mixed.wav", new Wave32To16Stream(mixer));
-            IWaveProvider iwp = new Wave32To16Stream(mixer);
-            //bufferedWaveProvider.AddSamples(iwp);
+            if(multipleBufWaveProv.Count==0)
+            {
+                foreach(string user in this.activeUsersInCall)
+                {
+                    multipleBufWaveProv.Add(user, new BufferedWaveProvider(recorder.WaveFormat));
+                }
+            } else
+            {
+                List<string> actualUsers = new List<string>(this.multipleBufWaveProv.Keys);
+                foreach(string user in this.activeUsersInCall)
+                {
+                    if(actualUsers.Contains(user))
+                    {
+                        continue;
+                    } else
+                    {
+                        if(!multipleBufWaveProv.ContainsKey(user))
+                            multipleBufWaveProv.Add(user, new BufferedWaveProvider(recorder.WaveFormat));
+                    }
+                }
+                foreach(string user in actualUsers)
+                {
+                    if(this.activeUsersInCall.Contains(user))
+                    {
+                        continue;
+                    } else
+                    {
+                        if (multipleBufWaveProv.ContainsKey(user))
+                        {
+                            multipleBufWaveProv[user].ClearBuffer();
+                            multipleBufWaveProv.Remove(user);
+                        }
+                    }
+                }
+            }
+            foreach(var singleBuf in multipleBufWaveProv)
+            {
+                mixingSampleProvider.AddMixerInput(singleBuf.Value);
+            }
         }
 
-        public void updateUsersCount(int activeUsers)
+        private void clearAllBuffers()
+        {
+            foreach(var singleBuf in multipleBufWaveProv)
+            {
+                singleBuf.Value.ClearBuffer();
+            }
+        }
+
+        public void updateUsersCount(List<string> activeUsers)
         {
             this.activeUsersInCall = activeUsers;
+            updateInputBuffers();
         }
 
         public void stop()
         {
             player.Stop();
             recorder.StopRecording();
-            bufferedWaveProvider.ClearBuffer();
+            clearAllBuffers();
         }
 
         public Boolean switchMicrophone()
@@ -112,13 +151,13 @@ namespace ClientWindows
         {
             if (speakerStatus)
             {
-                bufferedWaveProvider.ClearBuffer();
+                clearAllBuffers();
                 player.Pause();
                 speakerStatus = false;
             }
             else
             {
-                bufferedWaveProvider.ClearBuffer();
+                clearAllBuffers();
                 player.Resume();
                 speakerStatus = true;
             }
@@ -140,13 +179,17 @@ namespace ClientWindows
                     position++;
             }
 
+            byte[] usernameBytes = new byte[position];
             byte[] sound = new byte[inMsg.Length - (position + 1)];
 
+            Array.Copy(inMsg, 0, usernameBytes, 0, usernameBytes.Length);
             Array.Copy(inMsg, (position + 1), sound, 0, sound.Length);
+            string username = Encoding.ASCII.GetString(usernameBytes);
             byte[] soundRaw = DecodeSamples(sound);
-            if (bufferedWaveProvider == null)
+
+            if ((!this.multipleBufWaveProv.ContainsKey(username))||this.multipleBufWaveProv[username]==null)
                 return;
-            bufferedWaveProvider.AddSamples(soundRaw, 0, soundRaw.Length);
+            this.multipleBufWaveProv[username].AddSamples(soundRaw, 0, soundRaw.Length);
         }
 
         private void RecorderOnDataAvailable(object sender, WaveInEventArgs waveInEventArgs)
@@ -165,9 +208,6 @@ namespace ClientWindows
             Array.Copy(sound, 0, outMsg, (length + 1), sound.Length);
 
             voiceSendCallback(outMsg);
-
-            //bufferedWaveProvider.AddSamples(DecodeSamples(x), 0, DecodeSamples(x).Length);
-            //bufferedWaveProvider.AddSamples(waveInEventArgs.Buffer, 0, waveInEventArgs.BytesRecorded);
         }
 
         private static byte[] EncodeSamples(byte[] data)

@@ -143,7 +143,7 @@ namespace ClientWindows
             invitationContainer.Remove(inv);
             if(inv.status==2)
             {
-                addToFriendContainer(new Friend(inv.username, 1));
+                addToFriendContainer(new Friend(inv.username, 1)); //TODO: when accepting invitation it shows active user
             }
             updateInvitationButton();
         }
