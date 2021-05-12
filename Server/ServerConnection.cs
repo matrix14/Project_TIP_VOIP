@@ -233,8 +233,8 @@ namespace Server
             while (true)
             {
                 byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
-                //PrepareData(RemoteIpEndPoint.Address, receiveBytes);
-                Task.Run(() => { PrepareData(RemoteIpEndPoint.Address, receiveBytes); });            
+                PrepareData(RemoteIpEndPoint.Address, receiveBytes);
+                //Task.Run(() => { PrepareData(RemoteIpEndPoint.Address, receiveBytes); });            
             }
         }
         
@@ -271,7 +271,7 @@ namespace Server
                 }
                 else
                 {
-                    if (clientIp.ToString() == "7.60.42.67" && Encoding.ASCII.GetString(receiveBytes).Split(':', 2)[0] == "111")
+                    if (clientIp.ToString() == "7.60.42.67" && Encoding.ASCII.GetString(receiveBytes).Split(':', 2)[0] == "test1")
                     {
                         Console.WriteLine("Self message");
                     }

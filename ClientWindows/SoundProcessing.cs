@@ -188,7 +188,6 @@ namespace ClientWindows
 
             if(username==Program.username)
             {
-                string a = "";
                 return;
             }
 
