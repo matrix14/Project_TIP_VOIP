@@ -266,12 +266,15 @@ namespace Server
                 // Key is clientIp
                 if (key.ToString() != clientIp.ToString())
                 {
-                    if (clientIp.ToString() == "7.60.42.67" && Encoding.ASCII.GetString(receiveBytes).Split(':',2)[0] == "111")
+                    lock (voiceToSend[conversationId][key]) voiceToSend[conversationId][key].Enqueue(receiveBytes);
+                    lock (userNewVoiceHandler[key]) userNewVoiceHandler[key].Set();
+                }
+                else
+                {
+                    if (clientIp.ToString() == "7.60.42.67" && Encoding.ASCII.GetString(receiveBytes).Split(':', 2)[0] == "111")
                     {
                         Console.WriteLine("Self message");
                     }
-                    lock (voiceToSend[conversationId][key]) voiceToSend[conversationId][key].Enqueue(receiveBytes);
-                    lock (userNewVoiceHandler[key]) userNewVoiceHandler[key].Set();
                 }
             }
         }
