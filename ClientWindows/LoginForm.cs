@@ -212,5 +212,11 @@ namespace ClientWindows
                 checkConnectionTimer.Stop();
             }
         }
+
+        private void settingsButton_Button_Click(object sender, EventArgs e)
+        {
+            SettingsForm sf = new SettingsForm();
+            sf.ShowDialog();
+        }
     }
 }

@@ -127,6 +127,7 @@ namespace ClientWindows
             this.soundSettings_button.TabIndex = 7;
             this.soundSettings_button.Text = "Ustawienia";
             this.soundSettings_button.UseVisualStyleBackColor = true;
+            this.soundSettings_button.Click += new System.EventHandler(this.soundSettings_button_Click);
             // 
             // incomingMsg_label
             // 

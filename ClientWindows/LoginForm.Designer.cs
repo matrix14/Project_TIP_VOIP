@@ -40,6 +40,7 @@ namespace ClientWindows
             this.usernameFree_label = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.serverConnection_Label = new System.Windows.Forms.ToolStripStatusLabel();
+            this.settingsButton_Button = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -130,7 +131,7 @@ namespace ClientWindows
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.serverConnection_Label});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 203);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 231);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(227, 22);
             this.statusStrip1.TabIndex = 9;
@@ -145,12 +146,23 @@ namespace ClientWindows
             this.serverConnection_Label.Text = "Brak połączenia!";
             this.serverConnection_Label.Click += new System.EventHandler(this.serverConnection_Label_Click);
             // 
+            // settingsButton_Button
+            // 
+            this.settingsButton_Button.Location = new System.Drawing.Point(12, 200);
+            this.settingsButton_Button.Name = "settingsButton_Button";
+            this.settingsButton_Button.Size = new System.Drawing.Size(200, 25);
+            this.settingsButton_Button.TabIndex = 10;
+            this.settingsButton_Button.Text = "Ustawienia";
+            this.settingsButton_Button.UseVisualStyleBackColor = true;
+            this.settingsButton_Button.Click += new System.EventHandler(this.settingsButton_Button_Click);
+            // 
             // LoginForm
             // 
             this.AcceptButton = this.confirmAction_button;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(227, 225);
+            this.ClientSize = new System.Drawing.Size(227, 253);
+            this.Controls.Add(this.settingsButton_Button);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.usernameFree_label);
             this.Controls.Add(this.actualMode_Label);
@@ -185,6 +197,7 @@ namespace ClientWindows
         private System.Windows.Forms.Label usernameFree_label;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel serverConnection_Label;
+        private System.Windows.Forms.Button settingsButton_Button;
     }
 }
 

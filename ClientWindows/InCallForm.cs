@@ -268,5 +268,11 @@ namespace ClientWindows
                 this.soundState_label.ForeColor = Color.Green;
             }
         }
+
+        private void soundSettings_button_Click(object sender, EventArgs e)
+        {
+            SettingsForm sf = new SettingsForm();
+            sf.ShowDialog();
+        }
     }
 }

@@ -46,6 +46,7 @@ namespace ClientWindows
             this.activeFriendStatus_Label = new System.Windows.Forms.Label();
             this.callUser = new System.Windows.Forms.Button();
             this.activeUserWindow = new System.Windows.Forms.Label();
+            this.settingsButton_Button = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -94,6 +95,7 @@ namespace ClientWindows
             this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addFriend_button,
+            this.settingsButton_Button,
             this.closeApp_button});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
@@ -246,6 +248,16 @@ namespace ClientWindows
             this.activeUserWindow.Visible = false;
             this.activeUserWindow.Click += new System.EventHandler(this.label1_Click_1);
             // 
+            // settingsButton_Button
+            // 
+            this.settingsButton_Button.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.settingsButton_Button.Image = ((System.Drawing.Image)(resources.GetObject("settingsButton_Button.Image")));
+            this.settingsButton_Button.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.settingsButton_Button.Name = "settingsButton_Button";
+            this.settingsButton_Button.Size = new System.Drawing.Size(68, 22);
+            this.settingsButton_Button.Text = "Ustawienia";
+            this.settingsButton_Button.Click += new System.EventHandler(this.settingsButton_Button_Click);
+            // 
             // LoggedInForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -292,5 +304,6 @@ namespace ClientWindows
         private System.Windows.Forms.ToolStripStatusLabel connectionStatus_label;
         private System.Windows.Forms.Label activeFriendStatus_Label;
         private System.Windows.Forms.Label callingStatusLabel;
+        private System.Windows.Forms.ToolStripButton settingsButton_Button;
     }
 }
