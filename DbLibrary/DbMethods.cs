@@ -14,6 +14,37 @@ namespace DbLibrary
     public class DbMethods : DbConnection
     {
 
+        public int GetUserActivity(string username)
+        {
+            string query = string.Format("SELECT is_active FROM users WHERE user_id = {0}", GetUserId(username));
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            
+            try
+            {
+                dataReader.Read();
+                return dataReader.GetInt32(0);
+            }
+            catch
+            {
+                return 0;
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+        }
+
+        public void SetUserActivity(string username,bool status)
+        {
+            string query = string.Format("UPDATE users SET is_active = {1} WHERE user_id = {0}", GetUserId(username),status);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+            dataReader.Read();
+            dataReader.Close();
+            
+        }
+
         public int GetSecondUserId(int conversationId, int userId)
         {
             string query = string.Format("SELECT user1_id,user2_id FROM conversations WHERE  conversation_id = {0}", conversationId);
