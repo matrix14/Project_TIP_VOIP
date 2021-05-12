@@ -36,6 +36,10 @@ namespace ClientWindows
 
             this.serverAddress_Input.Text = Shared.IP.serverIp;
             this.serverAddress_Input.Enabled = !Program.isLoggedIn;
+            if (this.serverAddress_Input.Enabled)
+                this.serverAddress_label.Text = "Adres IP Serwera";
+            else
+                this.serverAddress_label.Text = "Wyloguj się aby zmienić IP";
         }
 
         private void inputDevice_label_Click(object sender, EventArgs e)

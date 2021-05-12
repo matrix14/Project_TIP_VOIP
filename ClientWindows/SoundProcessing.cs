@@ -165,7 +165,7 @@ namespace ClientWindows
         }
 
         public void incomingEncodedSound(byte[] inMsg)
-        {
+        { //TODO: Skip msg from myself
             if(speakerStatus==false)
             {
                 return;
@@ -185,6 +185,13 @@ namespace ClientWindows
             Array.Copy(inMsg, 0, usernameBytes, 0, usernameBytes.Length);
             Array.Copy(inMsg, (position + 1), sound, 0, sound.Length);
             string username = Encoding.ASCII.GetString(usernameBytes);
+
+            if(username==Program.username)
+            {
+                string a = "";
+                return;
+            }
+
             byte[] soundRaw = DecodeSamples(sound);
 
             if ((!this.multipleBufWaveProv.ContainsKey(username))||this.multipleBufWaveProv[username]==null)
