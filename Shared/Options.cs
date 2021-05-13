@@ -11,7 +11,7 @@ namespace Shared
         GET_FRIENDS = 4,                    //                                                              Error:<>$$Data:<JSONFriend>$$       
         DELETE_ACCOUNT = 5,                 //                                                              Error:<>$$
         ADD_FRIEND = 6,                     //  Data:<JSONUsername>$$                                       Error:<>$$
-        ACCEPT_FRIEND = 7,                  //  Data:<JSONId>$$                                             Error:<>$$
+        ACCEPT_FRIEND = 7,                  //  Data:<JSONId>$$                                             Error:<>$$Data<JSONFriend>$$
         DECLINE_FRIEND = 8,                 //  Data:<JSONId>$$                                             Error:<>$$
         INVITE_TO_CONVERSATION = 9,         //  Data:<JSONUsername>$$                                       Error:<>$$Data:<JSONId>$$
         JOIN_CONVERSATION = 10,             //  Data:<JSONId>$$                                             Error:<>$$

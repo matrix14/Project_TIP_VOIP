@@ -111,6 +111,7 @@ namespace Server
         {
             lock (userLoginHandler) userLoginHandler[clientId].Reset();
             lock (activeUsers[clientId]) activeUsers[clientId].logged = false;
+            activeUsers[clientId].dbConnection.SetUserActivity(activeUsers[clientId].username, false);
             lock (eventHandlers) eventHandlers[activeUsers[clientId].username].Set();
             lock (userInvitationsIds[activeUsers[clientId].userId])
             {
@@ -203,6 +204,7 @@ namespace Server
                     // If user isnt already logged in, add data to activeUsers
                     activeUsers[clientId].username = login.username;
                     activeUsers[clientId].logged = true;
+                    activeUsers[clientId].dbConnection.SetUserActivity(activeUsers[clientId].username, true);
                     lock (activeUsers[clientId].dbConnection)
                     {
                         activeUsers[clientId].userId = dbConnection.GetUserId(login.username);
@@ -401,7 +403,8 @@ namespace Server
             {
                 ;
             }
-            return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
+            Friend f = new Friend(inv.username, activeUsers[clientId].dbConnection.GetUserActivity(inv.username));
+            return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR, f);
         }
 
         public string DeclineFriend(string msg, int clientId)

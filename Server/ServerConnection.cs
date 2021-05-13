@@ -269,13 +269,6 @@ namespace Server
                     lock (voiceToSend[conversationId][key]) voiceToSend[conversationId][key].Enqueue(receiveBytes);
                     lock (userNewVoiceHandler[key]) userNewVoiceHandler[key].Set();
                 }
-                else
-                {
-                    if (clientIp.ToString() == "7.60.42.67" && Encoding.ASCII.GetString(receiveBytes).Split(':', 2)[0] == "test1")
-                    {
-                        Console.WriteLine("Self message");
-                    }
-                }
             }
         }
 
