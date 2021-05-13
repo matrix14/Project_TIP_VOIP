@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace ClientWindows
 {
@@ -11,6 +13,7 @@ namespace ClientWindows
         public static String username = "";
         public static Boolean isLoggedIn = false;
         public static Boolean isInCall = false;
+        public static SettingsService setServ;
 
 
         /// <summary>
@@ -19,14 +22,13 @@ namespace ClientWindows
         [STAThread]
         static void Main(string[] args)
         {
-            if(args.Length==1)
+            setServ = new SettingsService();
+
+            if (args.Length==1) //Temporary change of server IP Address
             {
+                MessageBox.Show("Tymczasowo nadpisano IP serwera za pomocą argumentu! Adres IP nie zostanie zapisany w konfiguracji.");
                 Shared.IP.serverIp = args[0];
             }
-           /* else
-            {
-                Shared.IP.serverIp = "127.0.0.1";
-            }*/
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

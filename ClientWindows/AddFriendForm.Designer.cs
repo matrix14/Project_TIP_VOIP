@@ -38,17 +38,20 @@ namespace ClientWindows
             // username_label
             // 
             this.username_label.AutoSize = true;
-            this.username_label.Location = new System.Drawing.Point(13, 13);
+            this.username_label.Location = new System.Drawing.Point(20, 20);
+            this.username_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.username_label.Name = "username_label";
-            this.username_label.Size = new System.Drawing.Size(102, 13);
+            this.username_label.Size = new System.Drawing.Size(147, 20);
             this.username_label.TabIndex = 0;
             this.username_label.Text = "Nazwa użytkownika";
             // 
             // username_input
             // 
-            this.username_input.Location = new System.Drawing.Point(16, 29);
+            this.username_input.Enabled = false;
+            this.username_input.Location = new System.Drawing.Point(24, 45);
+            this.username_input.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.username_input.Name = "username_input";
-            this.username_input.Size = new System.Drawing.Size(263, 20);
+            this.username_input.Size = new System.Drawing.Size(392, 26);
             this.username_input.TabIndex = 1;
             this.username_input.KeyUp += new System.Windows.Forms.KeyEventHandler(this.username_input_KeyUp);
             // 
@@ -56,18 +59,21 @@ namespace ClientWindows
             // 
             this.isUserExists_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.isUserExists_label.ForeColor = System.Drawing.Color.Red;
-            this.isUserExists_label.Location = new System.Drawing.Point(13, 52);
+            this.isUserExists_label.Location = new System.Drawing.Point(20, 80);
+            this.isUserExists_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.isUserExists_label.Name = "isUserExists_label";
-            this.isUserExists_label.Size = new System.Drawing.Size(263, 13);
+            this.isUserExists_label.Size = new System.Drawing.Size(394, 20);
             this.isUserExists_label.TabIndex = 2;
             this.isUserExists_label.Text = "Nie znaleziono użytkownika!";
             this.isUserExists_label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // addFriend_button
             // 
-            this.addFriend_button.Location = new System.Drawing.Point(16, 69);
+            this.addFriend_button.Enabled = false;
+            this.addFriend_button.Location = new System.Drawing.Point(24, 106);
+            this.addFriend_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.addFriend_button.Name = "addFriend_button";
-            this.addFriend_button.Size = new System.Drawing.Size(263, 23);
+            this.addFriend_button.Size = new System.Drawing.Size(394, 35);
             this.addFriend_button.TabIndex = 3;
             this.addFriend_button.Text = "Dodaj znajomego";
             this.addFriend_button.UseVisualStyleBackColor = true;
@@ -76,13 +82,14 @@ namespace ClientWindows
             // AddFriendForm
             // 
             this.AcceptButton = this.addFriend_button;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(291, 111);
+            this.ClientSize = new System.Drawing.Size(436, 171);
             this.Controls.Add(this.addFriend_button);
             this.Controls.Add(this.isUserExists_label);
             this.Controls.Add(this.username_input);
             this.Controls.Add(this.username_label);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "AddFriendForm";
             this.Text = "Dodaj znajomego";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddFriendForm_FormClosing);

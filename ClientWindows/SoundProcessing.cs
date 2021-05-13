@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ClientWindows
 {
-    class SoundProcessing
+    class SoundProcessing //TODO: on device change update recording/playing device
     {
         private WaveInEvent recorder;
         private Dictionary<String, BufferedWaveProvider> multipleBufWaveProv = new Dictionary<string, BufferedWaveProvider>();
@@ -41,7 +41,7 @@ namespace ClientWindows
                 DeviceNumber = 1,
                 WaveFormat = format
             };
-            recorder.DeviceNumber = 0;
+            recorder.DeviceNumber = Program.setServ.getIOInputDevice();
             recorder.DataAvailable += RecorderOnDataAvailable;
 
             mixingSampleProvider = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(16000, 1));
@@ -50,6 +50,7 @@ namespace ClientWindows
             updateInputBuffers();
 
             player = new WaveOut();
+            player.DeviceNumber = Program.setServ.getIOOutputDevice();
             clearAllBuffers();
             player.Init(mixingSampleProvider);
 
@@ -165,7 +166,7 @@ namespace ClientWindows
         }
 
         public void incomingEncodedSound(byte[] inMsg)
-        { //TODO: Skip msg from myself
+        {
             if(speakerStatus==false)
             {
                 return;

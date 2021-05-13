@@ -158,7 +158,7 @@ namespace ClientWindows
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.ACCEPT_FRIEND, new Id(inv.invitationId)));
         }
 
-        public static void acceptInvitationReply(String message) //TODO: change to returning FRIEND - add friend to friendlist basing on this
+        public static void acceptInvitationReply(String message)
         {
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);

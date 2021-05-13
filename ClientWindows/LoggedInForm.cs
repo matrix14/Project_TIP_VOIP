@@ -135,8 +135,7 @@ namespace ClientWindows
                     invitationContainer.Add(inv);
                 } else if(inv.status==2)
                 {
-                    Friend newFr = new Friend(inv.inviteeUsername, 1);
-                    friendsContainer.Add(newFr);
+                    addToFriendContainer(new Friend(inv.inviteeUsername, 1));
                 }
             }
             updateInvitationButton();

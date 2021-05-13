@@ -34,7 +34,7 @@ namespace ClientWindows
                 Options opt = (Options)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
                 switch(opt)
                 {
-                    case Options.FRIEND_INVITATIONS: //TODO: user which invite someone doesn't update friends after he accepted invitation
+                    case Options.FRIEND_INVITATIONS:
                         LoggedInService.incomingInvitation(message);
                         break;
                     case Options.ACTIVE_FRIENDS:

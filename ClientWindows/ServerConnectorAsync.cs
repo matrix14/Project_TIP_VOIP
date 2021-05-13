@@ -30,6 +30,7 @@ namespace ClientWindows
 
         private static Socket sock;
 
+
         public static void StartConnection()
         {
             connectionTimer.Interval = 5000;
@@ -52,8 +53,18 @@ namespace ClientWindows
         }
         public static void StopConnection()
         {
-            sock.Shutdown(SocketShutdown.Both);
-            sock.Close();
+            try
+            {
+                sock.Shutdown(SocketShutdown.Both);
+                sock.Close();
+            } catch(SocketException)
+            {
+                return;
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString());
+            }
         }
         private static void connectionTimerOnTimerElapsed(object sender, ElapsedEventArgs e)
         {
@@ -177,7 +188,11 @@ namespace ClientWindows
                     connectionTimer.Stop();
                 }
                 connectDone.Set();
-            } catch (Exception e)
+            } catch(ObjectDisposedException)
+            {
+
+            }
+            catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
                 return;
