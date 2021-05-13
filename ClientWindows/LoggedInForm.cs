@@ -13,6 +13,7 @@ namespace ClientWindows
     public delegate void UsernameCallback(Username u);
     public delegate void IdCallback(Id id);
     public delegate void CallCallback(Call c);
+    public delegate void FriendCallback(Friend fr);
     public partial class LoggedInForm : Form
     {
         private static List<Friend> friendsContainer = new List<Friend>();
@@ -31,11 +32,14 @@ namespace ClientWindows
             IdCallback callback6 = callUserReply;
             BooleanCallback callback7 = callUserReplyFromUser;
             CallCallback callback8 = openInCallWindow;
+            FriendCallback callback9 = addToFriendContainer;
+            LoggedInService.AddToFriendList = callback9;
             LoggedInService.NewInactiveFriend = callback4;
             LoggedInService.NewActiveFriend = callback5;
             LoggedInService.InviteToConversationReplyOk = callback6;
             LoggedInService.InviteToConversationReplyFromUser = callback7;
             LoggedInService.OpenInCallForm = callback8;
+
 
             StringCallback callback2 = writeToInvitingList;
             LoggedInService.NewInvitationCallback = callback2;
@@ -141,10 +145,10 @@ namespace ClientWindows
         public void removeFromInvitingList(Invitation inv)
         {
             invitationContainer.Remove(inv);
-            if(inv.status==2)
+            /*if(inv.status==2)
             {
                 addToFriendContainer(new Friend(inv.username, 1)); //TODO: when accepting invitation it shows active user
-            }
+            }*/
             updateInvitationButton();
         }
 

@@ -22,6 +22,7 @@ namespace ClientWindows
         private static IdCallback inviteToConversationReplyOk;
         private static BooleanCallback inviteToConversationReplyFromUser;
         private static CallCallback openInCallForm;
+        private static FriendCallback addToFriendList;
 
 
         private static Invitation lastProcessedInvitation = new Invitation();
@@ -46,6 +47,7 @@ namespace ClientWindows
         public static StringCallback AddUserToCall { get => addUserToCall; set => addUserToCall = value; }
         public static StringCallback RemoveUserFromCall { get => removeUserFromCall; set => removeUserFromCall = value; }
         public static CallCallback OpenInCallForm { get => openInCallForm; set => openInCallForm = value; }
+        public static FriendCallback AddToFriendList { get => addToFriendList; set => addToFriendList = value; }
 
         public static void logout()
         {
@@ -156,10 +158,14 @@ namespace ClientWindows
             ServerProcessing.processSendMessage(MessageProccesing.CreateMessage(Options.ACCEPT_FRIEND, new Id(inv.invitationId)));
         }
 
-        public static void acceptInvitationReply(String message)
+        public static void acceptInvitationReply(String message) //TODO: change to returning FRIEND - add friend to friendlist basing on this
         {
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+
+            String frListStr = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
+            Friend fr = MessageProccesing.DeserializeObjectOnErrorCode(Options.ACCEPT_FRIEND, frListStr) as Friend;
+
             MessageBoxButtons buttons = MessageBoxButtons.OK;
             string title = "Dodanie znajomego";
             String msg = "";
@@ -184,6 +190,7 @@ namespace ClientWindows
             MessageBox.Show(msg, title, buttons);
             lastProcessedInvitation.status = 2;
             invitationProcessedCallback(lastProcessedInvitation);
+            addToFriendList(fr);
             invitationProcessing.Set();
         }
 

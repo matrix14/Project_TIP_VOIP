@@ -62,6 +62,7 @@ namespace Shared
         {
             if (option == Options.GET_FRIENDS) return JsonConvert.DeserializeObject<List<Friend>>(data);
             else if (option == Options.INVITE_TO_CONVERSATION) return JsonConvert.DeserializeObject<Id>(data);
+            else if (option == Options.ACCEPT_FRIEND) return JsonConvert.DeserializeObject<Friend>(data);
             return null;
         }
 
