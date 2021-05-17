@@ -128,7 +128,6 @@ namespace ClientWindows
                 syncMessageStop();
             } else
             {
-                //TODO Implement faults
             }
         }
     }

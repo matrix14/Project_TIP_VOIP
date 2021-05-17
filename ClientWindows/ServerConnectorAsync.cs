@@ -49,7 +49,7 @@ namespace ClientWindows
             } catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
-                return; //TODO Add message for client when problem
+                return;
             }
         }
         public static void StopConnection()
@@ -92,7 +92,7 @@ namespace ClientWindows
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
-                return; //TODO Add message for client when problem
+                return;
             }
         }
         public static void SendMessage(String message)
@@ -105,7 +105,7 @@ namespace ClientWindows
             {
                 if(!sock.Connected)
                 {
-                    //TODO do something when connection is lost
+                    MessageBox.Show("Połaczenie z serwerem utracone! Proszę zrestartować aplikacje!");
                 }
             } 
             catch (Exception e)
@@ -127,7 +127,6 @@ namespace ClientWindows
             {
                 MessageBox.Show(e.ToString());
                 return;
-                //TODO implement fault
             }
         }
 
@@ -153,7 +152,6 @@ namespace ClientWindows
             {
                 MessageBox.Show(e.ToString());
                 return;
-                //TODO Implement faults
             }
         }
 
@@ -181,7 +179,6 @@ namespace ClientWindows
             {
                 MessageBox.Show(e.ToString());
                 return;
-                //TODO Implement faults
             }
         }
 
@@ -203,7 +200,6 @@ namespace ClientWindows
             {
                 MessageBox.Show(e.ToString());
                 return;
-                //TODO Implement faults
             }
         }
 

@@ -78,7 +78,7 @@ namespace ClientWindows
             if (Program.setServ.getIOInputDevice() != actualInputDev)
             {
                 bool microphoneStatusStart = microphoneStatus;
-                WaveFormat format = new WaveFormat(16000, 1); //TODO: verify difference beetween (16000, 16, 1)
+                WaveFormat format = new WaveFormat(16000, 16, 1);
                 if(microphoneStatusStart)
                     recorder.StopRecording();
                 recorder = new WaveInEvent()

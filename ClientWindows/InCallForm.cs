@@ -79,7 +79,10 @@ namespace ClientWindows
 
             updateUsersInCall();
             ByteCallback callback = incomingTraffic;
+            NoneCallback callback4 = closeCall;
+
             CallProcessing.ReceiveMsgCallback = callback;
+            CallProcessing.CloseCallCallback = callback4;
             CallProcessing.Start();
             Program.isInCall = true;
 
@@ -108,6 +111,17 @@ namespace ClientWindows
             this.call.removeUser(username);
             updateUsersInCall();
             if (this.call.usernames.Count == 0)
+            {
+                this.Close();
+            }
+        }
+
+        public void closeCall()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(() => { closeCall(); }));
+            } else
             {
                 this.Close();
             }
@@ -183,14 +197,26 @@ namespace ClientWindows
         {
             if (incomingMsg_label.InvokeRequired)
             {
-                incomingMsg_label.Invoke(new MethodInvoker(() => { incomingTraffic(b); })); //TODO: ObjectDisposedException - not exist "Label"
+                try {
+                    incomingMsg_label.Invoke(new MethodInvoker(() => { incomingTraffic(b); }));
+                }
+                catch(ObjectDisposedException)
+                {
+                    return;
+                }
             }
             else
             {
-                packetsCounter++;
-                incomingMsg_label.Text = Encoding.ASCII.GetString(b);
-                if (sp != null)
-                    sp.incomingEncodedSound(b);
+                try {
+                    packetsCounter++;
+                    incomingMsg_label.Text = Encoding.ASCII.GetString(b);
+                    if (sp != null)
+                        sp.incomingEncodedSound(b);
+                }
+                    catch (ObjectDisposedException)
+                {
+                    return;
+                }
             }
         }
 

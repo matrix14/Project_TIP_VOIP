@@ -19,6 +19,7 @@ namespace ClientWindows
         private static Boolean connectionExist = false;
 
         private static ByteCallback receiveMsgCallback = null;
+        private static NoneCallback closeCallCallback = null;
 
         private static FileStream logFile = null;
 
@@ -34,6 +35,7 @@ namespace ClientWindows
         private static UdpState udpState;
 
         public static ByteCallback ReceiveMsgCallback { get => receiveMsgCallback; set => receiveMsgCallback = value; }
+        public static NoneCallback CloseCallCallback { get => closeCallCallback; set => closeCallCallback = value; }
 
         public static void Start()
         {
@@ -119,8 +121,17 @@ namespace ClientWindows
                     return;
                 }
 
-                if (connectionExist&&receiveBytes!=null&&receiveMsgCallback!=null)
-                    receiveMsgCallback(receiveBytes); //TODO: NullReferenceException, InvalidOperationException: BufferFull
+                if (connectionExist && receiveBytes != null && receiveMsgCallback != null)
+                {
+                    try
+                    {
+                        receiveMsgCallback(receiveBytes);
+                    } catch (NullReferenceException) {
+                        return;
+                    } catch (InvalidOperationException) {
+                        return;
+                    }
+                }
 
                 if (u == null || e == null || u.Client == null)
                     return;
@@ -128,7 +139,8 @@ namespace ClientWindows
                 ReceiveMessages();
             }catch(ObjectDisposedException)
             {
-                return; //TODO: System.ObjectDisposedException (when connection close)
+                closeCallCallback();
+                return;
             }
             catch (Exception e)
             {

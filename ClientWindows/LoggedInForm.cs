@@ -438,11 +438,14 @@ namespace ClientWindows
                     callUser.Enabled = false;
                     callingStatusLabel.Text = "";
                     callingStatusLabel.ForeColor = Color.Green;
-                    Call c = new Call(lastCallId.id, new List<string> { lastCallUsername.username }); //TODO: lastCallId = null NullReferenceException
-                    NoneCallback ncb = updateFriendViewOnCallClosing;
-                    InCallForm icf = new InCallForm(c, ncb);
-                    icf.Show();
-                    updateCallStatus(new Friend(lastCallUsername, 1));
+                    if (lastCallId != null && lastCallUsername != null)
+                    {
+                        Call c = new Call(lastCallId.id, new List<string> { lastCallUsername.username });
+                        NoneCallback ncb = updateFriendViewOnCallClosing;
+                        InCallForm icf = new InCallForm(c, ncb);
+                        icf.Show();
+                        updateCallStatus(new Friend(lastCallUsername, 1));
+                    }
                 } else
                 {
                     callUser.Enabled = true;
