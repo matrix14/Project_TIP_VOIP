@@ -13,6 +13,7 @@ namespace ClientWindows
 {
     public partial class InvitationListForm : Form
     {
+        private List<Invitation> processingInvitation = new List<Invitation>();
         private List<Invitation> invitationContainer = new List<Invitation>();
         public InvitationListForm()
         {
@@ -50,19 +51,28 @@ namespace ClientWindows
             if (e.ColumnIndex == invitationsDataGrid.Columns["acceptButtons"].Index)
             {
                 Invitation inv = (Invitation)invitationsDataGrid[0, e.RowIndex].Value;
-
+                if(processingInvitation.Contains(inv))
+                    return;
+                processingInvitation.Add(inv);
                 LoggedInService.acceptInvitation(inv);
             }
             else if (e.ColumnIndex == invitationsDataGrid.Columns["declineButtons"].Index)
             {
                 Invitation inv = (Invitation)invitationsDataGrid[0, e.RowIndex].Value;
-
+                if (processingInvitation.Contains(inv))
+                    return;
+                processingInvitation.Add(inv);
                 LoggedInService.declineInvitation(inv);
             }
         }
 
         public void updateInvitationList(List<Invitation> invitations)
         {
+            foreach(Invitation i in processingInvitation)
+            {
+                if (!invitations.Contains(i))
+                    processingInvitation.Remove(i);
+            }
             this.invitationContainer = invitations;
             updateInvitations();
         }

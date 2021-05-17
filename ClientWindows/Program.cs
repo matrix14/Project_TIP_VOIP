@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Configuration;
 using System.Collections.Specialized;
+using Shared;
 
 namespace ClientWindows
 {
@@ -15,6 +16,7 @@ namespace ClientWindows
         public static Boolean isInCall = false;
         public static SettingsService setServ;
         public static SoundProcessing spGlobal = null;
+        public static Call actualCall = null;
 
 
         /// <summary>

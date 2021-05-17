@@ -23,6 +23,8 @@ namespace ClientWindows
         private int packetsCounter = 0;
         private int packetsCounter2 = 0;
 
+        private NoneCallback updateFriendViewOnClosing;
+
         CancellationTokenSource tokenSource = null;
         CancellationToken token;
 
@@ -33,6 +35,11 @@ namespace ClientWindows
         public InCallForm()
         {
             InitializeComponent();
+        }
+
+        private void updateGlobalCallVar()
+        {
+            Program.actualCall = this.call;
         }
 
         private void updateUsersInCall()
@@ -54,12 +61,14 @@ namespace ClientWindows
             this.callUsersList_label.Text = usersListStr;
             if(sp!=null)
                 sp.updateUsersCount(this.call.usernames);
+            updateGlobalCallVar();
         }
 
-        public InCallForm(Call c)
+        public InCallForm(Call c, NoneCallback ncb)
         {
-            
+            this.updateFriendViewOnClosing = ncb;
             this.call = c;
+            updateGlobalCallVar();
             this.callId = new Id(c.callId);
             InitializeComponent();
             this.Text = "(" + Program.username + ") Aktywne połączenie";
@@ -149,6 +158,7 @@ namespace ClientWindows
 
         private void InCallForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Program.actualCall = null;
             if (this.callId == null) return;
             packetsCounterTimer.Stop();
             tokenSource.Cancel();
@@ -160,6 +170,8 @@ namespace ClientWindows
             CallProcessing.Stop();
             LoggedInService.declineCall(this.callId);
             Program.isInCall = false;
+            if (updateFriendViewOnClosing != null)
+                updateFriendViewOnClosing();
         }
 
         private void incomingTraffic_label_Click(object sender, EventArgs e)
@@ -181,37 +193,6 @@ namespace ClientWindows
                     sp.incomingEncodedSound(b);
             }
         }
-
-        /*public void sentBytes()
-        {
-            do
-            {
-                char b = 'Z';
-                switch (i)
-                {
-                    case 0:
-                        b = 'A';
-                        break;
-                    case 1:
-                        b = 'B';
-                        break;
-                    case 2:
-                        b = 'C';
-                        break;
-                    case 3:
-                        b = 'D';
-                        break;
-                }
-
-                CallProcessing.SendMessages(Encoding.ASCII.GetBytes(Program.username + ": " + b));
-                i++;
-                if (i == 4)
-                {
-                    i = 0;
-                }
-                System.Threading.Thread.Sleep(250);
-            } while (callStopped == false);
-        }*/
 
         public void sendSound(byte[] sound)
         {

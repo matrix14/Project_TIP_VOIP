@@ -14,6 +14,7 @@ namespace ClientWindows
     public delegate void IdCallback(Id id);
     public delegate void CallCallback(Call c);
     public delegate void FriendCallback(Friend fr);
+    public delegate void NoneCallback();
     public partial class LoggedInForm : Form
     {
         private static List<Friend> friendsContainer = new List<Friend>();
@@ -21,6 +22,8 @@ namespace ClientWindows
         private static Id lastCallId = null;
         private static Username lastCallUsername = null;
         private InvitationListForm ilf = null;
+
+        private static Friend actualFriendView = null;
         public LoggedInForm()
         {
             InitializeComponent();
@@ -105,7 +108,7 @@ namespace ClientWindows
             }
         }
 
-        public void updateFriendList() //TODO: sort friend list (first sorting over Active/NotActive, then alphabetically)
+        public void updateFriendList()
         {
             if (friendsList.InvokeRequired)
             {
@@ -305,17 +308,32 @@ namespace ClientWindows
             callUser.Visible = true;
         }
 
-        public void updateCallStatus()
+        public void updateCallStatus(Friend fr)
         {
-            if(this.callUser.InvokeRequired)
+            if (this.callUser.InvokeRequired)
             {
-                this.callUser.Invoke(new MethodInvoker(() => { updateCallStatus(); }));
+                this.callUser.Invoke(new MethodInvoker(() => { updateCallStatus(fr); }));
                 return;
             }
-            if (Program.isInCall) //TODO: user already in call
-                this.callUser.Text = "Dodaj do rozmowy";
-            else
+            if (this.activeUserWindow.Text != fr.username)
+                return;
+            if (Program.isInCall)
+            {
+                if (Program.actualCall.usernames.Contains(fr.username))
+                {
+                    this.callUser.Enabled = false;
+                    this.callUser.Text = "Uzytkownik w rozmowie";
+                }
+                else
+                {
+                    this.callUser.Enabled = true;
+                    this.callUser.Text = "Dodaj do rozmowy";
+                }
+            }
+            else {
+                this.callUser.Enabled = true;
                 this.callUser.Text = "Zadzwoń";
+            }
         }
 
         private void friendsList_SelectedIndexChanged(object sender, EventArgs e)
@@ -323,13 +341,11 @@ namespace ClientWindows
             ListBox lb = (ListBox)sender;
             if (lb.SelectedIndex == -1) return;
             Friend fr = (Friend)lb.Items[lb.SelectedIndex];
+            actualFriendView = fr;
             activeUserWindow.Text = fr.username;
             callUser.Enabled = (fr.active==1);
             this.callingStatusLabel.Visible = false;
-            if (Program.isInCall)
-                this.callUser.Text = "Dodaj do rozmowy";
-            else
-                this.callUser.Text = "Zadzwoń";
+            updateCallStatus(fr);
             if (callUser.Enabled)
             {
                 activeFriendStatus_Label.Text = "Aktywny";
@@ -381,6 +397,11 @@ namespace ClientWindows
             }
         }
 
+        public void updateFriendViewOnCallClosing()
+        {
+            updateCallStatus(actualFriendView);
+        }
+
         private void callUser_Click(object sender, EventArgs e)
         {
             LoggedInService.inviteToConversation(new Username(activeUserWindow.Text));
@@ -415,11 +436,13 @@ namespace ClientWindows
                 if (reply==true)
                 {
                     callUser.Enabled = false;
-                    callingStatusLabel.Text = "Zaakceptowano!";
+                    callingStatusLabel.Text = "";
                     callingStatusLabel.ForeColor = Color.Green;
                     Call c = new Call(lastCallId.id, new List<string> { lastCallUsername.username }); //TODO: lastCallId = null NullReferenceException
-                    InCallForm icf = new InCallForm(c);
+                    NoneCallback ncb = updateFriendViewOnCallClosing;
+                    InCallForm icf = new InCallForm(c, ncb);
                     icf.Show();
+                    updateCallStatus(new Friend(lastCallUsername, 1));
                 } else
                 {
                     callUser.Enabled = true;
@@ -437,7 +460,8 @@ namespace ClientWindows
             }
             else
             {
-                InCallForm icf = new InCallForm(c);
+                NoneCallback ncb = updateFriendViewOnCallClosing;
+                InCallForm icf = new InCallForm(c, ncb);
                 icf.Show();
             }
         }
