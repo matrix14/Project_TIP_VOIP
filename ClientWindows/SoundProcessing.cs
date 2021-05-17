@@ -37,7 +37,7 @@ namespace ClientWindows
         public void startUp(List<string> activeUsers, CancellationToken token)
         {
             
-            WaveFormat format = new WaveFormat(16000, 1); //TODO: verify difference beetween (16000, 16, 1)
+            WaveFormat format = new WaveFormat(16000, 16, 1);
             recorder = new WaveInEvent()
             {
                 BufferMilliseconds = 50,
@@ -47,8 +47,8 @@ namespace ClientWindows
             actualInputDev = Program.setServ.getIOInputDevice();
             recorder.DataAvailable += RecorderOnDataAvailable;
 
-            mixingSampleProvider = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(16000, 1));
-
+            mixingSampleProvider = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(16000, 1)); //WaveFormat.CreateIeeeFloatWaveFormat(16000, 1) = 16000,32,1
+            
             activeUsersInCall = activeUsers;
             updateInputBuffers();
 

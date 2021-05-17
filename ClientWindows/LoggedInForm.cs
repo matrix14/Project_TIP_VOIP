@@ -343,9 +343,9 @@ namespace ClientWindows
             Friend fr = (Friend)lb.Items[lb.SelectedIndex];
             actualFriendView = fr;
             activeUserWindow.Text = fr.username;
-            callUser.Enabled = (fr.active==1);
             this.callingStatusLabel.Visible = false;
             updateCallStatus(fr);
+            callUser.Enabled = (fr.active == 1);
             if (callUser.Enabled)
             {
                 activeFriendStatus_Label.Text = "Aktywny";

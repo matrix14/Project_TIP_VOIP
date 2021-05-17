@@ -39,7 +39,6 @@ namespace ClientWindows
             connectionTimer.Elapsed += new ElapsedEventHandler(connectionTimerOnTimerElapsed);
             connectionTimer.AutoReset = false;
 
-
             try
             {
                 IPAddress ip = IPAddress.Parse(address);

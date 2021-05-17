@@ -50,6 +50,7 @@ namespace ClientWindows
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             ServerConnectorAsync.StartConnection();
+            ServerProcessing.startUp();
 
             Task.Run(() => ServerConnectorAsync.ReceiveWhile());
             Application.Run(new LoginForm());

@@ -18,7 +18,6 @@ namespace ClientWindows
         private static System.Timers.Timer syncMessageTimer = new System.Timers.Timer();
 
         private static int serverSyncReplyTimeout = 3000; //Timeout for server reply in sync messages
-
         public static void startUp()
         {
             syncMessageTimer.Interval = serverSyncReplyTimeout;
@@ -39,8 +38,6 @@ namespace ClientWindows
             lastOptions = (Options)int.Parse((message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries)[0])
                 .Split(new String[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]);
             ServerConnectorAsync.SendMessage(message);
-            //if (lastOptions == Options.JOIN_CONVERSATION || lastOptions == Options.LEAVE_CONVERSATION) syncProcessNotCompleted.Set();
-            //TODO: verify if really not needed
             return;
         }
 
@@ -53,7 +50,7 @@ namespace ClientWindows
 
         private static void syncMessageStop()
         {
-            if(syncMessageTimer.Enabled==true) //TODO: verify
+            if(syncMessageTimer.Enabled==true)
                 syncMessageTimer.Stop();
             syncProcessNotCompleted.Set();
         }
