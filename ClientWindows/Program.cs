@@ -14,6 +14,7 @@ namespace ClientWindows
         public static Boolean isLoggedIn = false;
         public static Boolean isInCall = false;
         public static SettingsService setServ;
+        public static SoundProcessing spGlobal = null;
 
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace ClientWindows
 
             if (args.Length==1) //Temporary change of server IP Address
             {
-                MessageBox.Show("Tymczasowo nadpisano IP serwera za pomocą argumentu! Adres IP nie zostanie zapisany w konfiguracji.");
+                //MessageBox.Show("Tymczasowo nadpisano IP serwera za pomocą argumentu! Adres IP nie zostanie zapisany w konfiguracji.");
                 Shared.IP.serverIp = args[0];
             }
 

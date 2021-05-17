@@ -97,11 +97,14 @@ namespace ClientWindows
                 //TODO: verify if IP is ok
                 Program.setServ.setServerIP(this.serverAddress_Input.Text);
                 MessageBox.Show("Zmieniono adres IP serwera, zrestartuj aplikacje!");
+                System.Windows.Forms.Application.Exit();
             }
             if (!actualIOInputDev.Equals(this.inputDevices_Combo.SelectedIndex)|| !actualIOOutputDev.Equals(this.outputDevices_Combo.SelectedIndex))
             {
                 Program.setServ.saveIODevices(this.inputDevices_Combo.SelectedIndex, this.outputDevices_Combo.SelectedIndex);
             }
+            if(Program.spGlobal!=null)
+                Program.spGlobal.updateIODevices();
             this.Close();
         }
 

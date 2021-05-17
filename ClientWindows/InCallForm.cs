@@ -81,6 +81,7 @@ namespace ClientWindows
 
             ByteCallback sendCb = sendSound;
             sp = new SoundProcessing(sendCb);
+            Program.spGlobal = sp;
 
             tokenSource = new System.Threading.CancellationTokenSource();
             token = tokenSource.Token;
@@ -152,6 +153,7 @@ namespace ClientWindows
             packetsCounterTimer.Stop();
             tokenSource.Cancel();
             sp.stop();
+            Program.spGlobal = null;
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));

@@ -188,10 +188,9 @@ namespace ClientWindows
                     connectionTimer.Stop();
                 }
                 connectDone.Set();
-            } catch(ObjectDisposedException)
-            {
-
-            }
+            } 
+            catch(ObjectDisposedException) { }
+            catch(SocketException) { }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());

@@ -24,6 +24,9 @@ namespace ClientWindows
         private Boolean microphoneStatus = true;
         private Boolean speakerStatus = true;
 
+        private static int actualInputDev = 0;
+        private static int actualOutputDev = 0;
+
         public SoundProcessing(ByteCallback voiceSendCallback)
         {
             this.voiceSendCallback = voiceSendCallback;
@@ -38,10 +41,10 @@ namespace ClientWindows
             recorder = new WaveInEvent()
             {
                 BufferMilliseconds = 50,
-                DeviceNumber = 1,
+                DeviceNumber = Program.setServ.getIOInputDevice(),
                 WaveFormat = format
             };
-            recorder.DeviceNumber = Program.setServ.getIOInputDevice();
+            actualInputDev = Program.setServ.getIOInputDevice();
             recorder.DataAvailable += RecorderOnDataAvailable;
 
             mixingSampleProvider = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(16000, 1));
@@ -51,11 +54,12 @@ namespace ClientWindows
 
             player = new WaveOut();
             player.DeviceNumber = Program.setServ.getIOOutputDevice();
+            actualOutputDev = Program.setServ.getIOOutputDevice();
             clearAllBuffers();
             player.Init(mixingSampleProvider);
 
             int waveInDevices = WaveIn.DeviceCount;
-            WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(0);
+            //WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(0);
 
             recorder.StartRecording();
             while (true)
@@ -67,6 +71,40 @@ namespace ClientWindows
                 player.Play();
             }
 
+        }
+
+        public void updateIODevices()
+        {
+            if (Program.setServ.getIOInputDevice() != actualInputDev)
+            {
+                bool microphoneStatusStart = microphoneStatus;
+                WaveFormat format = new WaveFormat(16000, 1); //TODO: verify difference beetween (16000, 16, 1)
+                if(microphoneStatusStart)
+                    recorder.StopRecording();
+                recorder = new WaveInEvent()
+                {
+                    BufferMilliseconds = 50,
+                    DeviceNumber = Program.setServ.getIOInputDevice(),
+                    WaveFormat = format
+                };
+                actualInputDev = Program.setServ.getIOInputDevice();
+                recorder.DataAvailable += RecorderOnDataAvailable;
+                if (microphoneStatusStart)
+                    recorder.StartRecording();
+            }
+            if (Program.setServ.getIOOutputDevice() != actualOutputDev)
+            {
+                bool speakerStatusStart = speakerStatus;
+                clearAllBuffers();
+                speakerStatus = false;
+                this.player.Stop();
+                this.player = new WaveOut();
+                player.DeviceNumber = Program.setServ.getIOOutputDevice();
+                actualOutputDev = Program.setServ.getIOOutputDevice();
+                this.player.Init(mixingSampleProvider);
+                if(speakerStatusStart)
+                    speakerStatus = true;
+            }
         }
 
         private void updateInputBuffers()

@@ -20,7 +20,7 @@ namespace ClientWindows
 
         private static ByteCallback receiveMsgCallback = null;
 
-        private static FileStream logFile;
+        private static FileStream logFile = null;
 
         private struct UdpState
         {
@@ -57,7 +57,7 @@ namespace ClientWindows
 
             connectionExist = true;
 
-            openLog();
+            //openLog();
 
             ReceiveMessages();
         }
@@ -111,7 +111,7 @@ namespace ClientWindows
                     return;
 
                 byte[] receiveBytes = u.EndReceive(ar, ref e);
-                logToFile(receiveBytes);
+                //logToFile(receiveBytes);
 
                 if (connectionExist == false || receiveBytes == null || receiveMsgCallback == null)
                 {
