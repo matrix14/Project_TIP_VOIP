@@ -30,6 +30,8 @@ namespace ClientWindows
 
         private static Socket sock;
 
+        public static Boolean closingApp = false;
+
 
         public static void StartConnection()
         {
@@ -169,7 +171,14 @@ namespace ClientWindows
                 }
                 receiveDone.Set();
             }
-            catch (Exception e) //TODO: System.Net.Sockets.SocketException - when server crash or close
+            catch(SocketException) //when server crash or close
+            {
+                if (closingApp)
+                    return;
+                MessageBox.Show("Utracono połaczenie z serwerem, uruchom aplikacje ponownie!");
+                System.Windows.Forms.Application.Exit();
+            }
+            catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
                 return;
@@ -182,15 +191,15 @@ namespace ClientWindows
             try
             {
                 Socket sockInt = (Socket)res.AsyncState;
-                sockInt.EndConnect(res); //TODO: ObjectDisposedException - when no connection
+                sockInt.EndConnect(res);
                 if(sockInt.Connected)
                 {
                     connectionTimer.Stop();
                 }
                 connectDone.Set();
             } 
-            catch(ObjectDisposedException) { }
-            catch(SocketException) { }
+            catch(ObjectDisposedException) { } //When cannot connect
+            catch(SocketException) { } //When cannot connect
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());

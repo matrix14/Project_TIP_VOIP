@@ -30,9 +30,9 @@ namespace ClientWindows
             Shared.IP.serverIp = this.getServerIP();
             if (!this.checkIOHash())
             {
-                MessageBox.Show("Zmieniono urządzenia Audio, ustawiono domyślne urządzenia!");
                 saveIODevices(0, 0);
                 saveActualIOHash();
+                MessageBox.Show("Zmieniono urządzenia Audio, zweryfikuj ustawienia!");
             }
                 
         }

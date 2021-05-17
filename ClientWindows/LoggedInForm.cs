@@ -77,7 +77,35 @@ namespace ClientWindows
                 ilf.updateInvitationList(invitationContainer);
         }
 
-        public void updateFriendList()
+        private static int compareFriendList(Friend x, Friend y)
+        {
+            if (x == null)
+            {
+                if (y == null)
+                    return 0;
+                else
+                    return -1;
+            }
+            else
+            {
+                if (y == null)
+                    return 1;
+                else
+                {
+                    if (x.active > y.active)
+                        return -1;
+                    else if(x.active < y.active)
+                        return 1;
+                    else
+                    {
+                        //Do nothing
+                    }
+                    return x.username.CompareTo(y.username);
+                }
+            }
+        }
+
+        public void updateFriendList() //TODO: sort friend list (first sorting over Active/NotActive, then alphabetically)
         {
             if (friendsList.InvokeRequired)
             {
@@ -86,6 +114,8 @@ namespace ClientWindows
             }
             else
             {
+                friendsContainer.Sort(compareFriendList);
+
                 friendsList.Items.Clear();
                 int i = 1;
                 if (friendsContainer == null || friendsContainer.Count == 0)
@@ -254,6 +284,11 @@ namespace ClientWindows
 
         private void LoggedInForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            for (int i = Application.OpenForms.Count - 1; i >= 0; i--)
+            {
+                if ((Application.OpenForms[i].Name != "LoginForm")&&(Application.OpenForms[i].Name != "LoggedInForm"))
+                    Application.OpenForms[i].Close();
+            }
             LoggedInService.logout();
         }
 
@@ -277,7 +312,7 @@ namespace ClientWindows
                 this.callUser.Invoke(new MethodInvoker(() => { updateCallStatus(); }));
                 return;
             }
-            if (Program.isInCall)
+            if (Program.isInCall) //TODO: user already in call
                 this.callUser.Text = "Dodaj do rozmowy";
             else
                 this.callUser.Text = "Zadzwoń";

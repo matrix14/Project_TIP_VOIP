@@ -100,6 +100,7 @@ namespace ClientWindows
             this.Controls.Add(this.label1);
             this.Controls.Add(this.declineCall_button);
             this.Controls.Add(this.acceptCall_button);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "IncomingCallForm";
             this.Text = "Przychodzące połączenie";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.IncomingCallForm_FormClosing);

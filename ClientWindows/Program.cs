@@ -23,6 +23,20 @@ namespace ClientWindows
         [STAThread]
         static void Main(string[] args)
         {
+            OperatingSystem os = Environment.OSVersion;
+            if (os.Platform == PlatformID.Win32NT)
+            {
+                if(!(os.Version.Major>=6))
+                {
+                    MessageBox.Show("Program działa tylko na systemach Windows Vista/7 i nowszych!");
+                    return;
+                }
+            } else
+            {
+                MessageBox.Show("Program działa tylko na systemach Windows Vista/7 i nowszych!");
+                return;
+            }
+
             setServ = new SettingsService();
 
             if (args.Length==1) //Temporary change of server IP Address
@@ -37,6 +51,7 @@ namespace ClientWindows
 
             Task.Run(() => ServerConnectorAsync.ReceiveWhile());
             Application.Run(new LoginForm());
+            ServerConnectorAsync.closingApp = true;
             ServerConnectorAsync.StopConnection();
         }
     }

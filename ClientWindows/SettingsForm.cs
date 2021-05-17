@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -33,32 +34,31 @@ namespace ClientWindows
             foreach (MMDevice device in enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
             {
                 //Console.WriteLine("{0}, {1}", device.FriendlyName, device.State);
-                this.inputDevices_Combo.Items.Add(String.Format("{0}: {1}", j, device.FriendlyName));
+                //this.inputDevices_Combo.Items.Add(String.Format("{0}: {1}", j, device.FriendlyName));
                 j++;
             }
 
-            /*int availableInputDevicesCount = WaveIn.DeviceCount;
+            int availableInputDevicesCount = WaveIn.DeviceCount;
             for (int i = 0; i < availableInputDevicesCount; i++)
             {
                 WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(i);
                 this.inputDevices_Combo.Items.Add(String.Format("{0}: {1}", i, deviceInfo.ProductName));
-            }*/
+            }
 
             MMDeviceEnumerator enumerator2 = new MMDeviceEnumerator();
             int j2 = 0;
             foreach (MMDevice device in enumerator2.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
             {
-                //Console.WriteLine("{0}, {1}", device.FriendlyName, device.State);
-                this.outputDevices_Combo.Items.Add(String.Format("{0}: {1}", j2, device.FriendlyName));
+                //this.outputDevices_Combo.Items.Add(String.Format("{0}: {1}", j2, device.FriendlyName));
                 j2++;
             }
 
-            /*int availableOutputDevicesCount = WaveOut.DeviceCount;
+            int availableOutputDevicesCount = WaveOut.DeviceCount;
             for (int i = 0; i < availableOutputDevicesCount; i++)
             {
                 WaveOutCapabilities deviceInfo = WaveOut.GetCapabilities(i);
                 this.outputDevices_Combo.Items.Add(String.Format("{0}: {1}", i, deviceInfo.ProductName));
-            }*/
+            }
 
             this.inputDevices_Combo.SelectedIndex = 0;
             this.outputDevices_Combo.SelectedIndex = 0;
@@ -92,12 +92,26 @@ namespace ClientWindows
 
         private void saveSettings_button_Click(object sender, EventArgs e)
         {
+            Boolean correctData = false;
             if (!actualIP.Equals(this.serverAddress_Input.Text))
             {
-                //TODO: verify if IP is ok
-                Program.setServ.setServerIP(this.serverAddress_Input.Text);
-                MessageBox.Show("Zmieniono adres IP serwera, zrestartuj aplikacje!");
-                System.Windows.Forms.Application.Exit();
+                try
+                {
+                    IPAddress ip = IPAddress.Parse(this.serverAddress_Input.Text);
+                    Program.setServ.setServerIP(this.serverAddress_Input.Text);
+                    MessageBox.Show("Zmieniono adres IP serwera, zrestartuj aplikacje!");
+                    System.Windows.Forms.Application.Exit();
+                } 
+                catch(ArgumentNullException)
+                {
+                    correctData = true;
+                    MessageBox.Show("To nie jest prawidlowy adres IP!");
+                }
+                catch(FormatException)
+                {
+                    correctData = true;
+                    MessageBox.Show("To nie jest prawidlowy adres IP!");
+                }
             }
             if (!actualIOInputDev.Equals(this.inputDevices_Combo.SelectedIndex)|| !actualIOOutputDev.Equals(this.outputDevices_Combo.SelectedIndex))
             {
@@ -105,12 +119,18 @@ namespace ClientWindows
             }
             if(Program.spGlobal!=null)
                 Program.spGlobal.updateIODevices();
-            this.Close();
+            if(!correctData)
+                this.Close();
         }
 
         private void discardSettings_button_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void inputDevices_Combo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

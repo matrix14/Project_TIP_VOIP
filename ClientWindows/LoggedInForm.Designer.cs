@@ -36,6 +36,7 @@ namespace ClientWindows
             this.signedInLogin_Text = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.addFriend_button = new System.Windows.Forms.ToolStripButton();
+            this.settingsButton_Button = new System.Windows.Forms.ToolStripButton();
             this.closeApp_button = new System.Windows.Forms.ToolStripButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.invitingList_button = new System.Windows.Forms.Button();
@@ -46,7 +47,6 @@ namespace ClientWindows
             this.activeFriendStatus_Label = new System.Windows.Forms.Label();
             this.callUser = new System.Windows.Forms.Button();
             this.activeUserWindow = new System.Windows.Forms.Label();
-            this.settingsButton_Button = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -112,6 +112,16 @@ namespace ClientWindows
             this.addFriend_button.Size = new System.Drawing.Size(104, 22);
             this.addFriend_button.Text = "Dodaj znajomego";
             this.addFriend_button.Click += new System.EventHandler(this.addFriend_button_Click);
+            // 
+            // settingsButton_Button
+            // 
+            this.settingsButton_Button.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.settingsButton_Button.Image = ((System.Drawing.Image)(resources.GetObject("settingsButton_Button.Image")));
+            this.settingsButton_Button.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.settingsButton_Button.Name = "settingsButton_Button";
+            this.settingsButton_Button.Size = new System.Drawing.Size(68, 22);
+            this.settingsButton_Button.Text = "Ustawienia";
+            this.settingsButton_Button.Click += new System.EventHandler(this.settingsButton_Button_Click);
             // 
             // closeApp_button
             // 
@@ -248,16 +258,6 @@ namespace ClientWindows
             this.activeUserWindow.Visible = false;
             this.activeUserWindow.Click += new System.EventHandler(this.label1_Click_1);
             // 
-            // settingsButton_Button
-            // 
-            this.settingsButton_Button.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.settingsButton_Button.Image = ((System.Drawing.Image)(resources.GetObject("settingsButton_Button.Image")));
-            this.settingsButton_Button.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.settingsButton_Button.Name = "settingsButton_Button";
-            this.settingsButton_Button.Size = new System.Drawing.Size(68, 22);
-            this.settingsButton_Button.Text = "Ustawienia";
-            this.settingsButton_Button.Click += new System.EventHandler(this.settingsButton_Button_Click);
-            // 
             // LoggedInForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -266,6 +266,7 @@ namespace ClientWindows
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.statusStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximumSize = new System.Drawing.Size(555, 489);
             this.MinimumSize = new System.Drawing.Size(555, 489);
             this.Name = "LoggedInForm";

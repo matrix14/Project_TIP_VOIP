@@ -14,7 +14,6 @@ namespace ClientWindows
     public delegate void BooleanCallback(Boolean exist);
     public partial class LoginForm : Form
     {
-        //TODO: password check, username length check
         private Boolean registerMode = false;
 
         private System.Timers.Timer checkUsernameTimer = new System.Timers.Timer();
@@ -137,6 +136,16 @@ namespace ClientWindows
         {
             if (this.registerMode)
             {
+                if (this.login_textbox.Text.Length < 3)
+                {
+                    MessageBox.Show("Login nie może być krótszy niż 3 znaki!");
+                    return;
+                }
+                if (this.password_textbox.Text.Length < 3)
+                {
+                    MessageBox.Show("Hasło nie może być krótsze niż 3 znaki!");
+                    return;
+                }
                 LoginService.register(this.login_textbox.Text, this.password_textbox.Text);
                 this.confirmAction_button.Enabled = false;
             }

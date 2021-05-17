@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ClientWindows
 {
-    class SoundProcessing //TODO: on device change update recording/playing device
+    class SoundProcessing
     {
         private WaveInEvent recorder;
         private Dictionary<String, BufferedWaveProvider> multipleBufWaveProv = new Dictionary<string, BufferedWaveProvider>();

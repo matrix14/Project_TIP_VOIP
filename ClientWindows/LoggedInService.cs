@@ -56,6 +56,8 @@ namespace ClientWindows
 
         public static void logoutReply(String message)
         {
+            if (Program.isLoggedIn == false)
+                return;
             String[] replySplit = message.Split(new String[] { "$$" }, StringSplitOptions.RemoveEmptyEntries);
             ErrorCodes error = (ErrorCodes)int.Parse(replySplit[0].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1]);
             MessageBoxButtons buttons = MessageBoxButtons.OK;
@@ -187,7 +189,8 @@ namespace ClientWindows
                     msg = "Zły identyfikator zaproszenia!";
                     break;
             }
-            MessageBox.Show(msg, title, buttons);
+            if(error!=ErrorCodes.NO_ERROR)
+                MessageBox.Show(msg, title, buttons);
             lastProcessedInvitation.status = 2;
             invitationProcessedCallback(lastProcessedInvitation);
             addToFriendList(fr);
@@ -230,7 +233,8 @@ namespace ClientWindows
                     msg = "Zły identyfikator zaproszenia!";
                     break;
             }
-            MessageBox.Show(msg, title, buttons);
+            if (error != ErrorCodes.NO_ERROR)
+                MessageBox.Show(msg, title, buttons);
             invitationProcessedCallback(lastProcessedInvitation);
             invitationProcessing.Set();
         }

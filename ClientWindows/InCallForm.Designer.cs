@@ -160,6 +160,7 @@ namespace ClientWindows
             this.Controls.Add(this.leaveCall_button);
             this.Controls.Add(this.callUsersList_label);
             this.Controls.Add(this.activeCallWith_label);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "InCallForm";
             this.Text = "Aktywne połączenie";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.InCallForm_FormClosing);

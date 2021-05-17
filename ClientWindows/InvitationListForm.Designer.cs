@@ -108,6 +108,7 @@ namespace ClientWindows
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(411, 450);
             this.Controls.Add(this.invitationsDataGrid);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "InvitationListForm";
             this.Text = "InvitationListForm";
             this.Load += new System.EventHandler(this.InvitationListForm_Load);
