@@ -46,6 +46,7 @@ namespace ClientWindows
             // 
             // confirmAction_button
             // 
+            this.confirmAction_button.Enabled = false;
             this.confirmAction_button.Location = new System.Drawing.Point(12, 125);
             this.confirmAction_button.Name = "confirmAction_button";
             this.confirmAction_button.Size = new System.Drawing.Size(200, 25);
@@ -90,6 +91,7 @@ namespace ClientWindows
             // 
             // changeMode_button
             // 
+            this.changeMode_button.Enabled = false;
             this.changeMode_button.Location = new System.Drawing.Point(12, 169);
             this.changeMode_button.Name = "changeMode_button";
             this.changeMode_button.Size = new System.Drawing.Size(200, 25);

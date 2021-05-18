@@ -207,6 +207,8 @@ namespace ClientWindows
             {
                 if (connectionAlive)
                 {
+                    this.changeMode_button.Enabled = true;
+                    this.confirmAction_button.Enabled = true;
                     this.serverConnection_Label.Text = "Połączono";
                     this.serverConnection_Label.ForeColor = Color.Green;
                 }
