@@ -41,11 +41,11 @@ namespace ClientWindows
 
             setServ = new SettingsService();
 
-            if (args.Length==1) //Temporary change of server IP Address
+            /*if (args.Length==1) //Temporary change of server IP Address
             {
                 //MessageBox.Show("Tymczasowo nadpisano IP serwera za pomocą argumentu! Adres IP nie zostanie zapisany w konfiguracji.");
                 Shared.IP.serverIp = args[0];
-            }
+            }*/
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

@@ -327,15 +327,17 @@ namespace ClientWindows
 
         public void updateCallStatus(Friend fr)
         {
-            if (this.callUser.InvokeRequired)
+            if (this.InvokeRequired)
             {
-                this.callUser.Invoke(new MethodInvoker(() => { updateCallStatus(fr); }));
+                this.Invoke(new MethodInvoker(() => { updateCallStatus(fr); }));
                 return;
             }
             if (this.activeUserWindow.Text != fr.username)
                 return;
             if (Program.isInCall)
             {
+                if (Program.actualCall == null)
+                    return;
                 if (Program.actualCall.usernames.Contains(fr.username))
                 {
                     this.callUser.Enabled = false;
@@ -419,7 +421,8 @@ namespace ClientWindows
 
         public void updateFriendViewOnCallClosing()
         {
-            updateCallStatus(actualFriendView);
+            if(actualFriendView!=null)
+                updateCallStatus(actualFriendView);
         }
 
         private void callUser_Click(object sender, EventArgs e)
