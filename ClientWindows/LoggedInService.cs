@@ -322,6 +322,12 @@ namespace ClientWindows
             String userString = replySplit[1].Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries)[1];
             Call c = MessageProccesing.DeserializeObject(Options.INCOMMING_CALL, userString) as Call;
 
+            if (Program.isInCall)
+            {
+                declineCall(new Id(c.callId));
+                return;
+            }
+
             Task.Run(() =>
             {
                 IncomingCallForm icf = new IncomingCallForm(c, OpenInCallForm);
