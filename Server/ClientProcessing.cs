@@ -576,6 +576,7 @@ namespace Server
             List<string> conversationsParticipansList = new List<string>();
             lock (activeUsers[clientId].dbConnection)
                 conversationsParticipansList = activeUsers[clientId].dbConnection.GetConversationsParticipants(conversationId, activeUsers[clientId].username);
+            
             foreach (string participant in conversationsParticipansList)
             {
                 whichFunction[participant].Add(new Tuple<Options, string>(Options.DECLINED_CALL, activeUsers[clientId].username));
@@ -731,7 +732,10 @@ namespace Server
             lock (activeUsers)
             {
                 lock (activeUsers[clientId].dbConnection)
+                {
+                    activeUsers[clientId].dbConnection.SetUserActivity(activeUsers[clientId].username, false);
                     activeUsers[clientId].dbConnection.CloseConnection();
+                }
                 activeUsers[clientId] = null;
             }
             //lock (eventHandlers) eventHandlers.Remove(activeUsers[clientId].username);

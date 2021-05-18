@@ -47,6 +47,8 @@ namespace Server
         }
 
 
+
+
         /// <summary>
         /// Used to request-response type of communication like: 
         /// Login, Registry, Start new conversation, End conversation, Get Friends
@@ -261,14 +263,21 @@ namespace Server
                 }
                 return;
             }
-            foreach (var key in voiceToSend[conversationId].Keys)
+            try
             {
-                // Key is clientIp
-                if (key.ToString() != clientIp.ToString())
+                foreach (var key in voiceToSend[conversationId].Keys)
                 {
-                    lock (voiceToSend[conversationId][key]) voiceToSend[conversationId][key].Enqueue(receiveBytes);
-                    lock (userNewVoiceHandler[key]) userNewVoiceHandler[key].Set();
+                    // Key is clientIp
+                    if (key.ToString() != clientIp.ToString())
+                    {
+                        lock (voiceToSend[conversationId][key]) voiceToSend[conversationId][key].Enqueue(receiveBytes);
+                        lock (userNewVoiceHandler[key]) userNewVoiceHandler[key].Set();
+                    }
                 }
+            }
+            catch
+            {
+                return;
             }
         }
 

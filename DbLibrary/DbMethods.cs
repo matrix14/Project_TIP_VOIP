@@ -14,6 +14,27 @@ namespace DbLibrary
     public class DbMethods : DbConnection
     {
 
+        public int GetActiveConversationId(string username)
+        {
+            string query = string.Format("SELECT status FROM conversations WHERE user_id = {0} and status= 2", GetUserId(username));
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            try
+            {
+                dataReader.Read();
+                return dataReader.GetInt32(0);
+            }
+            catch
+            {
+                return 0;
+            }
+            finally
+            {
+                dataReader.Close();
+            }
+        }
+
         public int GetUserActivity(string username)
         {
             string query = string.Format("SELECT is_active FROM users WHERE user_id = {0}", GetUserId(username));
@@ -188,7 +209,7 @@ namespace DbLibrary
             List<string> result = new List<string>();
 
             // Status 2 means accepted call
-            string query = string.Format("SELECT cv.username FROM conversations_view cv WHERE cv.conversation_id = {0} AND cv.status = 2 AND cv.username != '{1}'", conversationId, username);
+            string query = string.Format("SELECT cv.username FROM conversations_view cv WHERE cv.conversation_id = {0} AND cv.username != '{1}'", conversationId, username);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
