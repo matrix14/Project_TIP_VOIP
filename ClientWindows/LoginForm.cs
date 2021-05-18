@@ -178,9 +178,21 @@ namespace ClientWindows
                 LoggedInForm lif = new LoggedInForm();
                 lif.Location = this.Location;
                 lif.StartPosition = FormStartPosition.Manual;
-                lif.FormClosing += delegate { this.Show(); };
+                lif.FormClosing += delegate { showForm(); };
                 lif.Show();
                 this.Hide();
+            }
+        }
+
+        public void showForm()
+        {
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new MethodInvoker(() => { showForm(); }));
+                return;
+            } else
+            {
+                this.Show();
             }
         }
 

@@ -17,7 +17,7 @@ namespace ClientWindows
 
         private static System.Timers.Timer syncMessageTimer = new System.Timers.Timer();
 
-        private static int serverSyncReplyTimeout = 4000; //Timeout for server reply in sync messages
+        private static int serverSyncReplyTimeout = 3000; //Timeout for server reply in sync messages
         public static void startUp()
         {
             syncMessageTimer.Interval = serverSyncReplyTimeout;
@@ -28,7 +28,7 @@ namespace ClientWindows
         private static void syncMessageTimerOnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             syncMessageTimer.Stop();
-            MessageBox.Show("Serwer nie odpowiedział w wyznaczonym czasie!");
+            //MessageBox.Show("Serwer nie odpowiedział w wyznaczonym czasie!");
             syncMessageStop();
         }
 
