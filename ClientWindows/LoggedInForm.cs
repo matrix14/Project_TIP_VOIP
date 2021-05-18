@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections;
+using System.Threading;
 
 namespace ClientWindows
 {
@@ -22,6 +23,8 @@ namespace ClientWindows
         private static Id lastCallId = null;
         private static Username lastCallUsername = null;
         private InvitationListForm ilf = null;
+
+        private static ManualResetEvent invitationContainerLock = new ManualResetEvent(true);
 
         private static Friend actualFriendView = null;
         public LoggedInForm()
@@ -61,12 +64,14 @@ namespace ClientWindows
         {
             if (this.invitingList_button.InvokeRequired)
             {
-                friendsList.Invoke(new MethodInvoker(() => { updateInvitationButton(); }));
+                this.invitingList_button.Invoke(new MethodInvoker(() => { updateInvitationButton(); }));
                 return;
             }
             else
             {
                 int amount = 0;
+                invitationContainerLock.WaitOne();
+                invitationContainerLock.Reset();
                 foreach (Invitation inv in invitationContainer)
                 {
                     if (inv.status < 2)
@@ -74,10 +79,16 @@ namespace ClientWindows
                         amount++;
                     }
                 }
+                invitationContainerLock.Set();
                 this.invitingList_button.Text = "Zaproszenia (" + amount.ToString() + ")";
             }
             if (ilf != null)
+            {
+                invitationContainerLock.WaitOne();
+                invitationContainerLock.Reset();
                 ilf.updateInvitationList(invitationContainer);
+                invitationContainerLock.Set();
+            }
         }
 
         private static int compareFriendList(Friend x, Friend y)
@@ -165,7 +176,10 @@ namespace ClientWindows
             {
                 if(inv.status<2)
                 {
+                    invitationContainerLock.WaitOne();
+                    invitationContainerLock.Reset();
                     invitationContainer.Add(inv);
+                    invitationContainerLock.Set();
                 } else if(inv.status==2)
                 {
                     addToFriendContainer(new Friend(inv.inviteeUsername, 1));
@@ -176,7 +190,10 @@ namespace ClientWindows
 
         public void removeFromInvitingList(Invitation inv)
         {
+            invitationContainerLock.WaitOne();
+            invitationContainerLock.Reset();
             invitationContainer.Remove(inv);
+            invitationContainerLock.Set();
             /*if(inv.status==2)
             {
                 addToFriendContainer(new Friend(inv.username, 1)); //TODO: when accepting invitation it shows active user
@@ -361,9 +378,12 @@ namespace ClientWindows
 
         private void invitingList_button_Click(object sender, EventArgs e)
         {
+            invitationContainerLock.WaitOne();
+            invitationContainerLock.Reset();
             ilf = new InvitationListForm(invitationContainer);
             ilf.ShowDialog();
             ilf = null;
+            invitationContainerLock.Set();
         }
 
         private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
