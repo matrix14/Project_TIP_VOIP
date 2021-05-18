@@ -110,7 +110,7 @@ namespace ClientWindows
             this.Controls.Add(this.invitationsDataGrid);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "InvitationListForm";
-            this.Text = "InvitationListForm";
+            this.Text = "Zaproszenia";
             this.Load += new System.EventHandler(this.InvitationListForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.invitationsDataGrid)).EndInit();
             this.ResumeLayout(false);

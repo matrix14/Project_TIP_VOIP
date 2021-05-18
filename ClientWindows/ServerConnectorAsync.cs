@@ -20,7 +20,7 @@ namespace ClientWindows
     class ServerConnectorAsync
     {
         private static int port = 13579;
-        private static String address = Shared.IP.serverIp;
+        private static String address = "";
 
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
@@ -41,6 +41,7 @@ namespace ClientWindows
 
             try
             {
+                address = Program.setServ.getServerIP();
                 IPAddress ip = IPAddress.Parse(address);
                 IPEndPoint remoteAddr = new IPEndPoint(ip, port);
                 sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
