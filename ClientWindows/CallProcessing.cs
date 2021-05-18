@@ -14,7 +14,7 @@ namespace ClientWindows
     {
         private static int connectionPortRecv = 11000;
         private static int connectionPortSend = 11001;
-        private static String connectionIp = Shared.IP.serverIp;
+        private static String connectionIp;
 
         private static Boolean connectionExist = false;
 
@@ -39,6 +39,7 @@ namespace ClientWindows
 
         public static void Start()
         {
+            connectionIp = Program.setServ.getServerIP();
             IPAddress ip;
             IPAddress.TryParse(connectionIp, out ip);
 
@@ -139,7 +140,8 @@ namespace ClientWindows
                 ReceiveMessages();
             }catch(ObjectDisposedException)
             {
-                closeCallCallback();
+                if(Program.isInCall)
+                    closeCallCallback();
                 return;
             }
             catch (Exception e)

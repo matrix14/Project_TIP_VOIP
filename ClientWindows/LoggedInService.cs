@@ -313,7 +313,10 @@ namespace ClientWindows
                 else
                     removeUserFromCall(us.username);
             else
+            {
                 inviteToConversationReplyFromUser(ack);
+
+            }
         }
 
         public static void incomingCall(String message)

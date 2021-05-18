@@ -27,7 +27,7 @@ namespace ClientWindows
         {
             config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             appSettings = config.AppSettings;
-            Shared.IP.serverIp = this.getServerIP();
+            //Shared.IP.serverIp = this.getServerIP();
             if (!this.checkIOHash())
             {
                 saveIODevices(0, 0);
