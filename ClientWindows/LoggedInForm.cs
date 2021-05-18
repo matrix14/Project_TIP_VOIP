@@ -60,7 +60,7 @@ namespace ClientWindows
             LoggedInService.getFriends();
         }
 
-        public void updateInvitationButton()
+        public void updateInvitationButton()//TODO: update invitationListView also
         {
             if (this.invitingList_button.InvokeRequired)
             {

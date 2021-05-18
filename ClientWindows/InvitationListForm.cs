@@ -55,6 +55,7 @@ namespace ClientWindows
                     return;
                 processingInvitation.Add(inv);
                 LoggedInService.acceptInvitation(inv);
+                removeInvitationList(inv);
             }
             else if (e.ColumnIndex == invitationsDataGrid.Columns["declineButtons"].Index)
             {
@@ -63,7 +64,18 @@ namespace ClientWindows
                     return;
                 processingInvitation.Add(inv);
                 LoggedInService.declineInvitation(inv);
+                removeInvitationList(inv);
             }
+        }
+
+        private void removeInvitationList(Invitation inv)
+        {
+            if (this.invitationContainer.Contains(inv))
+            {
+                this.invitationContainer.Remove(inv);
+                updateInvitations();
+            }
+
         }
 
         public void updateInvitationList(List<Invitation> invitations)
