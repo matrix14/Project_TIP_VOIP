@@ -417,11 +417,13 @@ namespace ClientWindows
                     {
                         activeFriendStatus_Label.Text = "Aktywny";
                         activeFriendStatus_Label.ForeColor = Color.Green;
+                        //TODO asd
                     } else
                     {
                         activeFriendStatus_Label.Text = "Nieaktywny";
                         activeFriendStatus_Label.ForeColor = Color.Red;
                     }
+                    updateCallStatus(fr);
                     return;
                 }
             }
