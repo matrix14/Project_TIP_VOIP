@@ -312,9 +312,7 @@ namespace ClientWindows
                     addUserToCall(us.username);
                 else
                 {
-                    if (Program.actualCall == null)
-                        return;
-                    if(Program.actualCall.usernames.Contains(us.username))
+                    if(Program.actualCall != null&&Program.actualCall.usernames.Contains(us.username))
                         removeUserFromCall(us.username); //TODO: declined call if in call
                     else
                         inviteToConversationReplyFromUser(ack);
