@@ -140,7 +140,7 @@ namespace ClientWindows
                 ReceiveMessages();
             }catch(ObjectDisposedException)
             {
-                if(Program.isInCall)
+                if(Program.isInCall&&closeCallCallback!=null)
                     closeCallCallback();
                 return;
             }

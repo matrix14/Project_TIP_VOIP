@@ -10,12 +10,12 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            /*
+            
             if (args.Length == 1)
             {
                 Shared.IP.serverIp = args[0];
             }
-            */
+            
             ServerConnection s = new ServerConnection();
             //StartTests();
         }

@@ -23,6 +23,8 @@ namespace ClientWindows
         private int packetsCounter = 0;
         private int packetsCounter2 = 0;
 
+        private Boolean closingApp = false;
+
         private NoneCallback updateFriendViewOnClosing;
 
         CancellationTokenSource tokenSource = null;
@@ -112,12 +114,15 @@ namespace ClientWindows
             updateUsersInCall();
             if (this.call.usernames.Count == 0)
             {
-                this.Close();
+                if (!closingApp)
+                    this.Close();
             }
         }
 
         public void closeCall()
         {
+            if (closingApp)
+                return;
             if (this.InvokeRequired)
             {
                 this.Invoke(new MethodInvoker(() => { closeCall(); }));
@@ -167,23 +172,28 @@ namespace ClientWindows
 
         private void leaveCall_button_Click(object sender, EventArgs e)
         {
+            if (closingApp)
+                return;
             this.Close();
         }
 
         private void InCallForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (closingApp == true)
+                return;
+            closingApp = true;
             Program.actualCall = null;
+            Program.isInCall = false;
+            Program.spGlobal = null;
             if (this.callId == null) return;
             packetsCounterTimer.Stop();
             tokenSource.Cancel();
             sp.stop();
-            Program.spGlobal = null;
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
             CallProcessing.SendMessages(BitConverter.GetBytes(callId.id));
             CallProcessing.Stop();
             LoggedInService.declineCall(this.callId);
-            Program.isInCall = false;
             if (updateFriendViewOnClosing != null)
                 updateFriendViewOnClosing();
         }
