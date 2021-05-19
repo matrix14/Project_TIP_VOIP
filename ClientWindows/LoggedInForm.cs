@@ -391,7 +391,7 @@ namespace ClientWindows
             invitationContainerLock.WaitOne();
             invitationContainerLock.Reset();
             ilf = new InvitationListForm(invitationContainer);
-            ilf.ShowDialog();
+            ilf.Show();
             ilf = null;
             invitationContainerLock.Set();
         }
