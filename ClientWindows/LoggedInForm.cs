@@ -82,7 +82,7 @@ namespace ClientWindows
                 invitationContainerLock.Set();
                 this.invitingList_button.Text = "Zaproszenia (" + amount.ToString() + ")";
             }
-            if (ilf != null)
+            if (ilf != null&&ilf.IsDisposed==false)
             {
                 invitationContainerLock.WaitOne();
                 invitationContainerLock.Reset();
@@ -392,7 +392,6 @@ namespace ClientWindows
             invitationContainerLock.Reset();
             ilf = new InvitationListForm(invitationContainer);
             ilf.Show();
-            ilf = null;
             invitationContainerLock.Set();
         }
 

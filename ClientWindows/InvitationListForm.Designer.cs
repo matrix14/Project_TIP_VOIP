@@ -111,6 +111,7 @@ namespace ClientWindows
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "InvitationListForm";
             this.Text = "Zaproszenia";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.InvitationListForm_FormClosing);
             this.Load += new System.EventHandler(this.InvitationListForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.invitationsDataGrid)).EndInit();
             this.ResumeLayout(false);

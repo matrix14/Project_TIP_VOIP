@@ -279,5 +279,10 @@ namespace ClientWindows
             SettingsForm sf = new SettingsForm();
             sf.ShowDialog();
         }
+
+        private void actualMode_Label_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

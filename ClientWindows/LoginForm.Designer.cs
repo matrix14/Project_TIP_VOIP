@@ -118,6 +118,7 @@ namespace ClientWindows
             this.actualMode_Label.Size = new System.Drawing.Size(103, 24);
             this.actualMode_Label.TabIndex = 7;
             this.actualMode_Label.Text = "Logowanie";
+            this.actualMode_Label.Click += new System.EventHandler(this.actualMode_Label_Click);
             // 
             // usernameFree_label
             // 
