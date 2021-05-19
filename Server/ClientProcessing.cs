@@ -569,7 +569,7 @@ namespace Server
             Id conversationId = MessageProccesing.DeserializeObject(msg) as Id;
             // If user isint logged return error
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
-
+            int activeConversationId = activeUsers[clientId].dbConnection.GetActiveConversationId(activeUsers[clientId].username);
             lock (activeUsers[clientId].dbConnection)
                 activeUsers[clientId].dbConnection.DeleteFromConversation(activeUsers[clientId].username,conversationId);
             // Notyfiy other participans about leacing conversation
@@ -582,7 +582,8 @@ namespace Server
                 whichFunction[participant].Add(new Tuple<Options, string>(Options.DECLINED_CALL, activeUsers[clientId].username));
                 eventHandlers[participant].Set();
             }
-            if (activeUsers[clientId].dbConnection.GetActiveConversationId(activeUsers[clientId].username) != conversationId)
+            
+            if (activeConversationId != conversationId.id)
                 return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
             throw new CustomException(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, conversationId));
         }

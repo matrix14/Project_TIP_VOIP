@@ -16,7 +16,7 @@ namespace DbLibrary
 
         public int GetActiveConversationId(string username)
         {
-            string query = string.Format("SELECT status FROM conversations WHERE user_id = {0} and status= 2", GetUserId(username));
+            string query = string.Format("SELECT conversation_id FROM conversations WHERE user_id = {0} and status= 2", GetUserId(username));
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
 

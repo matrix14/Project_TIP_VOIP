@@ -146,7 +146,8 @@ namespace Server
                     menager.Disconnect(clientId);
                     Console.WriteLine(e.Message);
                     break;
-                }                
+                }   
+                
             }
         }
 
