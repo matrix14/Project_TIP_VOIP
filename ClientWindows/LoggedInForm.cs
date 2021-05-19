@@ -307,7 +307,7 @@ namespace ClientWindows
             for (int i = Application.OpenForms.Count - 1; i >= 0; i--)
             {
                 if ((Application.OpenForms[i].Name != "LoginForm")&&(Application.OpenForms[i].Name != "LoggedInForm"))
-                    Application.OpenForms[i].Close(); //TODO: invoke
+                    Application.OpenForms[i].Close(); //TODO: invoke ???
             }
             LoggedInService.logout();
         }
