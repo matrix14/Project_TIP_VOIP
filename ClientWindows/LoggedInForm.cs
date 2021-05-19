@@ -482,7 +482,9 @@ namespace ClientWindows
                     callUser.Enabled = true;
                     callingStatusLabel.Text = "Odrzucono połączenie!";
                     callingStatusLabel.ForeColor = Color.Red;
-                    LoggedInService.declineCall(lastCallId);
+                    if(!Program.isInCall) {
+                        LoggedInService.declineCall(lastCallId);
+                    }
                 }
             }
         }
