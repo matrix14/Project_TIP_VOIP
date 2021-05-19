@@ -571,7 +571,7 @@ namespace Server
             if (!activeUsers[clientId].logged) return MessageProccesing.CreateMessage(ErrorCodes.NOT_LOGGED_IN);
 
             lock (activeUsers[clientId].dbConnection)
-                activeUsers[clientId].dbConnection.DeleteFromConversation(activeUsers[clientId].username);
+                activeUsers[clientId].dbConnection.DeleteFromConversation(activeUsers[clientId].username,conversationId);
             // Notyfiy other participans about leacing conversation
             List<string> conversationsParticipansList = new List<string>();
             lock (activeUsers[clientId].dbConnection)
@@ -582,6 +582,8 @@ namespace Server
                 whichFunction[participant].Add(new Tuple<Options, string>(Options.DECLINED_CALL, activeUsers[clientId].username));
                 eventHandlers[participant].Set();
             }
+            if (activeUsers[clientId].dbConnection.GetActiveConversationId(activeUsers[clientId].username) != conversationId)
+                return MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
             throw new CustomException(MessageProccesing.CreateMessage(Options.LEAVE_CONVERSATION, conversationId));
         }
 

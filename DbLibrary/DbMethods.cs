@@ -195,10 +195,10 @@ namespace DbLibrary
             return GetConversationId(invitor);
         }
 
-        public void DeleteFromConversation(string username)
+        public void DeleteFromConversation(string username,int conversationId)
         {
             string Id = GetUserId(username).ToString();
-            string query = String.Format("DELETE FROM conversations WHERE user_id = {0}", Id);
+            string query = String.Format("DELETE FROM conversations WHERE user_id = {0} and conversation_id = {1}", Id, conversationId);
             MySqlCommand cmd = new MySqlCommand(query, connection);
             MySqlDataReader dataReader = cmd.ExecuteReader();
             dataReader.Close();

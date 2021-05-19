@@ -35,10 +35,11 @@ namespace Server
 
 
         public void RunServer()
-        {
+        {      
             // Create a TCP/IP (IPv4) socket and listen for incoming connections.
             TcpListener listener = new TcpListener(IPAddress.Parse(IP.serverIp), 13579);
             listener.Start();
+            Console.WriteLine("Uruchomiono serwer");
             while (true)
             {
                 TcpClient client = listener.AcceptTcpClient();
@@ -87,7 +88,7 @@ namespace Server
                         decoder.GetChars(buffer, 0, bytes, chars, 0);
                         messageData.Append(chars);
                     } while (stream.DataAvailable);
-
+                    Console.WriteLine("Inc       : " + messageData.ToString() + clientId.ToString() + "\n");
                     try
                     {
                         //Prepare response
@@ -180,7 +181,7 @@ namespace Server
                     foreach (string message in messagesToSend)
                     {
                         byte[] send = Encoding.ASCII.GetBytes(message);
-                        Console.WriteLine("async message: " + message + " reciverId: " + clientId.ToString() + "\n");
+                        //Console.WriteLine("async message: " + message + " reciverId: " + clientId.ToString() + "\n");
                         stream.Write(send);
                     }
                     messagesToSend.Clear();
