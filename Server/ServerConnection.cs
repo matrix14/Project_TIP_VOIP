@@ -326,6 +326,7 @@ namespace Server
                         toSend[conversationId][clientIp].TryDequeue(out byte[] data);
                         foreach (var reciver in conversationsParticipans[conversationId])
                         {
+                            if (reciver.Address != clientIp)
                             s.SendTo(data, reciver);
                         }
                         userNewVoiceHandler[clientIp].Reset();
@@ -359,7 +360,7 @@ namespace Server
 
             if (receiveBytes.Length == 4 && BitConverter.ToInt32(receiveBytes, 0) == conversationId)
             {
-                lock (toSend[conversationId])
+                lock (toSend)
                 {
                     if (toSend[conversationId].ContainsKey(clientIp))
                     {
