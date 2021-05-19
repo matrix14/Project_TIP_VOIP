@@ -325,7 +325,7 @@ namespace ClientWindows
             callUser.Visible = true;
         }
 
-        public void updateCallStatus(Friend fr)
+        public void updateCallStatus(Friend fr) //TODO: uzytkownik w rozmowie = false
         {
             if (this.InvokeRequired)
             {
@@ -334,6 +334,14 @@ namespace ClientWindows
             }
             if (this.activeUserWindow.Text != fr.username)
                 return;
+
+            if(fr.active==0)
+            {
+                this.callUser.Enabled = false;
+                this.callUser.Text = "Użytkownik nie jest aktywny";
+                return;
+            }
+
             if (Program.isInCall)
             {
                 if (Program.actualCall == null)
@@ -364,7 +372,7 @@ namespace ClientWindows
             activeUserWindow.Text = fr.username;
             this.callingStatusLabel.Visible = false;
             updateCallStatus(fr);
-            callUser.Enabled = (fr.active == 1);
+            //callUser.Enabled = (fr.active == 1);
             if (callUser.Enabled)
             {
                 activeFriendStatus_Label.Text = "Aktywny";

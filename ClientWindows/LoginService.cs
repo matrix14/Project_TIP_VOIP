@@ -78,6 +78,7 @@ namespace ClientWindows
                     MessageBox.Show(msg, title, buttons);
                     break;
             }
+            //TODO: change username is not free
         }
 
         public static void checkIsUserExist(String username)
