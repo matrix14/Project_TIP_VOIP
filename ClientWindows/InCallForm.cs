@@ -114,7 +114,8 @@ namespace ClientWindows
             updateUsersInCall();
             if (this.call.usernames.Count == 0)
             {
-                this.Close();
+                if (!closingApp)
+                    this.Close();
             }
         }
 
@@ -171,6 +172,8 @@ namespace ClientWindows
 
         private void leaveCall_button_Click(object sender, EventArgs e)
         {
+            if (closingApp)
+                return;
             this.Close();
         }
 
