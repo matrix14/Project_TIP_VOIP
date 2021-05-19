@@ -19,6 +19,7 @@ namespace ClientWindows
         private System.Timers.Timer checkUsernameTimer = new System.Timers.Timer();
         private System.Timers.Timer checkConnectionTimer = new System.Timers.Timer();
         private Boolean checkUsernameTimerStopped = true;
+        private Boolean firstConnectionDone = false;
 
         private Boolean connectionAlive = false;
         public LoginForm()
@@ -40,6 +41,9 @@ namespace ClientWindows
 
             BooleanCallback callback2 = onLogin;
             LoginService.OnLoginCallback = callback2;
+
+            BooleanCallback callback3 = onRegistered;
+            LoginService.OnRegisterCallback = callback3;
 
             checkConnectionTimer.Start();
         }
@@ -97,6 +101,30 @@ namespace ClientWindows
                     this.usernameFree_label.Text = "Login dostępny";
                     this.usernameFree_label.ForeColor = Color.Green;
                     this.confirmAction_button.Enabled = true;
+                }
+                return;
+            }
+        }
+
+        public void onRegistered(Boolean succesfull)
+        {
+            if (usernameFree_label.InvokeRequired)
+            {
+                usernameFree_label.Invoke(new MethodInvoker(() => { usernameCheckUpdateInfo(succesfull); }));
+                return;
+            }
+            else
+            {
+                if (succesfull)
+                {
+                    this.usernameFree_label.Text = "Login niedostępny!";
+                    this.usernameFree_label.ForeColor = Color.Red;
+                    this.confirmAction_button.Enabled = false;
+                } else
+                {
+                    this.login_textbox.Text = "";
+                    this.password_textbox.Text = "";
+                    this.usernameFree_label.Visible = false;
                 }
                 return;
             }
@@ -207,8 +235,12 @@ namespace ClientWindows
             {
                 if (connectionAlive)
                 {
-                    this.changeMode_button.Enabled = true;
-                    this.confirmAction_button.Enabled = true;
+                    if (firstConnectionDone==false)
+                    {
+                        this.changeMode_button.Enabled = true;
+                        this.confirmAction_button.Enabled = true;
+                        firstConnectionDone = true;
+                    }
                     this.serverConnection_Label.Text = "Połączono";
                     this.serverConnection_Label.ForeColor = Color.Green;
                 }

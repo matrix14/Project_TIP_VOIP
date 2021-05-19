@@ -12,9 +12,12 @@ namespace ClientWindows
     {
         private static BooleanCallback checkUsernameCallback;
         private static BooleanCallback onLoginCallback;
+        private static BooleanCallback onRegisterCallback;
 
         public static BooleanCallback CheckUsernameCallback { get => checkUsernameCallback; set => checkUsernameCallback = value; }
         public static BooleanCallback OnLoginCallback { get => onLoginCallback; set => onLoginCallback = value; }
+
+        public static BooleanCallback OnRegisterCallback { get => onRegisterCallback; set => onRegisterCallback = value; }
 
         public static void login(String username, String pass)
         {
@@ -72,10 +75,12 @@ namespace ClientWindows
                 case ErrorCodes.NO_ERROR:
                     msg = "Pomyślnie zarejestrowano! Proszę się zalogować.";
                     MessageBox.Show(msg, title, buttons);
+                    Task.Run(() => onRegisterCallback(true));
                     break;
                 case ErrorCodes.USER_ALREADY_EXISTS:
                     msg = "Taki użytkownik już istnieje!";
                     MessageBox.Show(msg, title, buttons);
+                    Task.Run(() => onRegisterCallback(false));
                     break;
             }
             //TODO: change username is not free
