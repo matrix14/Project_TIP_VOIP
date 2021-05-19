@@ -105,13 +105,13 @@ namespace Server
                         if (option == Options.JOIN_CONVERSATION)
                         {
                             if (udpTask != null) await udpTask;
-                            udpTask = Task.Run(() => UdpWritev2(clientIp,IP.clientPort, conversationId.id, udpToken), udpToken);
+                            udpTask = Task.Run(() => UdpWrite(clientIp,IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
                         }
                         else if(option == Options.CREATE_UDP)
                         {
                             if (udpTask != null) await udpTask;
-                            udpTask = Task.Run(() => UdpWritev2(clientIp, IP.clientPort, conversationId.id, udpToken), udpToken);
+                            udpTask = Task.Run(() => UdpWrite(clientIp, IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
                         }
                         else if(option == Options.LEAVE_CONVERSATION)
@@ -326,7 +326,6 @@ namespace Server
                         toSend[conversationId][clientIp].TryDequeue(out byte[] data);
                         foreach (var reciver in conversationsParticipans[conversationId])
                         {
-                            if (reciver.Address != clientIp)
                             s.SendTo(data, reciver);
                         }
                         userNewVoiceHandler[clientIp].Reset();
@@ -346,7 +345,7 @@ namespace Server
             while (true)
             {
                 byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
-                PrepareDatav2(RemoteIpEndPoint.Address, receiveBytes);
+                PrepareData(RemoteIpEndPoint.Address, receiveBytes);
 
             }
         }
@@ -360,7 +359,7 @@ namespace Server
 
             if (receiveBytes.Length == 4 && BitConverter.ToInt32(receiveBytes, 0) == conversationId)
             {
-                lock (toSend)
+                lock (toSend[conversationId])
                 {
                     if (toSend[conversationId].ContainsKey(clientIp))
                     {
@@ -386,7 +385,7 @@ namespace Server
             toSend = new Dictionary<int, Dictionary<IPAddress, ConcurrentQueue<byte[]>>>();
             conversationsParticipans = new Dictionary<int, ConcurrentBag<IPEndPoint>>();
 
-            Task.Run(() => { UdpReadv2(); });
+            Task.Run(() => { UdpRead(); });
             RunServer();
         }
     }
