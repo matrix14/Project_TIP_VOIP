@@ -367,6 +367,7 @@ namespace ClientWindows
         {
             ListBox lb = (ListBox)sender;
             if (lb.SelectedIndex == -1) return;
+            if (lb.Items[lb.SelectedIndex].Equals("Wczytywanie...")) return;
             Friend fr = (Friend)lb.Items[lb.SelectedIndex];
             actualFriendView = fr;
             activeUserWindow.Text = fr.username;
