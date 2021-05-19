@@ -149,7 +149,9 @@ namespace ClientWindows
                 ReceiveObject ro = new ReceiveObject();
                 sock.BeginReceive(ro.buffer, 0, ReceiveObject.MAX_BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), ro);
 
-            } catch (Exception e)
+            }
+            catch (SocketException) { return; }
+            catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
                 return;
@@ -195,8 +197,8 @@ namespace ClientWindows
                 }
                 connectDone.Set();
             } 
-            catch(ObjectDisposedException) { } //When cannot connect
-            catch(SocketException) { } //When cannot connect
+            catch(ObjectDisposedException) { return; } //When cannot connect
+            catch(SocketException) { return; } //When cannot connect
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
