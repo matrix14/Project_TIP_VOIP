@@ -733,6 +733,7 @@ namespace Server
             {
                 lock (activeUsers[clientId].dbConnection)
                 {
+                    if (activeUsers[clientId].username != "")
                     activeUsers[clientId].dbConnection.SetUserActivity(activeUsers[clientId].username, false);
                     activeUsers[clientId].dbConnection.CloseConnection();
                 }
