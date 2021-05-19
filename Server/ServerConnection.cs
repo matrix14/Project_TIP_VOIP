@@ -105,13 +105,13 @@ namespace Server
                         if (option == Options.JOIN_CONVERSATION)
                         {
                             if (udpTask != null) await udpTask;
-                            udpTask = Task.Run(() => UdpWrite(clientIp,IP.clientPort, conversationId.id, udpToken), udpToken);
+                            udpTask = Task.Run(() => UdpWritev2(clientIp,IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR);
                         }
                         else if(option == Options.CREATE_UDP)
                         {
                             if (udpTask != null) await udpTask;
-                            udpTask = Task.Run(() => UdpWrite(clientIp, IP.clientPort, conversationId.id, udpToken), udpToken);
+                            udpTask = Task.Run(() => UdpWritev2(clientIp, IP.clientPort, conversationId.id, udpToken), udpToken);
                             sendMessage = MessageProccesing.CreateMessage(ErrorCodes.NO_ERROR,conversationId);
                         }
                         else if(option == Options.LEAVE_CONVERSATION)
@@ -345,7 +345,7 @@ namespace Server
             while (true)
             {
                 byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
-                PrepareData(RemoteIpEndPoint.Address, receiveBytes);
+                PrepareDatav2(RemoteIpEndPoint.Address, receiveBytes);
 
             }
         }
@@ -385,7 +385,7 @@ namespace Server
             toSend = new Dictionary<int, Dictionary<IPAddress, ConcurrentQueue<byte[]>>>();
             conversationsParticipans = new Dictionary<int, ConcurrentBag<IPEndPoint>>();
 
-            Task.Run(() => { UdpRead(); });
+            Task.Run(() => { UdpReadv2(); });
             RunServer();
         }
     }
