@@ -78,6 +78,9 @@ namespace ClientWindows
                 checkUsernameTimer.Stop();
                 checkUsernameTimer.Start();
                 checkUsernameTimerStopped = false;
+            } else
+            {
+                this.usernameFree_label.Visible = false;
             }
         }
 
@@ -93,12 +96,14 @@ namespace ClientWindows
                 if (exist)
                 {
                     this.usernameFree_label.Text = "Login niedostępny!";
+                    this.usernameFree_label.Visible = true;
                     this.usernameFree_label.ForeColor = Color.Red;
                     this.confirmAction_button.Enabled = false;
                 }
                 else
                 {
                     this.usernameFree_label.Text = "Login dostępny";
+                    this.usernameFree_label.Visible = true;
                     this.usernameFree_label.ForeColor = Color.Green;
                     this.confirmAction_button.Enabled = true;
                 }
@@ -119,6 +124,7 @@ namespace ClientWindows
                 {
                     this.usernameFree_label.Text = "Login niedostępny!";
                     this.usernameFree_label.ForeColor = Color.Red;
+                    this.usernameFree_label.Visible = true;
                     this.confirmAction_button.Enabled = false;
                 } else
                 {
