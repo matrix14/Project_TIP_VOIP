@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -166,6 +167,12 @@ namespace ClientWindows
             }
         }
 
+        private Boolean checkPass(String pass)
+        {
+            Regex rgx = new Regex("(?=.*[!\"#%&'()*+,\\-\\.:<>=?@\\[\\]\\^_{}|~])(?=.*[A-Z])(?=.*[0-9])(?!.*\\$).{8,255}");
+            return rgx.IsMatch(pass);
+        }
+
         private void confirmAction_button_Click(object sender, EventArgs e)
         {
             if (this.registerMode)
@@ -175,9 +182,9 @@ namespace ClientWindows
                     MessageBox.Show("Login nie może być krótszy niż 3 znaki!");
                     return;
                 }
-                if (this.password_textbox.Text.Length < 3)
+                if (!checkPass(this.password_textbox.Text))
                 {
-                    MessageBox.Show("Hasło nie może być krótsze niż 3 znaki!");
+                    MessageBox.Show("Hasło nie może być krótsze niż 8 znaków, musi posiadać minimum: 1 znak specjalny, 1 wielką literę, 1 cyfrę!");
                     return;
                 }
                 LoginService.register(this.login_textbox.Text, this.password_textbox.Text);

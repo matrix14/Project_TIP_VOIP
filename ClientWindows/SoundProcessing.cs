@@ -36,7 +36,6 @@ namespace ClientWindows
 
         public void startUp(List<string> activeUsers, CancellationToken token)
         {
-            
             WaveFormat format = new WaveFormat(16000, 16, 1);
             recorder = new WaveInEvent()
             {
@@ -59,7 +58,6 @@ namespace ClientWindows
             player.Init(mixingSampleProvider);
 
             int waveInDevices = WaveIn.DeviceCount;
-            //WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(0);
 
             recorder.StartRecording();
             while (true)
@@ -206,9 +204,8 @@ namespace ClientWindows
         public void incomingEncodedSound(byte[] inMsg)
         {
             if(speakerStatus==false)
-            {
                 return;
-            }
+
             int position = 0;
             foreach (byte b in inMsg)
             {
@@ -226,15 +223,25 @@ namespace ClientWindows
             string username = Encoding.ASCII.GetString(usernameBytes);
 
             if(username==Program.username)
-            {
                 return;
-            }
 
             byte[] soundRaw = DecodeSamples(sound);
 
             if ((!this.multipleBufWaveProv.ContainsKey(username))||this.multipleBufWaveProv[username]==null)
                 return;
             this.multipleBufWaveProv[username].AddSamples(soundRaw, 0, soundRaw.Length);
+        }
+        private static byte[] DecodeSamples(byte[] data)
+        {
+            byte[] decoded = new byte[data.Length * 2];
+            int outIndex = 0;
+            for (int n = 0; n < data.Length; n++)
+            {
+                short decodedSample = MuLawDecoder.MuLawToLinearSample(data[n]);
+                decoded[outIndex++] = (byte)(decodedSample & 0xFF);
+                decoded[outIndex++] = (byte)(decodedSample >> 8);
+            }
+            return decoded;
         }
 
         private void RecorderOnDataAvailable(object sender, WaveInEventArgs waveInEventArgs)
@@ -264,19 +271,6 @@ namespace ClientWindows
                 encoded[outIndex++] = MuLawEncoder.LinearToMuLawSample(BitConverter.ToInt16(data, n));
 
             return encoded;
-        }
-
-        private static byte[] DecodeSamples(byte[] data)
-        {
-            byte[] decoded = new byte[data.Length * 2];
-            int outIndex = 0;
-            for (int n = 0; n < data.Length; n++)
-            {
-                short decodedSample = MuLawDecoder.MuLawToLinearSample(data[n]);
-                decoded[outIndex++] = (byte)(decodedSample & 0xFF);
-                decoded[outIndex++] = (byte)(decodedSample >> 8);
-            }
-            return decoded;
         }
     }
 }

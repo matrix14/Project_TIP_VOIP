@@ -44,9 +44,7 @@ namespace ClientWindows
             IPAddress.TryParse(connectionIp, out ip);
 
             IPEndPoint eRecv = new IPEndPoint(ip, connectionPortRecv);
-            //IPEndPoint eSend = new IPEndPoint(ip, connectionPortSend);
             UdpClient uRecv = new UdpClient(connectionPortRecv);
-            //UdpClient uSend = new UdpClient(eSend);
 
             Socket sSend = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
@@ -56,7 +54,6 @@ namespace ClientWindows
             udpState.ePointSend = eSend;
             udpState.uClientRecv = uRecv;
             udpState.socketSend = sSend;
-            //udpState.uClientSend = uSend;
 
             connectionExist = true;
 
@@ -69,7 +66,6 @@ namespace ClientWindows
         {
             connectionExist = false;
             udpState.uClientRecv.Close();
-            //udpState.uClientSend.Close();
             udpState.socketSend.Close();
             udpState.ePointRecv = null;
             udpState.ePointSend = null;
