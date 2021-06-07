@@ -6,6 +6,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
+using System.Windows.Forms;
 
 namespace ClientWindows
 {
@@ -18,42 +20,101 @@ namespace ClientWindows
     class ServerConnectorAsync
     {
         private static int port = 13579;
-        private static String address = "127.0.0.1";
+        private static String address = "";
 
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
-        private static String reply = String.Empty;
+        private static System.Timers.Timer connectionTimer = new System.Timers.Timer();
 
         private static Socket sock;
 
+        public static Boolean closingApp = false;
+
+
         public static void StartConnection()
         {
+            connectionTimer.Interval = 5000;
+            connectionTimer.Elapsed += new ElapsedEventHandler(connectionTimerOnTimerElapsed);
+            connectionTimer.AutoReset = false;
+
+            try
+            {
+                address = Program.setServ.getServerIP();
+                IPAddress ip = IPAddress.Parse(address);
+                IPEndPoint remoteAddr = new IPEndPoint(ip, port);
+                sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
+                connectionTimer.Start();
+            } catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
+                return;
+            }
+        }
+        public static void StopConnection()
+        {
+            try
+            {
+                sock.Shutdown(SocketShutdown.Both);
+                sock.Close();
+            } catch(SocketException)
+            {
+                return;
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString());
+            }
+        }
+        private static void connectionTimerOnTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            if (sock.Connected)
+            {
+                connectionTimer.Stop();
+            } else
+            {
+                connectionTimer.Stop();
+                Reconnect();
+            }
+        }
+        public static void Reconnect()
+        {
+            sock.Close();
             try
             {
                 IPAddress ip = IPAddress.Parse(address);
                 IPEndPoint remoteAddr = new IPEndPoint(ip, port);
                 sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 sock.BeginConnect(remoteAddr, new AsyncCallback(ConnectCallback), sock);
-                connectDone.WaitOne();
-            } catch (Exception e)
+                connectionTimer.Start();
+            }
+            catch (Exception e)
             {
-                return; //TODO Add message for client when problem
+                MessageBox.Show(e.ToString());
+                return;
             }
         }
-
-        public static void StopConnection()
-        {
-            sock.Shutdown(SocketShutdown.Both);
-            sock.Close();
-        }
-
         public static void SendMessage(String message)
         {
-            byte[] byteData = Encoding.ASCII.GetBytes(message);
-            sock.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), sock);
-            sendDone.WaitOne();
+            try
+            {
+                byte[] byteData = Encoding.ASCII.GetBytes(message);
+                sock.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), sock);
+            } catch(System.Net.Sockets.SocketException)
+            {
+                if(!sock.Connected)
+                {
+                    MessageBox.Show("Połaczenie z serwerem utracone! Proszę zrestartować aplikacje!");
+                }
+            } 
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
+                return;
+            }
+            //sendDone.WaitOne();
         }
 
         private static void SendCallback(IAsyncResult res)
@@ -65,13 +126,14 @@ namespace ClientWindows
                 sendDone.Set();
             } catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
-                //TODO implement fault
             }
         }
 
         public static void ReceiveWhile()
         {
+            connectDone.WaitOne();
             do
             {
                 Receive();
@@ -87,10 +149,12 @@ namespace ClientWindows
                 ReceiveObject ro = new ReceiveObject();
                 sock.BeginReceive(ro.buffer, 0, ReceiveObject.MAX_BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), ro);
 
-            } catch (Exception e)
+            }
+            catch (SocketException) { return; }
+            catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
-                //TODO Implement faults
             }
         }
 
@@ -107,10 +171,17 @@ namespace ClientWindows
                 }
                 receiveDone.Set();
             }
+            catch(SocketException) //when server crash or close
+            {
+                if (closingApp)
+                    return;
+                MessageBox.Show("Utracono połaczenie z serwerem, uruchom aplikacje ponownie!");
+                System.Windows.Forms.Application.Exit();
+            }
             catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
-                //TODO Implement faults
             }
         }
 
@@ -120,12 +191,26 @@ namespace ClientWindows
             {
                 Socket sockInt = (Socket)res.AsyncState;
                 sockInt.EndConnect(res);
+                if(sockInt.Connected)
+                {
+                    connectionTimer.Stop();
+                }
                 connectDone.Set();
-            } catch (Exception e)
+            } 
+            catch(ObjectDisposedException) { return; } //When cannot connect
+            catch(SocketException) { return; } //When cannot connect
+            catch (Exception e)
             {
+                MessageBox.Show(e.ToString());
                 return;
-                //TODO Implement faults
             }
+        }
+
+        public static Boolean getConnectionState()
+        {
+            if (sock == null)
+                return false;
+            return sock.Connected;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿﻿using MySql.Data.MySqlClient;
-
+using MySql.Data.MySqlClient;
 namespace DbLibrary
 {
     public abstract class DbConnection

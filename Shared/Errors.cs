@@ -23,5 +23,6 @@ namespace Shared
         // Conversation
         CONVERSATION_ALREADY_STARTED = 13,
         WRONG_CONVERSATION_ID = 14,
+        USER_OFFLINE = 15,
     }
 }

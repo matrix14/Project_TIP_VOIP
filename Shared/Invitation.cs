@@ -12,6 +12,7 @@ namespace Shared
         /// 0 - Created 1 - Sended 2 - Accepted 3 - Declined
         /// </summary>
         public int status;
+
         public DateTime date;
 
         public Invitation(string sender, int invitationId, string inviteeUsername,int status) : base(sender)
@@ -24,6 +25,10 @@ namespace Shared
         public Invitation() : base()
         {
             this.status = 0;
+        }
+        public override string ToString()
+        {
+            return this.username;
         }
 
     }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using Shared;
 namespace Server
 {
@@ -8,6 +10,13 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            
+            if (args.Length == 1)
+            {
+                Shared.IP.serverIp = args[0];
+            }
+            
+            ServerConnection s = new ServerConnection();
             //StartTests();
         }
 
@@ -34,12 +43,12 @@ namespace Server
 
         public static string AcceptFriend(int clientId,int invitationId, ClientProcessing cp)
         {
-            return cp.AcceptFriend(MessageProccesing.CreateMessage<InvitationId>(Options.ACCEPT_FRIEND, new InvitationId(invitationId)), clientId);
+            return cp.AcceptFriend(MessageProccesing.CreateMessage<Id>(Options.ACCEPT_FRIEND, new Id(invitationId)), clientId);
         }
 
         public static string DeclineFriend(int clientId, int invitationId, ClientProcessing cp)
         {
-            return cp.DeclineFriend(MessageProccesing.CreateMessage<InvitationId>(Options.DECLINE_FRIEND, new InvitationId(invitationId)), clientId);
+            return cp.DeclineFriend(MessageProccesing.CreateMessage<Id>(Options.DECLINE_FRIEND, new Id(invitationId)), clientId);
         }
 
         public static string SendInvitations(int clientId, ClientProcessing cp)
